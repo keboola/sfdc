@@ -1,0 +1,75 @@
+
+.pageHeader {
+	overflow: hidden;
+	padding: 1em 20px 1em;
+	margin:  0 0 1em;
+	background:  #111;
+	color: #eee;
+}
+.pageHeader img {
+	float: right;
+}
+.pageHeader h1 {
+	margin:  0;
+}
+
+
+.pageContent {
+	margin: 1em 5% 2em;
+	font-size: 1.2em;
+}
+.pageContent p {
+	overflow: hidden;
+}
+.pageContent img {
+	border:  solid 2px #627aac;
+}
+
+.infoBox {
+	border: solid 3px #999;
+	background: #ccc;
+	margin: 0 0 1em;
+	padding: 1em 20px;
+}
+p.error {
+	border: solid 3px #ea2803;
+	background: #f3c5bd;
+	color: #ea2803;
+	padding: .5em 20px;
+}
+
+#preview {
+	position: absolute;
+	border: solid 3px #627aac;
+	display: none;
+}
+
+
+div.formElement {
+	overflow: visible;
+}
+form strong.error,
+form ul.errors {
+	font-weight: bold;
+	float: left;
+	text-align: right;
+	display: block;
+	width: 100%;
+	margin-left: 0;
+}
+form strong.error,
+form ul.errors li {
+	color: #ea2803;
+	list-style: none;
+}
+
+ul li, ol li {
+	margin-bottom: .5em;
+}
+
+
+.formCaptcha img {
+	float: right;
+	margin-bottom: .5em;
+	cursor: pointer;
+}

@@ -1,0 +1,29 @@
+<div class="errorMessage"><em><span class="alt">Error </span></em><?=$this->message?></div>
+<p><?=$this->info?></p>
+
+<? if (APPLICATION_ENV=='development' && $this->exception) { ?>
+	<div class="errorDebugInfo">
+		<? if ($this->debugInfo) { ?>
+		<h3>Debug info:</h3>
+		<div class="debugInfo">
+			<p>
+				<?
+					if (is_string($this->debugInfo)) {
+						echo '<pre>' . htmlspecialchars($this->debugInfo) . '</pre>';
+					} else {
+						vd($this->debugInfo);
+					}
+				?>
+			</p>
+		</div>
+		<? } ?>
+		<h3>Error code:</h3>
+		<div class="debugInfo"> <?= $this->exception->getCode() ?></div>
+
+		<h3>Stack trace:</h3>
+		<div class="debugInfo"><pre><?= $this->exception->getTraceAsString() ?></pre></div>
+
+		<h3>Request Parameters:</h3>
+		<div class="debugInfo"><pre><? var_dump($this->request->getParams()) ?></pre></div>
+	</div>
+<? } ?>

@@ -1,0 +1,42 @@
+<schema>
+	<name>AW_Campaigns</name>
+	<columns>
+		<column>
+			<name>id</name>
+			<title>ID (AW_Campaigns)</title>
+			<ldmType>CONNECTION_POINT</ldmType>
+			<folder>AW_Campaigns</folder>
+		</column>
+        <column>
+            <name>idAccount</name>
+            <title>ID (AW_Accounts)</title>
+            <ldmType>REFERENCE</ldmType>
+            <reference>id</reference>
+            <schemaReference>AW_Accounts</schemaReference>
+            <folder>AW_Campaigns</folder>
+        </column>
+		<column>
+			<name>name</name>
+			<title>Name (AW_Campaigns)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(100)</dataType>
+			<folder>AW_Campaigns</folder>
+		</column>
+		<column>
+			<name>startDate</name>
+			<title>Start Date (AW_Campaigns)</title>
+			<ldmType>DATE</ldmType>
+			<format>yyyy-MM-dd</format>
+			<schemaReference>AW_CampaignStartDate</schemaReference>
+			<folder>AW_Campaigns</folder>
+		</column>
+		<column>
+			<name>endDate</name>
+			<title>End Date (AW_Campaigns)</title>
+			<ldmType>DATE</ldmType>
+			<format>yyyy-MM-dd</format>
+			<schemaReference>AW_CampaignEndDate</schemaReference>
+			<folder>AW_Campaigns</folder>
+		</column>
+	</columns>
+</schema>
