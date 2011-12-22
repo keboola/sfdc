@@ -116,7 +116,7 @@ class App_GoodData
 		echo "\n".'*** Create dataset: '.basename($xml)."\n";
 		$maqlFile = ROOT_PATH.'/tmp/temp.maql';
 
-		$command = 'LoadCsv(csvDataFile="' . $csv . '", header="true", configFile="' . $xml . '");';
+		$command = 'UseCsv(csvDataFile="' . $csv . '", hasHeader="true", configFile="' . $xml . '");';
 		$command .= 'GenerateMaql(maqlFile="'.$maqlFile.'");';
 		$command .= 'ExecuteMaql(maqlFile="'.$maqlFile.'");';
 
@@ -135,7 +135,7 @@ class App_GoodData
 		echo "\n".'*** Update dataset: '.basename($xml)."\n";
 		$maqlFile = ROOT_PATH.'/tmp/update-'.$idUser.'-'.basename($xml).'-'.date('Ymd-His').'.maql';
 
-		$command = 'LoadCsv(csvDataFile="' . $csv . '", header="true", configFile="' . $xml . '");';
+		$command = 'UseCsv(csvDataFile="' . $csv . '", hasHeader="true", configFile="' . $xml . '");';
 		$command .= 'GenerateUpdateMaql(maqlFile="'.$maqlFile.'");';
 		$command .= 'ExecuteMaql(maqlFile="'.$maqlFile.'");';
 
@@ -152,7 +152,7 @@ class App_GoodData
 	public function loadData($xml, $csv, $incremental=false)
 	{
 		echo "\n".'*** Load data: '.basename($csv)."\n";
-		$command = 'LoadCsv(csvDataFile="' . $csv . '", header="true", configFile="' . $xml . '");';
+		$command = 'UseCsv(csvDataFile="' . $csv . '", hasHeader="true", configFile="' . $xml . '");';
 		$command .= 'TransferData(incremental="'.($incremental ? 'true' : 'false').'", waitForFinish="true");';
 
 		$this->call($command);

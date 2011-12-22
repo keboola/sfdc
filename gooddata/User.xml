@@ -1,0 +1,19 @@
+<schema>
+	<name>User</name>
+	<columns>
+		<column>
+			<name>Id</name>
+			<title>ID (User)</title>
+			<ldmType>CONNECTION_POINT</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>User</folder>
+		</column>
+        <column>
+            <name>Name</name>
+            <title>Name (User)</title>
+            <ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>User</folder>
+        </column>
+	</columns>
+</schema>

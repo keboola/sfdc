@@ -32,7 +32,7 @@ try {
 $start = time();
 echo 'Start: '.date('j. n. Y H:i:s', $start)."\n";
 
-$_u = new Model_Users();
+$_u = new Model_BiUser();
 $config = Zend_Registry::get('config');
 
 if ($opts->getOption('since')) {
@@ -52,10 +52,20 @@ if (!$opts->getOption('id')) {
 } else {
 	$u = $_u->fetchRow(array('id=?' => $opts->getOption('id')));
 	if ($u) {
+		$u->revalidateAccessToken();
+		$import = new App_SalesForceImport($u);
+		$import->importUsers();
+		$import->importOpportunities();
+		$import->importAccounts();
+
+
+
+		/*
 		$ao = new App_AdWordsImport($u->id, $u->oauthToken, $u->oauthTokenSecret, $config->adwords->developerToken,
 			$config->adwords->oauthKey, $config->adwords->oauthSecret);
 		$ao->importClients($config->adwords->managerId);
 		$ao->importCampaigns($since, $until);
+		*/
 
 	} else {
 		echo "Bad user id!\n";

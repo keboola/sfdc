@@ -1,0 +1,26 @@
+<schema>
+	<name>Account</name>
+	<columns>
+		<column>
+			<name>Id</name>
+			<title>ID (Account)</title>
+			<ldmType>CONNECTION_POINT</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>Account</folder>
+		</column>
+		<column>
+			<name>Name</name>
+			<title>Name (Account)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>Account</folder>
+		</column>
+		<column>
+			<name>Type</name>
+			<title>Type (Account)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>Account</folder>
+		</column>
+	</columns>
+</schema>

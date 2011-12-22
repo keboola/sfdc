@@ -51,24 +51,18 @@ if($opts->getOption('project') && $opts->getOption('id')) {
 	if($opts->getOption('setup')) {
 		$fgd = new App_GoodDataExport($opts->getOption('project'), $opts->getOption('id'), $config);
 		$fgd->setup();
-	} else
-
-		if($opts->getOption('load')) {
-			$fgd = new App_GoodDataExport($opts->getOption('project'), $opts->getOption('id'), $config);
-			$fgd->loadData($opts->getOption('all'));
-		} else
-
-			if ($opts->getOption('update')) {
-				$fgd = new App_GoodDataExport($opts->getOption('project'), $opts->getOption('id'), $config);
-				$fgd->updateStructure($opts->getOption('update'));
-			} else
-
-				if ($opts->getOption('dump')) {
-					$fgd = new App_GoodDataExport($opts->getOption('project'), $opts->getOption('id'), $config);
-					echo $fgd->dumpTable($opts->getOption('dump'), true, false, true);
-				} else {
-					echo $opts->getUsageMessage();
-				}
+	} elseif ($opts->getOption('load')) {
+		$fgd = new App_GoodDataExport($opts->getOption('project'), $opts->getOption('id'), $config);
+		$fgd->loadData($opts->getOption('all'));
+	} elseif ($opts->getOption('update')) {
+		$fgd = new App_GoodDataExport($opts->getOption('project'), $opts->getOption('id'), $config);
+		$fgd->updateStructure($opts->getOption('update'));
+	} elseif ($opts->getOption('dump')) {
+		$fgd = new App_GoodDataExport($opts->getOption('project'), $opts->getOption('id'), $config);
+		echo $fgd->dumpTable($opts->getOption('dump'), true, false, true);
+	} else {
+		echo $opts->getUsageMessage();
+	}
 } else {
 	echo $opts->getUsageMessage();
 }

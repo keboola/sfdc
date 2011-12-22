@@ -1,0 +1,84 @@
+<schema>
+	<name>Opportunity</name>
+	<columns>
+		<column>
+			<name>Id</name>
+			<title>ID (Opportunity)</title>
+			<ldmType>CONNECTION_POINT</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>Opportunity</folder>
+		</column>
+        <column>
+            <name>AccountId</name>
+            <title>AccountId (Opportunity)</title>
+            <ldmType>REFERENCE</ldmType>
+            <reference>Id</reference>
+            <schemaReference>Account</schemaReference>
+            <folder>Opportunity</folder>
+        </column>
+		<column>
+			<name>Amount</name>
+			<title>Amount (Opportunity)</title>
+			<ldmType>FACT</ldmType>
+			<folder>Opportunity</folder>
+		</column>
+		<column>
+			<name>ExpectedRevenue</name>
+			<title>ExpectedRevenue (Opportunity)</title>
+			<ldmType>FACT</ldmType>
+			<folder>Opportunity</folder>
+		</column>
+		<column>
+			<name>CloseDate</name>
+			<title>CloseDate (Opportunity)</title>
+			<ldmType>DATE</ldmType>
+			<format>yyyy-MM-dd HH:mm:ss</format>
+			<schemaReference>KB_OpportunityCloseDate</schemaReference>
+			<folder>Opportunity</folder>
+		</column>
+		<column>
+			<name>CreatedDate</name>
+			<title>CreatedDate (Opportunity)</title>
+			<ldmType>DATE</ldmType>
+			<format>yyyy-MM-dd HH:mm:ss</format>
+			<schemaReference>KB_OpportunityCreatedDate</schemaReference>
+			<folder>Opportunity</folder>
+		</column>
+		<column>
+			<name>IsWon</name>
+			<title>IsWon (Opportunity)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>Opportunity</folder>
+		</column>
+		<column>
+			<name>IsClosed</name>
+			<title>IsClosed (Opportunity)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>Opportunity</folder>
+		</column>
+		<column>
+			<name>Name</name>
+			<title>Name (Opportunity)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>Opportunity</folder>
+		</column>
+		<column>
+			<name>StageName</name>
+			<title>StageName (Opportunity)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>Opportunity</folder>
+		</column>
+		<column>
+			<name>OwnerId</name>
+			<title>OwnerId (Account)</title>
+			<ldmType>REFERENCE</ldmType>
+			<reference>Id</reference>
+			<schemaReference>User</schemaReference>
+			<folder>Opportunity</folder>
+		</column>
+	</columns>
+</schema>

@@ -75,24 +75,23 @@ class App_GoodDataExport
 		$prefix = $this->_config->db->prefix;
 
 		switch($table) {
-			case 'accounts':
-				$sql = 'SELECT t.id, t.email, t.name '
-					. 'FROM '.$prefix.'accounts t '
-					. 'WHERE t.idUser = '.$this->_idUser;
+			case 'Opportunity':
+				$sql = 'SELECT t.Id, t.AccountId, t.Amount, t.ExpectedRevenue, t.CloseDate, t.CreatedDate, t.IsWon, t.IsClosed, t.Name, t.StageName, t.OwnerId '
+					. 'FROM '.$prefix.'Opportunity t ';
+					//. 'WHERE t.idUser = '.$this->_idUser;
 				break;
-			case 'campaigns':
-				$sql = 'SELECT t.id, t.idAccount, t.name, t.startDate, t.endDate '
-					. 'FROM '.$prefix.'campaigns t '
-					. 'LEFT JOIN '.$prefix.'accounts a ON (t.idAccount = a.id)'
-					. 'WHERE a.idUser = '.$this->_idUser;
+			case 'Account':
+				$sql = 'SELECT t.Id, t.Name, t.Type '
+					. 'FROM '.$prefix.'Account t ';
+					//. 'LEFT JOIN '.$prefix.'accounts a ON (t.idAccount = a.id)'
+					//. 'WHERE a.idUser = '.$this->_idUser;
 				break;
-			case 'campaignStats' :
-				$sql = 'SELECT t.id, t.idAccount, t.idCampaign, t.date, t.clicks, t.impressions, t.cost '
-					. 'FROM '.$prefix.'campaignStats t '
-					. 'LEFT JOIN '.$prefix.'accounts a ON (t.idAccount = a.id)'
-					. 'WHERE a.idUser = '.$this->_idUser;
+			case 'User':
+				$sql = 'SELECT t.Id, t.Name '
+					. 'FROM '.$prefix.'User t ';
+					//. 'LEFT JOIN '.$prefix.'accounts a ON (t.idAccount = a.id)'
+					//. 'WHERE a.idUser = '.$this->_idUser;
 				break;
-
 			default:
 				return false;
 		}
@@ -147,12 +146,12 @@ class App_GoodDataExport
 	 */
 	public function setup()
 	{
-		$this->_gd->createDate('KB_EventDate', TRUE);
-		$this->_gd->createDate('AW_CampaignStartDate', FALSE);
-		$this->_gd->createDate('AW_CampaignEndDate', FALSE);
-		$this->createDataset('accounts');
-		$this->createDataset('campaigns');
-		$this->createDataset('campaignStats');
+		$this->_gd->createDate('KB_OpportunityCloseDate', FALSE);
+		$this->_gd->createDate('KB_OpportunityCreatedDate', FALSE);
+		$this->createDataset('User');
+		$this->createDataset('Account');
+		$this->createDataset('Opportunity');
+
 	}
 
 	/**
@@ -162,10 +161,9 @@ class App_GoodDataExport
 	 */
 	public function loadData($all=false)
 	{
-		$this->loadDataset('accounts', TRUE);
-		$this->loadDataset('campaigns', TRUE);
-		$this->loadDataset('campaignStats', $all);
-
+		$this->loadDataset('User', TRUE);
+		$this->loadDataset('Account', TRUE);
+		$this->loadDataset('Opportunity', TRUE);
 		$this->_gd->updateReports();
 	}
 

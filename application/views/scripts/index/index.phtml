@@ -1,1 +1,10 @@
-<p><a href="/register">Register new AdWords account</a></p>
+<? if ($this->user) { ?>
+	<p><strong><?= $this->user->name ?></strong></p>
+	<p><a href="/register">Authorize your Salesforce account</a></p>
+<? } ?>
+<p>Switch to user:</p>
+<ul>
+<? foreach($this->users as $user) { ?>
+	<li><a href="/?id=<?= $user['id'] ?>"><?= $user['name'] ?></li>
+<? } ?>
+</ul>

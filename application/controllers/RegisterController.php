@@ -8,74 +8,88 @@
  */
 class RegisterController extends Zend_Controller_Action
 {
-	protected $_gapi;
 
 	public function init()
 	{
+		$session = new Zend_Session_Namespace('salesforceUser');
+		$registry = Zend_Registry::getInstance();
+
+		if ($session->userId) {
+			$userTable = new Model_BiUser();
+			$userRow = $userTable->find(array('id' => $session->userId));
+			$registry->user = $userRow->current();
+		} else {
+			throw new Zend_Exception('No user given');
+		}
 		parent::init();
 	}
 
 	public function indexAction()
 	{
 		$config = Zend_Registry::get('config');
-		$form = new Form_AddAccount();
 
-		$ns = new Zend_Session_Namespace('awRegister');
+		$auth_url = $config->salesForce->loginUri
+					. "/services/oauth2/authorize?response_type=code&client_id="
+					. $config->salesForce->clientId . "&redirect_uri=" . urlencode($config->salesForce->redirectUri)
+					. "&scope=id api full refresh_token web";
+		header('Location: ' . $auth_url);
+	}
 
-		if($this->_request->isPost()) {
-			if ($form->isValid($this->_request->getParams())) {
-				$_u = new Model_Users();
-				$_u->add(
-					$this->_request->email,
-					$this->_request->idGD,
-					$ns->oauthToken,
-					$ns->oauthTokenSecret
-				);
-				unset($ns->oauthToken);
-				unset($ns->oauthTokenSecret);
+	public function callbackAction()
+	{
+		$registry = Zend_Registry::getInstance();
 
-				$this->_helper->getHelper('FlashMessenger')->addMessage('success|The account has been saved!');
-				$this->_redirect('/');
-			} else {
-				$form->populate($this->_request->getParams());
-			}
-		} else {
-			require_once 'Google/Api/Ads/AdWords/Lib/AdWordsUser.php';
+		$token_url = $registry->config->salesForce->loginUri . "/services/oauth2/token";
 
-			if (empty($this->_request->oauth_token)) {
-				$user = new AdWordsUser();
-				$user->SetOAuthInfo(array(
-					'oauth_consumer_key' => $config->adwords->oauthKey,
-					'oauth_consumer_secret' => $config->adwords->oauthSecret
-				));
-				$user->RequestOAuthToken("http://".$_SERVER['HTTP_HOST']."/register/index");
-				$authUrl = $user->GetOAuthAuthorizationUrl();
+		$code = $_GET['code'];
 
-				$oauthInfo = $user->GetOAuthInfo();
-				$ns->token = $oauthInfo["oauth_token"];
-				$ns->tokenSecret = $oauthInfo["oauth_token_secret"];
-
-				header("Location: $authUrl");
-			} else {
-				$user = new AdWordsUser();
-				$user->SetOAuthInfo(array(
-					'oauth_consumer_key' => $config->adwords->oauthKey,
-					'oauth_consumer_secret' => $config->adwords->oauthSecret,
-					'oauth_token' => $ns->token,
-					'oauth_token_secret' => $ns->tokenSecret
-				));
-				$user->upgradeOAuthToken($this->_request->oauth_verifier);
-				unset($ns->token);
-				unset($ns->tokenSecret);
-
-				$oauthInfo = $user->GetOAuthInfo();
-				$ns->oauthToken = $oauthInfo['oauth_token'];
-				$ns->oauthTokenSecret = $oauthInfo['oauth_token_secret'];
-			}
+		if (!isset($code) || $code == "") {
+			die("Error - code parameter missing from request!");
 		}
 
+		$params = "code=" . $code
+			. "&grant_type=authorization_code"
+			. "&client_id=" . $registry->config->salesForce->clientId
+			. "&client_secret=" . $registry->config->salesForce->clientSecret
+			. "&redirect_uri=" . urlencode($registry->config->salesForce->redirectUri);
 
-		$this->view->form = $form;
+		$curl = curl_init($token_url);
+		curl_setopt($curl, CURLOPT_HEADER, false);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($curl, CURLOPT_POST, true);
+		curl_setopt($curl, CURLOPT_POSTFIELDS, $params);
+
+		$json_response = curl_exec($curl);
+
+		$status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+
+		if ( $status != 200 ) {
+			die("Error: call to token URL $token_url failed with status $status, response $json_response, curl_error " . curl_error($curl) . ", curl_errno " . curl_errno($curl));
+		}
+
+		curl_close($curl);
+
+		$response = json_decode($json_response, true);
+/*
+		$access_token = $response['access_token'];
+		$instance_url = $response['instance_url'];
+
+		if (!isset($access_token) || $access_token == "") {
+			die("Error - access token missing from response!");
+		}
+
+		if (!isset($instance_url) || $instance_url == "") {
+			die("Error - instance URL missing from response!");
+		}
+*/
+
+		$this->view->response = $response;
+
+		$registry->user->accessToken = $response['access_token'];
+		$registry->user->instanceUrl = $response['instance_url'];
+		$registry->user->refreshToken = $response['refresh_token'];
+		$registry->user->save();
+
 	}
 
 }
