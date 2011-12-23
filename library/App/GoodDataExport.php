@@ -77,20 +77,25 @@ class App_GoodDataExport
 		switch($table) {
 			case 'Opportunity':
 				$sql = 'SELECT t.Id, t.AccountId, t.Amount, t.ExpectedRevenue, t.CloseDate, t.CreatedDate, t.IsWon, t.IsClosed, t.Name, t.StageName, t.OwnerId '
-					. 'FROM '.$prefix.'Opportunity t ';
-					//. 'WHERE t.idUser = '.$this->_idUser;
+					. 'FROM '.$prefix.'Opportunity t '
+					. 'WHERE t._idUser = '.$this->_idUser;
+				break;
+			case 'OpportunityHistory':
+				$sql = 'SELECT t.Id, t.OpportunityId, t.Amount, t.ExpectedRevenue, t.StageName '
+					. 'FROM '.$prefix.'OpportunityHistory t '
+					. 'WHERE t._idUser = '.$this->_idUser;
 				break;
 			case 'Account':
 				$sql = 'SELECT t.Id, t.Name, t.Type '
-					. 'FROM '.$prefix.'Account t ';
+					. 'FROM '.$prefix.'Account t '
 					//. 'LEFT JOIN '.$prefix.'accounts a ON (t.idAccount = a.id)'
-					//. 'WHERE a.idUser = '.$this->_idUser;
+					. 'WHERE t._idUser = '.$this->_idUser;
 				break;
 			case 'User':
 				$sql = 'SELECT t.Id, t.Name '
-					. 'FROM '.$prefix.'User t ';
+					. 'FROM '.$prefix.'User t '
 					//. 'LEFT JOIN '.$prefix.'accounts a ON (t.idAccount = a.id)'
-					//. 'WHERE a.idUser = '.$this->_idUser;
+					. 'WHERE t._idUser = '.$this->_idUser;
 				break;
 			default:
 				return false;
@@ -99,6 +104,7 @@ class App_GoodDataExport
 		if ($structure) {
 			$sql .= ' LIMIT 1';
 		} elseif (!$all) {
+			// TODO WTF is this?
 			$sql .= ' AND t.timestamp > \''.date('Y-m-d H:i:s', strtotime('-4 days')).'\'';
 		}
 
@@ -151,6 +157,7 @@ class App_GoodDataExport
 		$this->createDataset('User');
 		$this->createDataset('Account');
 		$this->createDataset('Opportunity');
+		$this->createDataset('OpportunityHistory');
 
 	}
 
@@ -164,6 +171,7 @@ class App_GoodDataExport
 		$this->loadDataset('User', TRUE);
 		$this->loadDataset('Account', TRUE);
 		$this->loadDataset('Opportunity', TRUE);
+		$this->loadDataset('OpportunityHistory', TRUE);
 		$this->_gd->updateReports();
 	}
 

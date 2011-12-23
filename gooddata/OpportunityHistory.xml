@@ -1,0 +1,39 @@
+<schema>
+	<name>OpportunityHistory</name>
+	<columns>
+		<column>
+			<name>Id</name>
+			<title>ID (OpportunityHistory)</title>
+			<ldmType>CONNECTION_POINT</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>OpportunityHistory</folder>
+		</column>
+        <column>
+            <name>OpportunityId</name>
+            <title>OpportunityId (Opportunity)</title>
+            <ldmType>REFERENCE</ldmType>
+            <reference>Id</reference>
+            <schemaReference>Opportunity</schemaReference>
+            <folder>OpportunityHistory</folder>
+        </column>
+		<column>
+			<name>Amount</name>
+			<title>Amount (OpportunityHistory)</title>
+			<ldmType>FACT</ldmType>
+			<folder>OpportunityHistory</folder>
+		</column>
+		<column>
+			<name>ExpectedRevenue</name>
+			<title>ExpectedRevenue (OpportunityHistory)</title>
+			<ldmType>FACT</ldmType>
+			<folder>OpportunityHistory</folder>
+		</column>
+		<column>
+			<name>StageName</name>
+			<title>StageName (OpportunityHistory)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>OpportunityHistory</folder>
+		</column>
+	</columns>
+</schema>

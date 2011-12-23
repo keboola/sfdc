@@ -12,9 +12,13 @@ class App_SalesForceImport
 		$this->_registry = Zend_Registry::getInstance();
 	}
 
-	public function importUsers()
+	public function importUsers($since)
 	{
-		$response = $this->query("SELECT Id,Name FROM User");
+		$query = "SELECT Id,Name FROM User";
+		if ($since) {
+			$query .= " WHERE LastModifiedDate > {$since}";
+		}
+		$response = $this->query($query);
 		$user = new Model_User();
 		$user->add(array('_idUser' => $this->_user->id, 'Id' => '--empty--', 'Name' => '--empty--'));
 		if ($response['totalSize'] > 0) {
@@ -26,9 +30,13 @@ class App_SalesForceImport
 		}
 	}
 
-	public function importOpportunities()
+	public function importOpportunities($since)
 	{
-		$response = $this->query("SELECT Id,AccountId,Amount,ExpectedRevenue,CloseDate,CreatedDate,IsWon,IsClosed,Name,StageName,OwnerId FROM Opportunity");
+		$query = "SELECT Id,AccountId,Amount,ExpectedRevenue,CloseDate,CreatedDate,IsWon,IsClosed,Name,StageName,OwnerId FROM Opportunity";
+		if ($since) {
+			$query .= " WHERE LastModifiedDate > {$since}";
+		}
+		$response = $this->query($query);
 		$opportunity = new Model_Opportunity();
 		if ($response['totalSize'] > 0) {
 			foreach($response['records'] as $record) {
@@ -39,9 +47,30 @@ class App_SalesForceImport
 		}
 	}
 
-	public function importAccounts()
+	public function importOpportunityHistories($since)
 	{
-		$response = $this->query("SELECT Id,Name,Type FROM Account");
+		$query = "SELECT Id,OpportunityId,Amount,ExpectedRevenue,StageName FROM OpportunityHistory";
+		if ($since) {
+			$query .= " WHERE SystemModstamp > {$since}";
+		}
+		$response = $this->query($query);
+		$opportunity = new Model_OpportunityHistory();
+		if ($response['totalSize'] > 0) {
+			foreach($response['records'] as $record) {
+				$record['_idUser'] = $this->_user->id;
+				unset($record['attributes']);
+				$opportunity->add($record);
+			}
+		}
+	}
+
+	public function importAccounts($since)
+	{
+		$query = "SELECT Id,Name,Type FROM Account";
+		if ($since) {
+			$query .= " WHERE LastModifiedDate > {$since}";
+		}
+		$response = $this->query($query);
 		$account = new Model_Account();
 		$account->add(array('_idUser' => $this->_user->id, 'Id' => '--empty--', 'Name' => '--empty--', 'Type' => null));
 		if ($response['totalSize'] > 0) {

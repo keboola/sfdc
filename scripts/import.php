@@ -14,13 +14,11 @@ $application->bootstrap(array('base', 'autoload', 'config', 'db'));
 // Setup console input
 $opts = new Zend_Console_Getopt(array(
 	'id|i=s'	=> 'Id of user',
-	'since|s-s'	=> 'Start date',
-	'until|u-s'	=> 'End date'
+	'full|f' => 'Full import'
 ));
 $opts->setHelp(array(
 	'i'	=> 'Id of user',
-	's'	=> 'Start date',
-	'u'	=> 'End date'
+	'f'	=> 'Full import'
 ));
 try {
 	$opts->parse();
@@ -35,16 +33,9 @@ echo 'Start: '.date('j. n. Y H:i:s', $start)."\n";
 $_u = new Model_BiUser();
 $config = Zend_Registry::get('config');
 
-if ($opts->getOption('since')) {
-	$since = date('Ymd', strtotime($opts->getOption('since')));
-} else {
-	$since = date('Ymd', strtotime('-1 day'));
-}
-
-if ($opts->getOption('until')) {
-	$until = date('Ymd', strtotime($opts->getOption('until')));
-} else {
-	$until = date('Ymd', strtotime('-1 day'));
+$since = '';
+if (!$opts->getOption('full')) {
+	$since = date('Y-m-d', strtotime('-4 day')) . 'T00:00:00.000Z';
 }
 
 if (!$opts->getOption('id')) {
@@ -54,9 +45,10 @@ if (!$opts->getOption('id')) {
 	if ($u) {
 		$u->revalidateAccessToken();
 		$import = new App_SalesForceImport($u);
-		$import->importUsers();
-		$import->importOpportunities();
-		$import->importAccounts();
+		$import->importUsers($since);
+		$import->importOpportunities($since);
+		$import->importOpportunityHistories($since);
+		$import->importAccounts($since);
 
 
 
