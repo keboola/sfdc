@@ -45,6 +45,7 @@ if (!$opts->getOption('id')) {
 	if ($u) {
 		$u->revalidateAccessToken();
 		$import = new App_SalesForceImport($u);
+		$import->importContacts($since);
 		$import->importUsers($since);
 		$import->importOpportunities($since);
 		$import->importOpportunityHistories($since);
