@@ -50,8 +50,8 @@ if (!$opts->getOption('id')) {
 		$import->importOpportunities($since);
 		$import->importOpportunityHistories($since);
 		$import->importAccounts($since);
-
-
+		$import->importTasks($since);
+		$import->importEvents($since);
 
 		/*
 		$ao = new App_AdWordsImport($u->id, $u->oauthToken, $u->oauthTokenSecret, $config->adwords->developerToken,

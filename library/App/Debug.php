@@ -34,7 +34,7 @@ class App_Debug
 		$m = new Zend_Mail('utf8');
 		$m->setFrom($c->app->email);
 		$m->addTo($c->app->admin);
-		$m->setSubject('AdOcean-GoodData connector error');
+		$m->setSubject('SalesForce-GoodData connector error');
 		$m->setBodyText($data);
 
 		if ($attachment && file_exists($attachment)) {
@@ -43,7 +43,7 @@ class App_Debug
 			$a->disposition = Zend_Mime::DISPOSITION_ATTACHMENT;
 			$m->addAttachment($a);
 		}
-		
+
 		$m->send();
 	}
 }

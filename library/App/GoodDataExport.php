@@ -97,6 +97,24 @@ class App_GoodDataExport
 					//. 'LEFT JOIN '.$prefix.'accounts a ON (t.idAccount = a.id)'
 					. 'WHERE t._idUser = '.$this->_idUser;
 				break;
+			case 'Contact':
+				$sql = 'SELECT t.Id, t.Name '
+					. 'FROM '.$prefix.'Contact t '
+					//. 'LEFT JOIN '.$prefix.'accounts a ON (t.idAccount = a.id)'
+					. 'WHERE t._idUser = '.$this->_idUser;
+				break;
+			case 'Task':
+				$sql = 'SELECT t.Id, t.AccountId, t.OwnerId, IF (t.ActivityDate IS NULL , \'1990-01-01\', t.ActivityDate) AS ActivityDate, t.Priority, t.Status, t.Subject, t.IsClosed '
+					. 'FROM '.$prefix.'Task t '
+					//. 'LEFT JOIN '.$prefix.'accounts a ON (t.idAccount = a.id)'
+					. 'WHERE t._idUser = '.$this->_idUser;
+				break;
+			case 'Event':
+				$sql = 'SELECT t.Id, t.AccountId, t.OwnerId, t.ActivityDate, t.Subject '
+					. 'FROM '.$prefix.'Event t '
+					//. 'LEFT JOIN '.$prefix.'accounts a ON (t.idAccount = a.id)'
+					. 'WHERE t._idUser = '.$this->_idUser;
+				break;
 			default:
 				return false;
 		}
@@ -154,10 +172,15 @@ class App_GoodDataExport
 	{
 		$this->_gd->createDate('KB_OpportunityCloseDate', FALSE);
 		$this->_gd->createDate('KB_OpportunityCreatedDate', FALSE);
+		$this->_gd->createDate('KB_TaskActivityDate', FALSE);
+		$this->_gd->createDate('KB_EventActivityDate', FALSE);
 		$this->createDataset('User');
 		$this->createDataset('Account');
 		$this->createDataset('Opportunity');
 		$this->createDataset('OpportunityHistory');
+		$this->createDataset('Contact');
+		$this->createDataset('Task');
+		$this->createDataset('Event');
 
 	}
 
@@ -172,6 +195,9 @@ class App_GoodDataExport
 		$this->loadDataset('Account', TRUE);
 		$this->loadDataset('Opportunity', TRUE);
 		$this->loadDataset('OpportunityHistory', TRUE);
+		$this->loadDataset('Contact', TRUE);
+		$this->loadDataset('Task', TRUE);
+		$this->loadDataset('Event', TRUE);
 		$this->_gd->updateReports();
 	}
 

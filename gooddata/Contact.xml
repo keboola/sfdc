@@ -1,5 +1,5 @@
 <schema>
-	<name>User</name>
+	<name>Contact</name>
 	<columns>
 		<column>
 			<name>Id</name>

@@ -32,7 +32,7 @@
 			<name>CloseDate</name>
 			<title>CloseDate (Opportunity)</title>
 			<ldmType>DATE</ldmType>
-			<format>yyyy-MM-dd HH:mm:ss</format>
+			<format>yyyy-MM-dd</format>
 			<schemaReference>KB_OpportunityCloseDate</schemaReference>
 			<folder>Opportunity</folder>
 		</column>

@@ -99,7 +99,43 @@ class App_SalesForceImport
 				$user->add($record);
 			}
 		}
+	}
 
+
+	public function importTasks($since)
+	{
+		$query = "SELECT AccountId,ActivityDate,Id,IsClosed,OwnerId,Priority,Status,Subject FROM Task";
+		if ($since) {
+			$query .= " WHERE LastModifiedDate > {$since}";
+		}
+
+		$response = $this->query($query);
+		$user = new Model_Task();
+		if ($response['totalSize'] > 0) {
+			foreach($response['records'] as $record) {
+				$record['_idUser'] = $this->_user->id;
+				unset($record['attributes']);
+				$user->add($record);
+			}
+		}
+	}
+
+	public function importEvents($since)
+	{
+		$query = "SELECT AccountId,ActivityDate,Id,OwnerId,Subject FROM Event";
+		if ($since) {
+			$query .= " WHERE LastModifiedDate > {$since}";
+		}
+
+		$response = $this->query($query);
+		$user = new Model_Event();
+		if ($response['totalSize'] > 0) {
+			foreach($response['records'] as $record) {
+				$record['_idUser'] = $this->_user->id;
+				unset($record['attributes']);
+				$user->add($record);
+			}
+		}
 	}
 
 	private function query($query, $queryUrl = '') {
