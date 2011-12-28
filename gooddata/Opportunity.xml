@@ -33,7 +33,7 @@
 			<title>CloseDate (Opportunity)</title>
 			<ldmType>DATE</ldmType>
 			<format>yyyy-MM-dd</format>
-			<schemaReference>KB_OpportunityCloseDate</schemaReference>
+			<schemaReference>SF_OpportunityCloseDate</schemaReference>
 			<folder>Opportunity</folder>
 		</column>
 		<column>
@@ -41,7 +41,7 @@
 			<title>CreatedDate (Opportunity)</title>
 			<ldmType>DATE</ldmType>
 			<format>yyyy-MM-dd HH:mm:ss</format>
-			<schemaReference>KB_OpportunityCreatedDate</schemaReference>
+			<schemaReference>SF_OpportunityCreatedDate</schemaReference>
 			<folder>Opportunity</folder>
 		</column>
 		<column>

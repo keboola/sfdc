@@ -29,7 +29,7 @@
 			<title>ActivityDate (Task)</title>
 			<ldmType>DATE</ldmType>
 			<format>yyyy-MM-dd</format>
-			<schemaReference>KB_TaskActivityDate</schemaReference>
+			<schemaReference>SF_TaskActivityDate</schemaReference>
 			<folder>Task</folder>
 		</column>
 		<column>

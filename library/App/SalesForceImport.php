@@ -138,6 +138,24 @@ class App_SalesForceImport
 		}
 	}
 
+	public function importCampaigns($since)
+	{
+		$query = "SELECT Id,OwnerId,Name,ExpectedRevenue,BudgetedCost,ActualCost,StartDate,Type,Status FROM Campaign";
+		if ($since) {
+			$query .= " WHERE LastModifiedDate > {$since}";
+		}
+
+		$response = $this->query($query);
+		$user = new Model_Campaign();
+		if ($response['totalSize'] > 0) {
+			foreach($response['records'] as $record) {
+				$record['_idUser'] = $this->_user->id;
+				unset($record['attributes']);
+				$user->add($record);
+			}
+		}
+	}
+
 	private function query($query, $queryUrl = '') {
 		if (!$queryUrl) {
 			$url = "{$this->_user->instanceUrl}/services/data/v23.0/query?q=" . urlencode($query);

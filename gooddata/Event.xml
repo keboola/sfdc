@@ -29,7 +29,7 @@
 			<title>ActivityDate (Event)</title>
 			<ldmType>DATE</ldmType>
 			<format>yyyy-MM-dd</format>
-			<schemaReference>KB_EventActivityDate</schemaReference>
+			<schemaReference>SF_EventActivityDate</schemaReference>
 			<folder>Event</folder>
 		</column>
 		<column>

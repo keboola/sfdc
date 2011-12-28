@@ -104,7 +104,7 @@ class App_GoodDataExport
 					. 'WHERE t._idUser = '.$this->_idUser;
 				break;
 			case 'Task':
-				$sql = 'SELECT t.Id, t.AccountId, t.OwnerId, IF (t.ActivityDate IS NULL , \'1990-01-01\', t.ActivityDate) AS ActivityDate, t.Priority, t.Status, t.Subject, t.IsClosed '
+				$sql = 'SELECT t.Id, t.AccountId, t.OwnerId, t.ActivityDate, t.Priority, t.Status, t.Subject, t.IsClosed '
 					. 'FROM '.$prefix.'Task t '
 					//. 'LEFT JOIN '.$prefix.'accounts a ON (t.idAccount = a.id)'
 					. 'WHERE t._idUser = '.$this->_idUser;
@@ -112,6 +112,12 @@ class App_GoodDataExport
 			case 'Event':
 				$sql = 'SELECT t.Id, t.AccountId, t.OwnerId, t.ActivityDate, t.Subject '
 					. 'FROM '.$prefix.'Event t '
+					//. 'LEFT JOIN '.$prefix.'accounts a ON (t.idAccount = a.id)'
+					. 'WHERE t._idUser = '.$this->_idUser;
+				break;
+			case 'Campaign':
+				$sql = 'SELECT t.Id, t.OwnerId, t.Name, t.ExpectedRevenue, t.BudgetedCost, t.ActualCost, t.StartDate, t.Type, t.Status '
+					. 'FROM '.$prefix.'Campaign t '
 					//. 'LEFT JOIN '.$prefix.'accounts a ON (t.idAccount = a.id)'
 					. 'WHERE t._idUser = '.$this->_idUser;
 				break;
@@ -170,10 +176,11 @@ class App_GoodDataExport
 	 */
 	public function setup()
 	{
-		$this->_gd->createDate('KB_OpportunityCloseDate', FALSE);
-		$this->_gd->createDate('KB_OpportunityCreatedDate', FALSE);
-		$this->_gd->createDate('KB_TaskActivityDate', FALSE);
-		$this->_gd->createDate('KB_EventActivityDate', FALSE);
+		$this->_gd->createDate('SF_OpportunityCloseDate', FALSE);
+		$this->_gd->createDate('SF_OpportunityCreatedDate', FALSE);
+		$this->_gd->createDate('SF_TaskActivityDate', FALSE);
+		$this->_gd->createDate('SF_EventActivityDate', FALSE);
+		$this->_gd->createDate('SF_CampaignStartDate', FALSE);
 		$this->createDataset('User');
 		$this->createDataset('Account');
 		$this->createDataset('Opportunity');
@@ -181,6 +188,7 @@ class App_GoodDataExport
 		$this->createDataset('Contact');
 		$this->createDataset('Task');
 		$this->createDataset('Event');
+		$this->createDataset('Campaign');
 
 	}
 
@@ -198,6 +206,7 @@ class App_GoodDataExport
 		$this->loadDataset('Contact', TRUE);
 		$this->loadDataset('Task', TRUE);
 		$this->loadDataset('Event', TRUE);
+		$this->loadDataset('Campaign', TRUE);
 		$this->_gd->updateReports();
 	}
 
