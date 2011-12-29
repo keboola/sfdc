@@ -177,6 +177,9 @@ class App_SalesForceImport
 			$responseMore = $this->query($query, $response['nextRecordsUrl']);
 			$response = array_merge_recursive($response, $responseMore);
 		}
+		if (isset($response[0]['errorCode'])) {
+			throw new Exception($response[0]['errorCode'] . ': '. $response[0]['message']);
+		}
 		return $response;
 	}
 
