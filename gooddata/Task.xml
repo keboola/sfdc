@@ -9,6 +9,13 @@
 			<folder>Task</folder>
 		</column>
 		<column>
+			<name>isDeleted</name>
+			<title>isDeleted (TaskSnapshot)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>Task</folder>
+		</column>
+		<column>
 			<name>AccountId</name>
 			<title>AccountId (Task)</title>
 			<ldmType>REFERENCE</ldmType>

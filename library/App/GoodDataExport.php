@@ -72,55 +72,107 @@ class App_GoodDataExport
 	public function dumpTable($table, $return=false, $structure=false, $all=false)
 	{
 		$isDemo = $this->_idUser == self::DEMO_PROJECT;
-		$prefix = $this->_config->db->prefix;
 
 		switch($table) {
-			case 'Opportunity':
-				$sql = 'SELECT t.Id, t.AccountId, t.Amount, t.ExpectedRevenue, t.CloseDate, t.CreatedDate, t.IsWon, t.IsClosed, t.Name, t.StageName, t.OwnerId '
-					. 'FROM '.$prefix.'Opportunity t '
-					. 'WHERE t._idUser = '.$this->_idUser;
-				break;
-			case 'OpportunityHistory':
-				$sql = 'SELECT t.Id, t.OpportunityId, t.Amount, t.ExpectedRevenue, t.StageName '
-					. 'FROM '.$prefix.'OpportunityHistory t '
-					. 'WHERE t._idUser = '.$this->_idUser;
-				break;
-			case 'Account':
-				$sql = 'SELECT t.Id, t.Name, t.Type '
-					. 'FROM '.$prefix.'Account t '
-					//. 'LEFT JOIN '.$prefix.'accounts a ON (t.idAccount = a.id)'
-					. 'WHERE t._idUser = '.$this->_idUser;
-				break;
+
 			case 'User':
-				$sql = 'SELECT t.Id, t.Name '
-					. 'FROM '.$prefix.'User t '
-					//. 'LEFT JOIN '.$prefix.'accounts a ON (t.idAccount = a.id)'
+				// TODO load only last modified
+				$sql = 'SELECT t.Id, t.isDeleted, t.Name '
+					. 'FROM User t '
 					. 'WHERE t._idUser = '.$this->_idUser;
 				break;
-			case 'Contact':
-				$sql = 'SELECT t.Id, t.Name '
-					. 'FROM '.$prefix.'Contact t '
-					//. 'LEFT JOIN '.$prefix.'accounts a ON (t.idAccount = a.id)'
+			case 'UserSnapshot':
+				// TODO load only last modified
+				$sql = 'SELECT CONCAT(t.snapshotNumber, t.Id) AS Id, t.isDeleted, t.snapshotNumber, s.snapshotDate AS snapshotDate, t.Id as UserId, t.Name '
+					. 'FROM UserSnapshot t '
+					. 'LEFT JOIN bi_snapshot s ON t.snapshotNumber = s.snapshotNumber '
 					. 'WHERE t._idUser = '.$this->_idUser;
 				break;
-			case 'Task':
-				$sql = 'SELECT t.Id, t.AccountId, t.OwnerId, t.ActivityDate, t.Priority, t.Status, t.Subject, t.IsClosed '
-					. 'FROM '.$prefix.'Task t '
-					//. 'LEFT JOIN '.$prefix.'accounts a ON (t.idAccount = a.id)'
-					. 'WHERE t._idUser = '.$this->_idUser;
-				break;
-			case 'Event':
-				$sql = 'SELECT t.Id, t.AccountId, t.OwnerId, t.ActivityDate, t.Subject '
-					. 'FROM '.$prefix.'Event t '
-					//. 'LEFT JOIN '.$prefix.'accounts a ON (t.idAccount = a.id)'
-					. 'WHERE t._idUser = '.$this->_idUser;
-				break;
+
 			case 'Campaign':
-				$sql = 'SELECT t.Id, t.OwnerId, t.Name, t.ExpectedRevenue, t.BudgetedCost, t.ActualCost, t.StartDate, t.Type, t.Status '
-					. 'FROM '.$prefix.'Campaign t '
-					//. 'LEFT JOIN '.$prefix.'accounts a ON (t.idAccount = a.id)'
+				// TODO load only last modified
+				$sql = 'SELECT t.Id, t.isDeleted, t.OwnerId, t.Name, t.ExpectedRevenue, t.BudgetedCost, t.ActualCost, t.StartDate, t.Type, t.Status '
+					. 'FROM Campaign t '
 					. 'WHERE t._idUser = '.$this->_idUser;
 				break;
+			case 'CampaignSnapshot':
+				// TODO load only last modified
+				$sql = 'SELECT CONCAT(t.snapshotNumber, t.Id) AS Id, t.isDeleted, t.snapshotNumber, s.snapshotDate AS snapshotDate, t.Id as CampaignId, t.OwnerId, t.Name, t.ExpectedRevenue, t.BudgetedCost, t.ActualCost, t.StartDate, t.Type, t.Status '
+					. 'FROM CampaignSnapshot t '
+					. 'LEFT JOIN bi_snapshot s ON t.snapshotNumber = s.snapshotNumber '
+					. 'WHERE t._idUser = '.$this->_idUser;
+				break;
+
+			case 'Account':
+				// TODO load only last modified
+				$sql = 'SELECT t.Id, t.isDeleted, t.Name, t.Type '
+					. 'FROM Account t '
+					. 'WHERE t._idUser = '.$this->_idUser;
+				break;
+			case 'AccountSnapshot':
+				// TODO load only last modified
+				$sql = 'SELECT CONCAT(t.snapshotNumber, t.Id) AS Id, t.isDeleted, t.snapshotNumber, s.snapshotDate AS snapshotDate, t.Id as AccountId, t.Name, t.Type '
+					. 'FROM AccountSnapshot t '
+					. 'LEFT JOIN bi_snapshot s ON t.snapshotNumber = s.snapshotNumber '
+					. 'WHERE t._idUser = '.$this->_idUser;
+				break;
+
+			case 'Contact':
+				// TODO load only last modified
+				$sql = 'SELECT t.Id, t.isDeleted, t.Name '
+					. 'FROM Contact t '
+					. 'WHERE t._idUser = '.$this->_idUser;
+				break;
+			case 'ContactSnapshot':
+				// TODO load only last modified
+				$sql = 'SELECT CONCAT(t.snapshotNumber, t.Id) AS Id, t.isDeleted, t.snapshotNumber, s.snapshotDate AS snapshotDate, t.Id as ContactId, t.Name '
+					. 'FROM ContactSnapshot t '
+					. 'LEFT JOIN bi_snapshot s ON t.snapshotNumber = s.snapshotNumber '
+					. 'WHERE t._idUser = '.$this->_idUser;
+				break;
+
+			case 'Event':
+				// TODO load only last modified
+				$sql = 'SELECT t.Id, t.isDeleted, t.AccountId, t.OwnerId, t.ActivityDate, t.Subject '
+					. 'FROM Event t '
+					. 'WHERE t._idUser = '.$this->_idUser;
+				break;
+			case 'EventSnapshot':
+				// TODO load only last modified
+				$sql = 'SELECT CONCAT(t.snapshotNumber, t.Id) AS Id, t.isDeleted, t.snapshotNumber, s.snapshotDate AS snapshotDate, t.Id as EventId, t.AccountId, t.OwnerId, t.ActivityDate, t.Subject '
+					. 'FROM EventSnapshot t '
+					. 'LEFT JOIN bi_snapshot s ON t.snapshotNumber = s.snapshotNumber '
+					. 'WHERE t._idUser = '.$this->_idUser;
+				break;
+
+			case 'Task':
+				// TODO load only last modified
+				$sql = 'SELECT t.Id, t.isDeleted, t.AccountId, t.OwnerId, t.ActivityDate, t.Priority, t.Status, t.Subject, t.IsClosed '
+					. 'FROM Task t '
+					. 'WHERE t._idUser = '.$this->_idUser;
+				break;
+			case 'TaskSnapshot':
+				// TODO load only last modified
+				$sql = 'SELECT CONCAT(t.snapshotNumber, t.Id) AS Id, t.isDeleted, t.snapshotNumber, s.snapshotDate AS snapshotDate, t.Id as TaskId, t.AccountId, t.OwnerId, t.ActivityDate, t.Priority, t.Status, t.Subject, t.IsClosed '
+					. 'FROM TaskSnapshot t '
+					. 'LEFT JOIN bi_snapshot s ON t.snapshotNumber = s.snapshotNumber '
+					. 'WHERE t._idUser = '.$this->_idUser;
+				break;
+
+			case 'Opportunity':
+				// TODO load only last modified
+				$sql = 'SELECT t.Id, t.isDeleted, t.AccountId, t.Amount, t.ExpectedRevenue, t.CloseDate, t.CreatedDate, t.IsWon, t.IsClosed, t.Name, t.StageName, t.OwnerId '
+					. 'FROM Opportunity t '
+					. 'WHERE t._idUser = '.$this->_idUser;
+				break;
+			case 'OpportunitySnapshot':
+				// TODO load only last modified
+				$sql = 'SELECT CONCAT(t.snapshotNumber, t.Id) AS Id, t.isDeleted, t.snapshotNumber, s.snapshotDate AS snapshotDate, t.Id as OpportunityId, t.AccountId, t.Amount, t.ExpectedRevenue, t.CloseDate, t.CreatedDate, t.IsWon, t.IsClosed, t.Name, t.StageName, t.OwnerId '
+					. 'FROM OpportunitySnapshot t '
+					. 'LEFT JOIN bi_snapshot s ON t.snapshotNumber = s.snapshotNumber '
+					. 'WHERE t._idUser = '.$this->_idUser;
+				break;
+
 			default:
 				return false;
 		}
@@ -177,18 +229,30 @@ class App_GoodDataExport
 	public function setup()
 	{
 		$this->_gd->createDate('SF_OpportunityCloseDate', FALSE);
+		$this->_gd->createDate('SF_OpportunitySnapshotCloseDate', FALSE);
 		$this->_gd->createDate('SF_OpportunityCreatedDate', FALSE);
+		$this->_gd->createDate('SF_OpportunitySnapshotCreatedDate', FALSE);
 		$this->_gd->createDate('SF_TaskActivityDate', FALSE);
+		$this->_gd->createDate('SF_TaskSnapshotActivityDate', FALSE);
 		$this->_gd->createDate('SF_EventActivityDate', FALSE);
+		$this->_gd->createDate('SF_EventSnapshotActivityDate', FALSE);
 		$this->_gd->createDate('SF_CampaignStartDate', FALSE);
+		$this->_gd->createDate('SF_CampaignSnapshotStartDate', FALSE);
+		$this->_gd->createDate('SF_SnapshotDate', FALSE);
 		$this->createDataset('User');
+		$this->createDataset('UserSnapshot');
 		$this->createDataset('Account');
+		$this->createDataset('AccountSnapshot');
 		$this->createDataset('Opportunity');
-		$this->createDataset('OpportunityHistory');
+		$this->createDataset('OpportunitySnapshot');
 		$this->createDataset('Contact');
+		$this->createDataset('ContactSnapshot');
 		$this->createDataset('Task');
+		$this->createDataset('TaskSnapshot');
 		$this->createDataset('Event');
+		$this->createDataset('EventSnapshot');
 		$this->createDataset('Campaign');
+		$this->createDataset('CampaignSnapshot');
 
 	}
 
@@ -199,14 +263,20 @@ class App_GoodDataExport
 	 */
 	public function loadData($all=false)
 	{
-		$this->loadDataset('User', TRUE);
-		$this->loadDataset('Account', TRUE);
-		$this->loadDataset('Opportunity', TRUE);
-		$this->loadDataset('OpportunityHistory', TRUE);
-		$this->loadDataset('Contact', TRUE);
-		$this->loadDataset('Task', TRUE);
-		$this->loadDataset('Event', TRUE);
-		$this->loadDataset('Campaign', TRUE);
+		$this->loadDataset('User', $all);
+		$this->loadDataset('UserSnapshot', $all);
+		$this->loadDataset('Account', $all);
+		$this->loadDataset('AccountSnapshot', $all);
+		$this->loadDataset('Opportunity', $all);
+		$this->loadDataset('OpportunitySnapshot', $all);
+		$this->loadDataset('Contact', $all);
+		$this->loadDataset('ContactSnapshot', $all);
+		$this->loadDataset('Task', $all);
+		$this->loadDataset('TaskSnapshot', $all);
+		$this->loadDataset('Event', $all);
+		$this->loadDataset('EventSnapshot', $all);
+		$this->loadDataset('Campaign', $all);
+		$this->loadDataset('CampaignSnapshot', $all);
 		$this->_gd->updateReports();
 	}
 

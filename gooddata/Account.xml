@@ -9,6 +9,13 @@
 			<folder>Account</folder>
 		</column>
 		<column>
+			<name>isDeleted</name>
+			<title>isDeleted (Account)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>Account</folder>
+		</column>
+		<column>
 			<name>Name</name>
 			<title>Name (Account)</title>
 			<ldmType>ATTRIBUTE</ldmType>

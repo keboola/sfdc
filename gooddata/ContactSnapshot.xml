@@ -1,0 +1,49 @@
+<schema>
+	<name>ContactSnapshot</name>
+	<columns>
+		<column>
+			<name>Id</name>
+			<title>ID (ContactSnapshot)</title>
+			<ldmType>CONNECTION_POINT</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>ContactSnapshot</folder>
+		</column>
+		<column>
+			<name>isDeleted</name>
+			<title>isDeleted (ContactSnapshot)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>ContactSnapshot</folder>
+		</column>
+		<column>
+			<name>snapshotNumber</name>
+			<title>snapshotNumber (ContactSnapshot)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>ContactSnapshot</folder>
+		</column>
+		<column>
+			<name>snapshotDate</name>
+			<title>snapshotDate (ContactSnapshot)</title>
+			<ldmType>DATE</ldmType>
+			<format>yyyy-MM-dd</format>
+			<schemaReference>SF_SnapshotDate</schemaReference>
+			<folder>ContactSnapshot</folder>
+		</column>
+		<column>
+			<name>ContactId</name>
+			<title>ContactId (ContactSnapshot)</title>
+			<ldmType>REFERENCE</ldmType>
+			<reference>Id</reference>
+			<schemaReference>Contact</schemaReference>
+			<folder>ContactSnapshot</folder>
+		</column>
+        <column>
+            <name>Name</name>
+            <title>Name (ContactSnapshot)</title>
+            <ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>ContactSnapshot</folder>
+        </column>
+	</columns>
+</schema>

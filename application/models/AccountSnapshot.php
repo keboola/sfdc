@@ -6,10 +6,9 @@
  *
  */
 
-class Model_Account extends App_Db_Table
+class Model_AccountSnapshot extends App_Db_Table
 {
-	protected $_name = 'Account';
-	protected $_snapshotTableClass = 'Model_AccountSnapshot';
+	protected $_name = 'AccountSnapshot';
 
 	/**
 	 * @param $idUser
@@ -20,8 +19,7 @@ class Model_Account extends App_Db_Table
 		if ($data['Type'] == null) {
 			$data['Type'] = '--empty--';
 		}
-		$data['isDeleted'] = 0;
-		$account = $this->fetchRow(array('_idUser=?' => $data['_idUser'], 'Id=?' => $data['Id']));
+		$account = $this->fetchRow(array('_idUser=?' => $data['_idUser'], 'Id=?' => $data['Id'], 'snapshotNumber=?' => $data['snapshotNumber']));
 		if (!$account) {
 			$this->insert($data);
 		} else {
@@ -29,5 +27,4 @@ class Model_Account extends App_Db_Table
 			$account->save();
 		}
 	}
-
 }

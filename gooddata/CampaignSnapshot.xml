@@ -1,0 +1,97 @@
+<schema>
+	<name>CampaignSnapshot</name>
+	<columns>
+		<column>
+			<name>Id</name>
+			<title>ID (CampaignSnapshot)</title>
+			<ldmType>CONNECTION_POINT</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>CampaignSnapshot</folder>
+		</column>
+		<column>
+			<name>isDeleted</name>
+			<title>isDeleted (CampaignSnapshot)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>CampaignSnapshot</folder>
+		</column>
+		<column>
+			<name>snapshotNumber</name>
+			<title>snapshotNumber (CampaignSnapshot)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>CampaignSnapshot</folder>
+		</column>
+		<column>
+			<name>snapshotDate</name>
+			<title>snapshotDate (CampaignSnapshot)</title>
+			<ldmType>DATE</ldmType>
+			<format>yyyy-MM-dd</format>
+			<schemaReference>SF_SnapshotDate</schemaReference>
+			<folder>CampaignSnapshot</folder>
+		</column>
+		<column>
+			<name>CampaignId</name>
+			<title>CampaignId (CampaignSnapshot)</title>
+			<ldmType>REFERENCE</ldmType>
+			<reference>Id</reference>
+			<schemaReference>Campaign</schemaReference>
+			<folder>CampaignSnapshot</folder>
+		</column>
+        <column>
+            <name>OwnerId</name>
+            <title>OwnerId (CampaignSnapshot)</title>
+            <ldmType>REFERENCE</ldmType>
+            <reference>Id</reference>
+            <schemaReference>User</schemaReference>
+            <folder>CampaignSnapshot</folder>
+        </column>
+		<column>
+			<name>Name</name>
+			<title>Name (CampaignSnapshot)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>CampaignSnapshot</folder>
+		</column>
+		<column>
+			<name>ExpectedRevenue</name>
+			<title>ExpectedRevenue (CampaignSnapshot)</title>
+			<ldmType>FACT</ldmType>
+			<folder>CampaignSnapshot</folder>
+		</column>
+		<column>
+			<name>BudgetedCost</name>
+			<title>BudgetedCost (CampaignSnapshot)</title>
+			<ldmType>FACT</ldmType>
+			<folder>CampaignSnapshot</folder>
+		</column>
+		<column>
+			<name>ActualCost</name>
+			<title>ActualCost (CampaignSnapshot)</title>
+			<ldmType>FACT</ldmType>
+			<folder>CampaignSnapshot</folder>
+		</column>
+		<column>
+			<name>StartDate</name>
+			<title>StartDate (CampaignSnapshot)</title>
+			<ldmType>DATE</ldmType>
+			<format>yyyy-MM-dd</format>
+			<schemaReference>SF_CampaignSnapshotStartDate</schemaReference>
+			<folder>CampaignSnapshot</folder>
+		</column>
+		<column>
+			<name>Type</name>
+			<title>Type (CampaignSnapshot)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>CampaignSnapshot</folder>
+		</column>
+		<column>
+			<name>Status</name>
+			<title>Status (CampaignSnapshot)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>CampaignSnapshot</folder>
+		</column>
+	</columns>
+</schema>

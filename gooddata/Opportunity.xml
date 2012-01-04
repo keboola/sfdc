@@ -8,6 +8,13 @@
 			<dataType>VARCHAR(255)</dataType>
 			<folder>Opportunity</folder>
 		</column>
+		<column>
+			<name>isDeleted</name>
+			<title>isDeleted (Opportunity)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>Opportunity</folder>
+		</column>
         <column>
             <name>AccountId</name>
             <title>AccountId (Opportunity)</title>

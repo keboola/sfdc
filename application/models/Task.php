@@ -9,6 +9,7 @@
 class Model_Task extends App_Db_Table
 {
 	protected $_name = 'Task';
+	protected $_snapshotTableClass = 'Model_TaskSnapshot';
 
 	/**
 	 * @param $idUser
@@ -22,6 +23,7 @@ class Model_Task extends App_Db_Table
 		if ($data['ActivityDate'] == null) {
 			$data['ActivityDate'] = '1900-01-01';
 		}
+		$data['isDeleted'] = 0;
 
 		$user = $this->fetchRow(array('_idUser=?' => $data['_idUser'], 'Id=?' => $data['Id']));
 		if (!$user) {

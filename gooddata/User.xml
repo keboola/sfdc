@@ -8,6 +8,13 @@
 			<dataType>VARCHAR(255)</dataType>
 			<folder>User</folder>
 		</column>
+		<column>
+			<name>isDeleted</name>
+			<title>isDeleted (User)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>User</folder>
+		</column>
         <column>
             <name>Name</name>
             <title>Name (User)</title>

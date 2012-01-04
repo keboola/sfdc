@@ -6,10 +6,9 @@
  *
  */
 
-class Model_Opportunity extends App_Db_Table
+class Model_OpportunitySnapshot extends App_Db_Table
 {
-	protected $_name = 'Opportunity';
-	protected $_snapshotTableClass = 'Model_OpportunitySnapshot';
+	protected $_name = 'OpportunitySnapshot';
 
 	/**
 	 * @param $idUser
@@ -29,8 +28,7 @@ class Model_Opportunity extends App_Db_Table
 		if ($data['OwnerId'] == null) {
 			$data['OwnerId'] = '--empty--';
 		}
-		$data['isDeleted'] = 0;
-		$opportunity = $this->fetchRow(array('_idUser=?' => $data['_idUser'], 'Id=?' => $data['Id']));
+		$opportunity = $this->fetchRow(array('_idUser=?' => $data['_idUser'], 'Id=?' => $data['Id'], 'snapshotNumber=?' => $data['snapshotNumber']));
 		if (!$opportunity) {
 			$this->insert($data);
 		} else {

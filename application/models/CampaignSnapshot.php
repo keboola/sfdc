@@ -6,10 +6,10 @@
  *
  */
 
-class Model_Campaign extends App_Db_Table
+class Model_CampaignSnapshot extends App_Db_Table
 {
-	protected $_name = 'Campaign';
-	protected $_snapshotTableClass = 'Model_CampaignSnapshot';
+	protected $_name = 'CampaignSnapshot';
+	protected $_snapshotTableClass = 'Model_ContactSnapshot';
 
 	/**
 	 * @param $idUser
@@ -35,8 +35,7 @@ class Model_Campaign extends App_Db_Table
 		if ($data['StartDate'] == null) {
 			$data['StartDate'] = '1900-01-01';
 		}
-		$data['isDeleted'] = 0;
-		$user = $this->fetchRow(array('_idUser=?' => $data['_idUser'], 'Id=?' => $data['Id']));
+		$user = $this->fetchRow(array('_idUser=?' => $data['_idUser'], 'Id=?' => $data['Id'], 'snapshotNumber=?' => $data['snapshotNumber']));
 		if (!$user) {
 			$this->insert($data);
 		} else {
@@ -44,5 +43,4 @@ class Model_Campaign extends App_Db_Table
 			$user->save();
 		}
 	}
-
 }

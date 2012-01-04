@@ -10,153 +10,70 @@ class App_SalesForceImport
 	{
 		$this->_user = $user;
 		$this->_registry = Zend_Registry::getInstance();
+		$snapshotTable = new Model_BiSnapshot();
+		$this->_snapshotNumber = $snapshotTable->getSnapshotNumber();
 	}
 
-	public function importUsers($since)
+	public function importUsers()
 	{
 		$query = "SELECT Id,Name FROM User";
-		if ($since) {
-			$query .= " WHERE LastModifiedDate > {$since}";
-		}
-		$response = $this->query($query);
-		$user = new Model_User();
-		$user->add(array('_idUser' => $this->_user->id, 'Id' => '--empty--', 'Name' => '--empty--'));
-		if ($response['totalSize'] > 0) {
-			foreach($response['records'] as $record) {
-				$record['_idUser'] = $this->_user->id;
-				unset($record['attributes']);
-				$user->add($record);
-			}
-		}
+		$this->_processImport($query, "Model_User");
 	}
 
-	public function importOpportunities($since)
-	{
-		$query = "SELECT Id,AccountId,Amount,ExpectedRevenue,CloseDate,CreatedDate,IsWon,IsClosed,Name,StageName,OwnerId FROM Opportunity";
-		if ($since) {
-			$query .= " WHERE LastModifiedDate > {$since}";
-		}
-		$response = $this->query($query);
-		$opportunity = new Model_Opportunity();
-		if ($response['totalSize'] > 0) {
-			foreach($response['records'] as $record) {
-				$record['_idUser'] = $this->_user->id;
-				unset($record['attributes']);
-				$opportunity->add($record);
-			}
-		}
-	}
-
-	public function importOpportunityHistories($since)
-	{
-		$query = "SELECT Id,OpportunityId,Amount,ExpectedRevenue,StageName FROM OpportunityHistory";
-		if ($since) {
-			$query .= " WHERE SystemModstamp > {$since}";
-		}
-		$response = $this->query($query);
-		$opportunity = new Model_OpportunityHistory();
-		if ($response['totalSize'] > 0) {
-			foreach($response['records'] as $record) {
-				$record['_idUser'] = $this->_user->id;
-				unset($record['attributes']);
-				$opportunity->add($record);
-			}
-		}
-	}
-
-	public function importAccounts($since)
-	{
-		$query = "SELECT Id,Name,Type FROM Account";
-		if ($since) {
-			$query .= " WHERE LastModifiedDate > {$since}";
-		}
-		$response = $this->query($query);
-		$account = new Model_Account();
-		$account->add(array('_idUser' => $this->_user->id, 'Id' => '--empty--', 'Name' => '--empty--', 'Type' => null));
-		if ($response['totalSize'] > 0) {
-			foreach($response['records'] as $record) {
-				$record['_idUser'] = $this->_user->id;
-				unset($record['attributes']);
-				$account->add($record);
-			}
-		}
-	}
-
-	public function importContacts($since)
-	{
-		$query = "SELECT Id,Name FROM Contact";
-		if ($since) {
-			$query .= " WHERE LastModifiedDate > {$since}";
-		}
-
-		$response = $this->query($query);
-		$user = new Model_Contact();
-		$user->add(array('_idUser' => $this->_user->id, 'Id' => '--empty--', 'Name' => '--empty--'));
-		if ($response['totalSize'] > 0) {
-			foreach($response['records'] as $record) {
-				$record['_idUser'] = $this->_user->id;
-				unset($record['attributes']);
-				$user->add($record);
-			}
-		}
-	}
-
-
-	public function importTasks($since)
-	{
-		$query = "SELECT AccountId,ActivityDate,Id,IsClosed,OwnerId,Priority,Status,Subject FROM Task";
-		if ($since) {
-			$query .= " WHERE LastModifiedDate > {$since}";
-		}
-
-		$response = $this->query($query);
-		$user = new Model_Task();
-		if ($response['totalSize'] > 0) {
-			foreach($response['records'] as $record) {
-				$record['_idUser'] = $this->_user->id;
-				unset($record['attributes']);
-				$user->add($record);
-			}
-		}
-	}
-
-	public function importEvents($since)
-	{
-		$query = "SELECT AccountId,ActivityDate,Id,OwnerId,Subject FROM Event";
-		if ($since) {
-			$query .= " WHERE LastModifiedDate > {$since}";
-		}
-
-		$response = $this->query($query);
-		$user = new Model_Event();
-		if ($response['totalSize'] > 0) {
-			foreach($response['records'] as $record) {
-				$record['_idUser'] = $this->_user->id;
-				unset($record['attributes']);
-				$user->add($record);
-			}
-		}
-	}
-
-	public function importCampaigns($since)
+	public function importCampaigns()
 	{
 		$query = "SELECT Id,OwnerId,Name,ExpectedRevenue,BudgetedCost,ActualCost,StartDate,Type,Status FROM Campaign";
-		if ($since) {
-			$query .= " WHERE LastModifiedDate > {$since}";
-		}
+		$this->_processImport($query, "Model_Campaign");
+	}
 
-		$response = $this->query($query);
-		$user = new Model_Campaign();
+	public function importAccounts()
+	{
+		$query = "SELECT Id,Name,Type FROM Account";
+		$this->_processImport($query, "Model_Account");
+	}
+
+	public function importContacts()
+	{
+		$query = "SELECT Id,Name FROM Contact";
+		$this->_processImport($query, "Model_Contact");
+	}
+
+	public function importEvents()
+	{
+		$query = "SELECT AccountId,ActivityDate,Id,OwnerId,Subject FROM Event";
+		$this->_processImport($query, "Model_Event");
+	}
+
+	public function importTasks()
+	{
+		$query = "SELECT AccountId,ActivityDate,Id,IsClosed,OwnerId,Priority,Status,Subject FROM Task";
+		$this->_processImport($query, "Model_Task");
+	}
+
+	public function importOpportunities()
+	{
+		$query = "SELECT Id,AccountId,Amount,ExpectedRevenue,CloseDate,CreatedDate,IsWon,IsClosed,Name,StageName,OwnerId FROM Opportunity";
+		$this->_processImport($query, "Model_Opportunity");
+	}
+
+	private function _processImport($query, $tableClass)
+	{
+		$response = $this->_query($query);
+		$dbTable = new $tableClass;
+		$dbTable->deleteAll($this->_user->id);
+
 		if ($response['totalSize'] > 0) {
 			foreach($response['records'] as $record) {
 				$record['_idUser'] = $this->_user->id;
 				unset($record['attributes']);
-				$user->add($record);
+				$dbTable->add($record);
 			}
 		}
+
+		$dbTable->createSnapshot($this->_user->id, $this->_snapshotNumber);
 	}
 
-	private function query($query, $queryUrl = '') {
+	private function _query($query, $queryUrl = '') {
 		if (!$queryUrl) {
 			$url = "{$this->_user->instanceUrl}/services/data/v23.0/query?q=" . urlencode($query);
 		} else {

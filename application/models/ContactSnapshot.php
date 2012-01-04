@@ -6,10 +6,9 @@
  *
  */
 
-class Model_Contact extends App_Db_Table
+class Model_ContactSnapshot extends App_Db_Table
 {
-	protected $_name = 'Contact';
-	protected $_snapshotTableClass = 'Model_ContactSnapshot';
+	protected $_name = 'ContactSnapshot';
 
 	/**
 	 * @param $idUser
@@ -17,8 +16,7 @@ class Model_Contact extends App_Db_Table
 	 */
 	public function add($data)
 	{
-		$data['isDeleted'] = 0;
-		$user = $this->fetchRow(array('_idUser=?' => $data['_idUser'], 'Id=?' => $data['Id']));
+		$user = $this->fetchRow(array('_idUser=?' => $data['_idUser'], 'Id=?' => $data['Id'], 'snapshotNumber=?' => $data['snapshotNumber']));
 		if (!$user) {
 			$this->insert($data);
 		} else {

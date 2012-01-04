@@ -1,0 +1,49 @@
+<schema>
+	<name>UserSnapshot</name>
+	<columns>
+		<column>
+			<name>Id</name>
+			<title>ID (UserSnapshot)</title>
+			<ldmType>CONNECTION_POINT</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>UserSnapshot</folder>
+		</column>
+		<column>
+			<name>isDeleted</name>
+			<title>isDeleted (UserSnapshot)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>UserSnapshot</folder>
+		</column>
+		<column>
+			<name>snapshotNumber</name>
+			<title>snapshotNumber (UserSnapshot)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>UserSnapshot</folder>
+		</column>
+		<column>
+			<name>snapshotDate</name>
+			<title>snapshotDate (UserSnapshot)</title>
+			<ldmType>DATE</ldmType>
+			<format>yyyy-MM-dd</format>
+			<schemaReference>SF_SnapshotDate</schemaReference>
+			<folder>UserSnapshot</folder>
+		</column>
+		<column>
+			<name>UserId</name>
+			<title>UserId (UserSnapshot)</title>
+			<ldmType>REFERENCE</ldmType>
+			<reference>Id</reference>
+			<schemaReference>User</schemaReference>
+			<folder>UserSnapshot</folder>
+		</column>
+        <column>
+            <name>Name</name>
+            <title>Name (UserSnapshot)</title>
+            <ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>UserSnapshot</folder>
+        </column>
+	</columns>
+</schema>

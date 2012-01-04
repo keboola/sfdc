@@ -13,12 +13,10 @@ $application->bootstrap(array('base', 'autoload', 'config', 'db'));
 
 // Setup console input
 $opts = new Zend_Console_Getopt(array(
-	'id|i=s'	=> 'Id of user',
-	'full|f' => 'Full import'
+	'id|i=s'	=> 'Id of user'
 ));
 $opts->setHelp(array(
-	'i'	=> 'Id of user',
-	'f'	=> 'Full import'
+	'i'	=> 'Id of user'
 ));
 try {
 	$opts->parse();
@@ -33,10 +31,6 @@ echo 'Start: '.date('j. n. Y H:i:s', $start)."\n";
 $_u = new Model_BiUser();
 $config = Zend_Registry::get('config');
 
-$since = '';
-if (!$opts->getOption('full')) {
-	$since = date('Y-m-d', strtotime('-4 day')) . 'T00:00:00.000Z';
-}
 
 if (!$opts->getOption('id')) {
 	echo $opts->getUsageMessage();
@@ -45,24 +39,16 @@ if (!$opts->getOption('id')) {
 	if ($u) {
 		$u->revalidateAccessToken();
 		$import = new App_SalesForceImport($u);
-		$import->importContacts($since);
-		$import->importUsers($since);
-		$import->importOpportunities($since);
-		$import->importOpportunityHistories($since);
-		$import->importAccounts($since);
-		$import->importTasks($since);
-		$import->importEvents($since);
-		$import->importCampaigns($since);
-
-		/*
-		$ao = new App_AdWordsImport($u->id, $u->oauthToken, $u->oauthTokenSecret, $config->adwords->developerToken,
-			$config->adwords->oauthKey, $config->adwords->oauthSecret);
-		$ao->importClients($config->adwords->managerId);
-		$ao->importCampaigns($since, $until);
-		*/
+		$import->importContacts();
+		$import->importUsers();
+		$import->importOpportunities();
+		$import->importAccounts();
+		$import->importTasks();
+		$import->importEvents();
+		$import->importCampaigns();
 
 	} else {
-		echo "Bad user id!\n";
+		echo "Wrong user id!\n";
 	}
 }
 

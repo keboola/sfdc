@@ -10,6 +10,7 @@ class App_Db_Table extends Zend_Db_Table
 	 * @var string
 	 */
 	protected $_name;
+	protected $_snapshotTableClass;
 
 	/**
 	 * @param array $config
@@ -22,6 +23,37 @@ class App_Db_Table extends Zend_Db_Table
 
 		$c = Zend_Registry::get('config');
 		$this->_name = $c->db->prefix.(!empty($name) ? $name : $this->_name);
+	}
+
+	/**
+	 * set all rows as deleted
+	 * @param $idUser
+	 * @return void
+	 */
+	public function deleteAll($idUser)
+	{
+		$this->update(array("isDeleted" => 1), array('_idUser=?' => $idUser));
+	}
+
+	/**
+	 *
+	 * creates a snapshot in snapshot table
+	 *
+	 * @param $user
+	 * @param $snapshotNumber
+	 * @return void
+	 */
+	public function createSnapshot($user, $snapshotNumber)
+	{
+		$items = $this->fetchAll(array('_idUser=?' => $user));
+		$snapshotTable = new $this->_snapshotTableClass;
+		foreach ($items as $item) {
+			$data = $item->toArray();
+			unset($data['_id']);
+			$data['snapshotNumber'] = $snapshotNumber;
+			$snapshotTable->add($data);
+		}
+
 	}
 
 }

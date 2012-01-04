@@ -8,6 +8,13 @@
 			<dataType>VARCHAR(255)</dataType>
 			<folder>Campaign</folder>
 		</column>
+		<column>
+			<name>isDeleted</name>
+			<title>isDeleted (Campaign)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>Campaign</folder>
+		</column>
         <column>
             <name>OwnerId</name>
             <title>OwnerId (Campaign)</title>

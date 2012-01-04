@@ -6,10 +6,9 @@
  *
  */
 
-class Model_Event extends App_Db_Table
+class Model_EventSnapshot extends App_Db_Table
 {
-	protected $_name = 'Event';
-	protected $_snapshotTableClass = 'Model_EventSnapshot';
+	protected $_name = 'EventSnapshot';
 
 	/**
 	 * @param $idUser
@@ -20,8 +19,7 @@ class Model_Event extends App_Db_Table
 		if ($data['AccountId'] == null) {
 			$data['AccountId'] = '--empty--';
 		}
-		$data['isDeleted'] = 0;
-		$user = $this->fetchRow(array('_idUser=?' => $data['_idUser'], 'Id=?' => $data['Id']));
+		$user = $this->fetchRow(array('_idUser=?' => $data['_idUser'], 'Id=?' => $data['Id'], 'snapshotNumber=?' => $data['snapshotNumber']));
 		if (!$user) {
 			$this->insert($data);
 		} else {
