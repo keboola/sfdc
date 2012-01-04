@@ -1,4 +1,5 @@
 <?php
+
 defined('ROOT_PATH') || define('ROOT_PATH', realpath(dirname(__FILE__) . '/..'));
 define('APPLICATION_PATH', ROOT_PATH . '/application');
 defined('APPLICATION_ENV') || define('APPLICATION_ENV', (getenv('APPLICATION_ENV') ? getenv('APPLICATION_ENV')

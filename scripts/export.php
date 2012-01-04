@@ -1,7 +1,12 @@
 <?php
+
+require_once("config.php");
+
 define('ROOT_PATH', dirname(dirname($_SERVER['SCRIPT_FILENAME'])));
 define('APPLICATION_PATH', ROOT_PATH . '/application');
-define('APPLICATION_ENV', 'production');
+defined('APPLICATION_ENV') || define('APPLICATION_ENV', (getenv('APPLICATION_ENV') ? getenv('APPLICATION_ENV')
+	: 'production'));
+
 
 // Ensure library/ is on include_path
 set_include_path(implode(PATH_SEPARATOR, array(
