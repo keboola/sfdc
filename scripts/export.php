@@ -52,29 +52,30 @@ try {
 
 $config = Zend_Registry::get('config');
 
-if($opts->getOption('project') && $opts->getOption('id')) {
-	if ($opts->getOption('setup'))
-	{
-		$fgd = new App_GoodDataExport($opts->getOption('project'), $opts->getOption('id'), $config);
-		$fgd->setup();
+
+
+if($opts->getOption('id')) {
+	$userTable = new Model_BiUser();
+	$user = $userTable->fetchRow(array('id=?' => $opts->getOption('id')));
+
+	if (!$user) {
+		throw new Exception("User not found.");
 	}
-	elseif ($opts->getOption('load'))
-	{
-		$fgd = new App_GoodDataExport($opts->getOption('project'), $opts->getOption('id'), $config);
-		$fgd->loadData($opts->getOption('all'));
+	if (!$user->gdProject) {
+		throw new Exception("Missing GoodData project ID for user {$user->name} ({$user->id})");
 	}
-	elseif ($opts->getOption('update'))
-	{
-		$fgd = new App_GoodDataExport($opts->getOption('project'), $opts->getOption('id'), $config);
-		$fgd->updateStructure($opts->getOption('update'));
-	}
-	elseif ($opts->getOption('dump'))
-	{
-		$fgd = new App_GoodDataExport($opts->getOption('project'), $opts->getOption('id'), $config);
-		echo $fgd->dumpTable($opts->getOption('dump'), true, false, true);
-	}
-	else
-	{
+
+	$gd = new App_GoodDataExport($user->gdProject, $user->id, $config);
+
+	if ($opts->getOption('setup'))	{
+		$gd->setup();
+	} elseif ($opts->getOption('load')) {
+		$gd->loadData($opts->getOption('all'));
+	} elseif ($opts->getOption('update')) {
+		$gd->updateStructure($opts->getOption('update'));
+	} elseif ($opts->getOption('dump')) {
+		echo $gd->dumpTable($opts->getOption('dump'), true, false, true);
+	} else {
 		echo $opts->getUsageMessage();
 	}
 } else {

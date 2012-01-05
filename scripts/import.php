@@ -30,24 +30,18 @@ try {
 $start = time();
 echo 'Start: '.date('j. n. Y H:i:s', $start)."\n";
 
-$_u = new Model_BiUser();
+$userTable = new Model_BiUser();
 $config = Zend_Registry::get('config');
 
 
 if (!$opts->getOption('id')) {
 	echo $opts->getUsageMessage();
 } else {
-	$u = $_u->fetchRow(array('id=?' => $opts->getOption('id')));
-	if ($u) {
-		$u->revalidateAccessToken();
-		$import = new App_SalesForceImport($u);
-		$import->importContacts();
-		$import->importUsers();
-		$import->importOpportunities();
-		$import->importAccounts();
-		$import->importTasks();
-		$import->importEvents();
-		$import->importCampaigns();
+	$user = $userTable->fetchRow(array('id=?' => $opts->getOption('id')));
+	if ($user) {
+		$user->revalidateAccessToken();
+		$import = new App_SalesForceImport($user);
+		$import->importAll();
 
 	} else {
 		echo "Wrong user id!\n";

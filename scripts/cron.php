@@ -12,34 +12,49 @@ require_once 'Zend/Application.php';
 $application = new Zend_Application(APPLICATION_ENV, APPLICATION_PATH . '/configs/application.ini');
 $application->bootstrap(array('base', 'autoload', 'config', 'db'));
 
+// Setup console input
+$opts = new Zend_Console_Getopt(array(
+	'id|i=i'	=> 'Id of user'
+));
+$opts->setHelp(array(
+	'i'	=> 'Id of user'
+));
+try {
+	$opts->parse();
+} catch (Zend_Console_Getopt_Exception $e) {
+	echo $e->getUsageMessage();
+	exit;
+}
 
 $start = time();
 echo 'Start: '.date('j. n. Y H:i:s', $start)."\n";
 
-$_u = new Model_Users();
+$usersTable = new Model_BiUser();
 $config = Zend_Registry::get('config');
 
-$since = date('Ymd', strtotime('-4 days'));
-$until = date('Ymd', strtotime('-1 day'));
+$idUser = $opts->getOption('id');
+$config = Zend_Registry::get('config');
 
-foreach($_u->fetchAll() as $u) {
-	$ao = new App_AdWordsImport($u->id, $u->oauthToken, $u->oauthTokenSecret, $config->adwords->developerToken,
-		$config->adwords->oauthKey, $config->adwords->oauthSecret);
-	$ao->importClients($config->adwords->managerId);
-	if (!$u->isImported) {
-		$since = date('Ymd', strtotime('-60 days'));
-	}
-	if ($ao->importCampaigns($since, $until)) {
-		if (!$u->isImported) {
-			$u->isImported = 1;
-			$u->save();
-		}
+if (!$idUser) {
+	echo $opts->getUsageMessage();
+	exit;
+}
 
-		if (!empty($u->idGD)) {
-			$fgd = new App_GoodDataExport($u->idGD, $u->id, $config);
-			$fgd->loadData();
-		}
+foreach($usersTable->fetchAll(array('id=?' => $idUser)) as $user) {
+	// Import
+	print "Importing data\n";
+	$user->revalidateAccessToken();
+	$import = new App_SalesForceImport($user);
+	$import->importAll();
+	print "Importing done\n";
+
+	if (!$user->gdProject) {
+		throw new Exception("Missing GoodData project ID for user {$user->name} ({$user->id})");
 	}
+
+	// Export
+	$export = new App_GoodDataExport($user->gdProject, $user->id, $config);
+	$export->loadData();
 }
 
 $end = time();

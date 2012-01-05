@@ -294,7 +294,7 @@ class App_GoodDataExport
 	public function dump($sql, $file='')
 	{
 		$command = 'mysql -u '.$this->_config->db->login.' -p'.$this->_config->db->password.' -h '.$this->_config->db->host
-			.' '.$this->_config->db->db.' -B -e "'.$sql.'" | sed \'s/\t/","/g;s/^/"/;s/$/"/;s/\n//g\'';
+			.' '.$this->_config->db->db.' -B -e "'.$sql.'" | sed \'s/\"/\"\"/g\' | sed \'s/\t/","/g;s/^/"/;s/$/"/;s/\n//g\'';
 
 		if ($file) {
 			$command .= ' > '.$file;

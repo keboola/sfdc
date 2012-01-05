@@ -14,6 +14,17 @@ class App_SalesForceImport
 		$this->_snapshotNumber = $snapshotTable->getSnapshotNumber();
 	}
 
+	public function importAll()
+	{
+		$this->importContacts();
+		$this->importUsers();
+		$this->importOpportunities();
+		$this->importAccounts();
+		$this->importTasks();
+		$this->importEvents();
+		$this->importCampaigns();
+	}
+
 	public function importUsers()
 	{
 		$query = "SELECT Id,Name FROM User";
