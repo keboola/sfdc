@@ -9,6 +9,7 @@
 class Model_AccountSnapshot extends App_Db_Table
 {
 	protected $_name = 'AccountSnapshot';
+	protected $_isSnapshotTable = true;
 
 	/**
 	 * @param $idUser
@@ -16,15 +17,9 @@ class Model_AccountSnapshot extends App_Db_Table
 	 */
 	public function add($data)
 	{
-		if ($data['Type'] == null) {
+		if (!isset($data['Type']) || $data['Type'] == null) {
 			$data['Type'] = '--empty--';
 		}
-		$account = $this->fetchRow(array('_idUser=?' => $data['_idUser'], 'Id=?' => $data['Id'], 'snapshotNumber=?' => $data['snapshotNumber']));
-		if (!$account) {
-			$this->insert($data);
-		} else {
-			$account->setFromArray($data);
-			$account->save();
-		}
+		$this->insertOrSet($data);
 	}
 }

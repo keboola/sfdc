@@ -17,13 +17,12 @@ class Model_User extends App_Db_Table
 	 */
 	public function add($data)
 	{
-		$data['isDeleted'] = 0;
-		$user = $this->fetchRow(array('_idUser=?' => $data['_idUser'], 'Id=?' => $data['Id']));
-		if (!$user) {
-			$this->insert($data);
-		} else {
-			$user->setFromArray($data);
-			$user->save();
-		}
+		$this->insertOrSet($data);
 	}
+
+	public function insertEmptyRow($userId)
+	{
+		$this->add(array('_idUser' => $userId, 'Id' => '--empty--', 'Name' => '--empty--'));
+	}
+
 }

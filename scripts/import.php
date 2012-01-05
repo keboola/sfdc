@@ -6,9 +6,6 @@ define('APPLICATION_PATH', ROOT_PATH . '/application');
 defined('APPLICATION_ENV') || define('APPLICATION_ENV', (getenv('APPLICATION_ENV') ? getenv('APPLICATION_ENV')
 	: 'production'));
 
-
-var_dump(APPLICATION_ENV);
-
 set_include_path(implode(PATH_SEPARATOR, array(
 			realpath(APPLICATION_PATH . '/../library'), get_include_path(),
 		)));

@@ -47,7 +47,7 @@
 			<name>CreatedDate</name>
 			<title>CreatedDate (Opportunity)</title>
 			<ldmType>DATE</ldmType>
-			<format>yyyy-MM-dd HH:mm:ss</format>
+			<format>yyyy-MM-dd</format>
 			<schemaReference>SF_OpportunityCreatedDate</schemaReference>
 			<folder>Opportunity</folder>
 		</column>

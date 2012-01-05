@@ -180,8 +180,7 @@ class App_GoodDataExport
 		if ($structure) {
 			$sql .= ' LIMIT 1';
 		} elseif (!$all) {
-			// TODO WTF is this?
-			$sql .= ' AND t.timestamp > \''.date('Y-m-d H:i:s', strtotime('-4 days')).'\'';
+			$sql .= ' AND t.lastModificationDate > \''.date('Y-m-d', strtotime('-4 days')).'\'';
 		}
 
 		$file = null;

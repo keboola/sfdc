@@ -9,6 +9,7 @@
 class Model_OpportunitySnapshot extends App_Db_Table
 {
 	protected $_name = 'OpportunitySnapshot';
+	protected $_isSnapshotTable = true;
 
 	/**
 	 * @param $idUser
@@ -19,7 +20,7 @@ class Model_OpportunitySnapshot extends App_Db_Table
 		if ($data['Amount'] == null) {
 			$data['Amount'] = 0;
 		}
-		if ($data['ExpectedRevenue'] == null) {
+		if (!isset($data['ExpectedRevenue']) || $data['ExpectedRevenue'] == null) {
 			$data['ExpectedRevenue'] = 0;
 		}
 		if ($data['AccountId'] == null) {
@@ -28,12 +29,10 @@ class Model_OpportunitySnapshot extends App_Db_Table
 		if ($data['OwnerId'] == null) {
 			$data['OwnerId'] = '--empty--';
 		}
-		$opportunity = $this->fetchRow(array('_idUser=?' => $data['_idUser'], 'Id=?' => $data['Id'], 'snapshotNumber=?' => $data['snapshotNumber']));
-		if (!$opportunity) {
-			$this->insert($data);
-		} else {
-			$opportunity->setFromArray($data);
-			$opportunity->save();
-		}
+
+		$dateParts = explode("T", $data['CreatedDate']);
+		$data['CreatedDate'] = $dateParts[0];
+
+		$this->insertOrSet($data);
 	}
 }

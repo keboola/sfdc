@@ -53,19 +53,28 @@ try {
 $config = Zend_Registry::get('config');
 
 if($opts->getOption('project') && $opts->getOption('id')) {
-	if($opts->getOption('setup')) {
+	if ($opts->getOption('setup'))
+	{
 		$fgd = new App_GoodDataExport($opts->getOption('project'), $opts->getOption('id'), $config);
 		$fgd->setup();
-	} elseif ($opts->getOption('load')) {
+	}
+	elseif ($opts->getOption('load'))
+	{
 		$fgd = new App_GoodDataExport($opts->getOption('project'), $opts->getOption('id'), $config);
 		$fgd->loadData($opts->getOption('all'));
-	} elseif ($opts->getOption('update')) {
+	}
+	elseif ($opts->getOption('update'))
+	{
 		$fgd = new App_GoodDataExport($opts->getOption('project'), $opts->getOption('id'), $config);
 		$fgd->updateStructure($opts->getOption('update'));
-	} elseif ($opts->getOption('dump')) {
+	}
+	elseif ($opts->getOption('dump'))
+	{
 		$fgd = new App_GoodDataExport($opts->getOption('project'), $opts->getOption('id'), $config);
 		echo $fgd->dumpTable($opts->getOption('dump'), true, false, true);
-	} else {
+	}
+	else
+	{
 		echo $opts->getUsageMessage();
 	}
 } else {

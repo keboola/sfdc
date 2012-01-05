@@ -17,17 +17,15 @@ class Model_Account extends App_Db_Table
 	 */
 	public function add($data)
 	{
-		if ($data['Type'] == null) {
+		if (!isset($data['Type']) || $data['Type'] == null) {
 			$data['Type'] = '--empty--';
 		}
-		$data['isDeleted'] = 0;
-		$account = $this->fetchRow(array('_idUser=?' => $data['_idUser'], 'Id=?' => $data['Id']));
-		if (!$account) {
-			$this->insert($data);
-		} else {
-			$account->setFromArray($data);
-			$account->save();
-		}
+		$this->insertOrSet($data);
+	}
+
+	public function insertEmptyRow($userId)
+	{
+		$this->add(array('_idUser' => $userId, 'Id' => '--empty--', 'Name' => '--empty--', 'Type' => null));
 	}
 
 }

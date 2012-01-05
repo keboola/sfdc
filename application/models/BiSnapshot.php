@@ -6,7 +6,7 @@
  *
  */
 
-class Model_BiSnapshot extends App_Db_Table
+class Model_BiSnapshot extends Zend_Db_Table
 {
 	protected $_name = 'bi_snapshot';
 

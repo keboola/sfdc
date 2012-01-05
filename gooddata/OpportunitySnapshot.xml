@@ -70,7 +70,7 @@
 			<name>CreatedDate</name>
 			<title>CreatedDate (OpportunitySnapshot)</title>
 			<ldmType>DATE</ldmType>
-			<format>yyyy-MM-dd HH:mm:ss</format>
+			<format>yyyy-MM-dd</format>
 			<schemaReference>SF_OpportunitySnapshotCreatedDate</schemaReference>
 			<folder>OpportunitySnapshot</folder>
 		</column>

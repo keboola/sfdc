@@ -9,6 +9,7 @@
 class Model_UserSnapshot extends App_Db_Table
 {
 	protected $_name = 'UserSnapshot';
+	protected $_isSnapshotTable = true;
 
 	/**
 	 * @param $idUser
@@ -16,12 +17,6 @@ class Model_UserSnapshot extends App_Db_Table
 	 */
 	public function add($data)
 	{
-		$user = $this->fetchRow(array('_idUser=?' => $data['_idUser'], 'Id=?' => $data['Id'], 'snapshotNumber=?' => $data['snapshotNumber']));
-		if (!$user) {
-			$this->insert($data);
-		} else {
-			$user->setFromArray($data);
-			$user->save();
-		}
+		$this->insertOrSet($data);
 	}
 }

@@ -20,13 +20,6 @@ class Model_Event extends App_Db_Table
 		if ($data['AccountId'] == null) {
 			$data['AccountId'] = '--empty--';
 		}
-		$data['isDeleted'] = 0;
-		$user = $this->fetchRow(array('_idUser=?' => $data['_idUser'], 'Id=?' => $data['Id']));
-		if (!$user) {
-			$this->insert($data);
-		} else {
-			$user->setFromArray($data);
-			$user->save();
-		}
+		$this->insertOrSet($data);
 	}
 }

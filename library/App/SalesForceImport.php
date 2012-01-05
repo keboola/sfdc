@@ -17,7 +17,7 @@ class App_SalesForceImport
 	public function importUsers()
 	{
 		$query = "SELECT Id,Name FROM User";
-		$this->_processImport($query, "Model_User");
+		$this->_processImport($query, "Model_User", true);
 	}
 
 	public function importCampaigns()
@@ -28,14 +28,15 @@ class App_SalesForceImport
 
 	public function importAccounts()
 	{
-		$query = "SELECT Id,Name,Type FROM Account";
-		$this->_processImport($query, "Model_Account");
+//		$query = "SELECT Id,Name,Type FROM Account";
+		$query = "SELECT Id,Name FROM Account";
+		$this->_processImport($query, "Model_Account", true);
 	}
 
 	public function importContacts()
 	{
 		$query = "SELECT Id,Name FROM Contact";
-		$this->_processImport($query, "Model_Contact");
+		$this->_processImport($query, "Model_Contact", true);
 	}
 
 	public function importEvents()
@@ -52,15 +53,19 @@ class App_SalesForceImport
 
 	public function importOpportunities()
 	{
-		$query = "SELECT Id,AccountId,Amount,ExpectedRevenue,CloseDate,CreatedDate,IsWon,IsClosed,Name,StageName,OwnerId FROM Opportunity";
+//		$query = "SELECT Id,AccountId,Amount,ExpectedRevenue,CloseDate,CreatedDate,IsWon,IsClosed,Name,StageName,OwnerId FROM Opportunity";
+		$query = "SELECT Id,AccountId,Amount,CloseDate,CreatedDate,IsWon,IsClosed,Name,StageName,OwnerId FROM Opportunity";
 		$this->_processImport($query, "Model_Opportunity");
 	}
 
-	private function _processImport($query, $tableClass)
+	private function _processImport($query, $tableClass, $emptyRow=false)
 	{
 		$response = $this->_query($query);
 		$dbTable = new $tableClass;
-		$dbTable->deleteAll($this->_user->id);
+		$dbTable->prepareDeleteCheck($this->_user->id);
+		if ($emptyRow) {
+			$dbTable->insertEmptyRow($this->_user->id);
+		}
 
 		if ($response['totalSize'] > 0) {
 			foreach($response['records'] as $record) {
@@ -69,6 +74,8 @@ class App_SalesForceImport
 				$dbTable->add($record);
 			}
 		}
+
+		$dbTable->deleteCheck($this->_user->id);
 
 		$dbTable->createSnapshot($this->_user->id, $this->_snapshotNumber);
 	}
@@ -90,8 +97,8 @@ class App_SalesForceImport
 
 		$response = json_decode($json_response, true);
 		// Query more
-		if ($response['done'] === false && $response['nextRecordsUrl'] != '') {
-			$responseMore = $this->query($query, $response['nextRecordsUrl']);
+		if (isset($response['done']) && $response['done'] === false && $response['nextRecordsUrl'] != '') {
+			$responseMore = $this->_query($query, $response['nextRecordsUrl']);
 			$response = array_merge_recursive($response, $responseMore);
 		}
 		if (isset($response[0]['errorCode'])) {
