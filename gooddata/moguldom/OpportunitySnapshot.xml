@@ -53,12 +53,6 @@
 			<folder>OpportunitySnapshot</folder>
 		</column>
 		<column>
-			<name>ExpectedRevenue</name>
-			<title>ExpectedRevenue (OpportunitySnapshot)</title>
-			<ldmType>FACT</ldmType>
-			<folder>OpportunitySnapshot</folder>
-		</column>
-		<column>
 			<name>CloseDate</name>
 			<title>CloseDate (OpportunitySnapshot)</title>
 			<ldmType>DATE</ldmType>

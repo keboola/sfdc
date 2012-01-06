@@ -20,9 +20,9 @@ class Model_User extends App_Db_Table
 		$this->insertOrSet($data);
 	}
 
-	public function insertEmptyRow($userId)
+	public function insertEmptyRow()
 	{
-		$this->add(array('_idUser' => $userId, 'Id' => '--empty--', 'Name' => '--empty--'));
+		$this->add(array('Id' => '--empty--', 'Name' => '--empty--'));
 	}
 
 }

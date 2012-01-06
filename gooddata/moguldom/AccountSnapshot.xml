@@ -45,12 +45,5 @@
 			<dataType>VARCHAR(255)</dataType>
 			<folder>AccountSnapshot</folder>
 		</column>
-		<column>
-			<name>Type</name>
-			<title>Type (AccountSnapshot)</title>
-			<ldmType>ATTRIBUTE</ldmType>
-			<dataType>VARCHAR(255)</dataType>
-			<folder>AccountSnapshot</folder>
-		</column>
 	</columns>
 </schema>

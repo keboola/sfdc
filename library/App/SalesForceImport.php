@@ -16,89 +16,69 @@ class App_SalesForceImport
 
 	public function importAll()
 	{
-		$this->importContacts();
-		$this->importUsers();
-		$this->importOpportunities();
-		$this->importOpportunityHistory();
-		$this->importAccounts();
-		$this->importTasks();
-		$this->importEvents();
-		$this->importCampaigns();
-	}
+		$registry = Zend_Registry::getInstance();
+		$userStrId = $this->_user->strId;
+		foreach($registry->config->sfUser->$userStrId->tables as $table => $tableConfig) {
 
-	public function importUsers()
-	{
-		$query = "SELECT Id,Name FROM User";
-		$this->_processImport($query, "Model_User", true);
-	}
+			$response = $this->_query($tableConfig->importQuery);
 
-	public function importCampaigns()
-	{
-		$query = "SELECT Id,OwnerId,Name,ExpectedRevenue,BudgetedCost,ActualCost,StartDate,Type,Status FROM Campaign";
-		$this->_processImport($query, "Model_Campaign");
-	}
+			$tableClass = "Model_" . $table;
+			$dbTable = new $tableClass;
 
-	public function importAccounts()
-	{
-//		$query = "SELECT Id,Name,Type FROM Account";
-		$query = "SELECT Id,Name FROM Account";
-		$this->_processImport($query, "Model_Account", true);
-	}
+			$dbTable->prepareDeleteCheck();
 
-	public function importContacts()
-	{
-		$query = "SELECT Id,Name FROM Contact";
-		$this->_processImport($query, "Model_Contact", true);
-	}
+			// Empty record
+			if ($tableConfig->emptyRecord) {
+				$data = array();
+				foreach($tableConfig->emptyRecord as $column => $value) {
+					$data[$column] = $value;
+				}
+				$data = $this->transformValues($data, $tableConfig);
+				$dbTable->insertOrSet($data);
+			}
 
-	public function importEvents()
-	{
-		$query = "SELECT AccountId,ActivityDate,Id,OwnerId,Subject FROM Event";
-		$this->_processImport($query, "Model_Event");
-	}
+			if ($response['totalSize'] > 0) {
+				foreach($response['records'] as $record) {
+					unset($record['attributes']);
+					$record = $this->transformValues($record, $tableConfig);
+					$dbTable->insertOrSet($record);
+				}
+			}
 
-	public function importTasks()
-	{
-		$query = "SELECT AccountId,ActivityDate,Id,IsClosed,OwnerId,Priority,Status,Subject FROM Task";
-		$this->_processImport($query, "Model_Task");
-	}
+			$dbTable->deleteCheck();
 
-	public function importOpportunities()
-	{
-//		$query = "SELECT Id,AccountId,Amount,ExpectedRevenue,CloseDate,CreatedDate,IsWon,IsClosed,Name,StageName,OwnerId FROM Opportunity";
-		$query = "SELECT Id,AccountId,Amount,CloseDate,CreatedDate,IsWon,IsClosed,Name,StageName,ForecastCategory,Probability,OwnerId FROM Opportunity";
-		$this->_processImport($query, "Model_Opportunity");
-	}
-
-	public function importOpportunityHistory()
-	{
-		$query = "SELECT Amount,CloseDate,CreatedDate,ForecastCategory,Id,OpportunityId,Probability,StageName,SystemModstamp FROM OpportunityHistory";
-		$this->_processImport($query, "Model_OpportunityHistory", false, false);
-	}
-
-
-	private function _processImport($query, $tableClass, $emptyRow=false, $createSnapshot=true)
-	{
-		$response = $this->_query($query);
-		$dbTable = new $tableClass;
-		$dbTable->prepareDeleteCheck($this->_user->id);
-		if ($emptyRow) {
-			$dbTable->insertEmptyRow($this->_user->id);
+			if ($tableConfig->snapshot) {
+				$dbTable->createSnapshot($this->_snapshotNumber);
+			}
 		}
+	}
 
-		if ($response['totalSize'] > 0) {
-			foreach($response['records'] as $record) {
-				$record['_idUser'] = $this->_user->id;
-				unset($record['attributes']);
-				$dbTable->add($record);
+	/**
+	 * sets empty values, transforms desired columns
+	 * @param $record
+	 * @param $tableConfig
+	 * @return array
+	 */
+	public function transformValues($record, $tableConfig) {
+		// Empty values
+		if (isset($tableConfig->emptyColumn)) {
+			foreach($tableConfig->emptyColumn as $emptyColumnName => $emptyColumnValue) {
+				if (!isset($record[$emptyColumnName]) || $record[$emptyColumnName] == null) {
+					$record[$emptyColumnName] = $emptyColumnValue;
+				}
 			}
 		}
 
-		$dbTable->deleteCheck($this->_user->id);
-
-		if ($createSnapshot) {
-			$dbTable->createSnapshot($this->_user->id, $this->_snapshotNumber);
+		// Value transformation
+		if (isset($tableConfig->columnTransformation)) {
+			foreach($tableConfig->columnTransformation as $columnName => $columnTransformation) {
+				if ($columnTransformation == 'timeToDate') {
+					$dateParts = explode("T", $record[$columnName]);
+					$record[$columnName] = $dateParts[0];
+				}
+			}
 		}
+		return $record;
 	}
 
 	private function _query($query, $queryUrl = '') {

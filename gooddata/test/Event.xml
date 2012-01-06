@@ -1,0 +1,50 @@
+<schema>
+	<name>Event</name>
+	<columns>
+		<column>
+			<name>Id</name>
+			<title>ID (Event)</title>
+			<ldmType>CONNECTION_POINT</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>Event</folder>
+		</column>
+		<column>
+			<name>isDeleted</name>
+			<title>isDeleted (Event)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>Event</folder>
+		</column>
+		<column>
+			<name>AccountId</name>
+			<title>AccountId (Event)</title>
+			<ldmType>REFERENCE</ldmType>
+			<reference>Id</reference>
+			<schemaReference>Account</schemaReference>
+			<folder>Event</folder>
+		</column>
+		<column>
+			<name>OwnerId</name>
+			<title>OwnerId (Event)</title>
+			<ldmType>REFERENCE</ldmType>
+			<reference>Id</reference>
+			<schemaReference>User</schemaReference>
+			<folder>Event</folder>
+		</column>
+		<column>
+			<name>ActivityDate</name>
+			<title>ActivityDate (Event)</title>
+			<ldmType>DATE</ldmType>
+			<format>yyyy-MM-dd</format>
+			<schemaReference>SF_EventActivityDate</schemaReference>
+			<folder>Event</folder>
+		</column>
+		<column>
+			<name>Subject</name>
+			<title>Subject (Event)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>Event</folder>
+		</column>
+	</columns>
+</schema>

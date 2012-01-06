@@ -40,6 +40,11 @@ class App_GoodDataExport
 	private $_idUser;
 
 	/**
+	 * @var Model_BiUser
+	 */
+	private $_user;
+
+	/**
 	 * @var string
 	 */
 	private $_idProject;
@@ -50,15 +55,16 @@ class App_GoodDataExport
 	 * @param $idUser
 	 * @param $config
 	 */
-	public function __construct($idProject, $idUser, $config)
+	public function __construct($idProject, $user, $config)
 	{
 		$this->_gd = new App_GoodData($config->gooddata->username, $config->gooddata->password, $idProject);
 
 		$this->_idProject = $idProject;
-		$this->_idUser = $idUser;
+		$this->_idUser = $user->id;
+		$this->_user = $user;
 		$this->_config = $config;
 
-		$this->_xmlPath = realpath(APPLICATION_PATH . '/../gooddata');
+		$this->_xmlPath = realpath(APPLICATION_PATH . '/../gooddata/' . $user->strId);
 		$this->_tmpPath = realpath(APPLICATION_PATH . '/../tmp');
 	}
 
@@ -71,107 +77,29 @@ class App_GoodDataExport
 	 */
 	public function dumpTable($table, $return=false, $structure=false, $all=false)
 	{
-		$isDemo = $this->_idUser == self::DEMO_PROJECT;
+		$userStrId = $this->_user->strId;
+		$tablesConfig = Zend_Registry::get('config')->sfUser->$userStrId->tables;
 
-		switch($table) {
-
-			case 'User':
-				$sql = 'SELECT t.Id, t.isDeleted, t.Name '
-					. 'FROM User t '
-					. 'WHERE t._idUser = '.$this->_idUser;
-				break;
-			case 'UserSnapshot':
-				$sql = 'SELECT CONCAT(t.snapshotNumber, t.Id) AS Id, t.isDeleted, t.snapshotNumber, s.snapshotDate AS snapshotDate, t.Id as UserId, t.Name '
-					. 'FROM UserSnapshot t '
-					. 'LEFT JOIN bi_snapshot s ON t.snapshotNumber = s.snapshotNumber '
-					. 'WHERE t._idUser = '.$this->_idUser;
-				break;
-
-			case 'Campaign':
-				$sql = 'SELECT t.Id, t.isDeleted, t.OwnerId, t.Name, t.ExpectedRevenue, t.BudgetedCost, t.ActualCost, t.StartDate, t.Type, t.Status '
-					. 'FROM Campaign t '
-					. 'WHERE t._idUser = '.$this->_idUser;
-				break;
-			case 'CampaignSnapshot':
-				$sql = 'SELECT CONCAT(t.snapshotNumber, t.Id) AS Id, t.isDeleted, t.snapshotNumber, s.snapshotDate AS snapshotDate, t.Id as CampaignId, t.OwnerId, t.Name, t.ExpectedRevenue, t.BudgetedCost, t.ActualCost, t.StartDate, t.Type, t.Status '
-					. 'FROM CampaignSnapshot t '
-					. 'LEFT JOIN bi_snapshot s ON t.snapshotNumber = s.snapshotNumber '
-					. 'WHERE t._idUser = '.$this->_idUser;
-				break;
-
-			case 'Account':
-				$sql = 'SELECT t.Id, t.isDeleted, t.Name, t.Type '
-					. 'FROM Account t '
-					. 'WHERE t._idUser = '.$this->_idUser;
-				break;
-			case 'AccountSnapshot':
-				$sql = 'SELECT CONCAT(t.snapshotNumber, t.Id) AS Id, t.isDeleted, t.snapshotNumber, s.snapshotDate AS snapshotDate, t.Id as AccountId, t.Name, t.Type '
-					. 'FROM AccountSnapshot t '
-					. 'LEFT JOIN bi_snapshot s ON t.snapshotNumber = s.snapshotNumber '
-					. 'WHERE t._idUser = '.$this->_idUser;
-				break;
-
-			case 'Contact':
-				$sql = 'SELECT t.Id, t.isDeleted, t.Name '
-					. 'FROM Contact t '
-					. 'WHERE t._idUser = '.$this->_idUser;
-				break;
-			case 'ContactSnapshot':
-				$sql = 'SELECT CONCAT(t.snapshotNumber, t.Id) AS Id, t.isDeleted, t.snapshotNumber, s.snapshotDate AS snapshotDate, t.Id as ContactId, t.Name '
-					. 'FROM ContactSnapshot t '
-					. 'LEFT JOIN bi_snapshot s ON t.snapshotNumber = s.snapshotNumber '
-					. 'WHERE t._idUser = '.$this->_idUser;
-				break;
-
-			case 'Event':
-				$sql = 'SELECT t.Id, t.isDeleted, t.AccountId, t.OwnerId, t.ActivityDate, t.Subject '
-					. 'FROM Event t '
-					. 'WHERE t._idUser = '.$this->_idUser;
-				break;
-			case 'EventSnapshot':
-				$sql = 'SELECT CONCAT(t.snapshotNumber, t.Id) AS Id, t.isDeleted, t.snapshotNumber, s.snapshotDate AS snapshotDate, t.Id as EventId, t.AccountId, t.OwnerId, t.ActivityDate, t.Subject '
-					. 'FROM EventSnapshot t '
-					. 'LEFT JOIN bi_snapshot s ON t.snapshotNumber = s.snapshotNumber '
-					. 'WHERE t._idUser = '.$this->_idUser;
-				break;
-
-			case 'Task':
-				$sql = 'SELECT t.Id, t.isDeleted, t.AccountId, t.OwnerId, t.ActivityDate, t.Priority, t.Status, t.Subject, t.IsClosed '
-					. 'FROM Task t '
-					. 'WHERE t._idUser = '.$this->_idUser;
-				break;
-			case 'TaskSnapshot':
-				$sql = 'SELECT CONCAT(t.snapshotNumber, t.Id) AS Id, t.isDeleted, t.snapshotNumber, s.snapshotDate AS snapshotDate, t.Id as TaskId, t.AccountId, t.OwnerId, t.ActivityDate, t.Priority, t.Status, t.Subject, t.IsClosed '
-					. 'FROM TaskSnapshot t '
-					. 'LEFT JOIN bi_snapshot s ON t.snapshotNumber = s.snapshotNumber '
-					. 'WHERE t._idUser = '.$this->_idUser;
-				break;
-
-			case 'Opportunity':
-				$sql = 'SELECT t.Id, t.isDeleted, t.AccountId, t.Amount, t.ExpectedRevenue, t.CloseDate, t.CreatedDate, t.IsWon, t.IsClosed, t.Name, t.StageName, t.ForecastCategory, t.Probability, t.OwnerId '
-					. 'FROM Opportunity t '
-					. 'WHERE t._idUser = '.$this->_idUser;
-				break;
-			case 'OpportunitySnapshot':
-				$sql = 'SELECT CONCAT(t.snapshotNumber, t.Id) AS Id, t.isDeleted, t.snapshotNumber, s.snapshotDate AS snapshotDate, t.Id as OpportunityId, t.AccountId, t.Amount, t.ExpectedRevenue, t.CloseDate, t.CreatedDate, t.IsWon, t.IsClosed, t.Name, t.StageName, t.ForecastCategory, t.Probability, t.OwnerId '
-					. 'FROM OpportunitySnapshot t '
-					. 'LEFT JOIN bi_snapshot s ON t.snapshotNumber = s.snapshotNumber '
-					. 'WHERE t._idUser = '.$this->_idUser;
-				break;
-			case 'OpportunityHistory':
-				$sql = 'SELECT t.Id, t.Amount, t.ExpectedRevenue, t.CloseDate, t.CreatedDate, t.StageName, t.ForecastCategory, t.Probability, t.OpportunityId, t.SystemModstamp '
-					. 'FROM OpportunityHistory t '
-					. 'WHERE t._idUser = '.$this->_idUser;
-				break;
-
-			default:
-				return false;
+		$isSnapshotTable = false;
+		$tableId = $table;
+		if (strpos($table, "Snapshot")) {
+			$isSnapshotTable = true;
+			$tableId = str_replace("Snapshot", "", $table);
+		}
+		if (!isset($tablesConfig->$tableId)) {
+			return;
+		}
+		$tableConfig = $tablesConfig->$tableId;
+		if ($isSnapshotTable) {
+			$sql = "SELECT CONCAT(t.snapshotNumber, t.Id) AS Id, t.isDeleted, t.snapshotNumber, s.snapshotDate AS snapshotDate, t.Id as {$tableId}Id, {$tableConfig->exportQueryColumns} FROM {$table} t LEFT JOIN bi_snapshot s ON t.snapshotNumber = s.snapshotNumber";
+		} else {
+			$sql = "SELECT t.Id, t.isDeleted, {$tableConfig->exportQueryColumns} FROM {$table} t";
 		}
 
 		if ($structure) {
 			$sql .= ' LIMIT 1';
 		} elseif (!$all) {
-			$sql .= ' AND t.lastModificationDate > \''.date('Y-m-d', strtotime('-4 days')).'\'';
+			$sql .= ' WHERE t.lastModificationDate > \''.date('Y-m-d', strtotime('-4 days')).'\'';
 		}
 
 		$file = null;
@@ -218,35 +146,20 @@ class App_GoodDataExport
 	 */
 	public function setup()
 	{
-		$this->_gd->createDate('SF_OpportunityCloseDate', FALSE);
-		$this->_gd->createDate('SF_OpportunitySnapshotCloseDate', FALSE);
-		$this->_gd->createDate('SF_OpportunityHistoryCloseDate', FALSE);
-		$this->_gd->createDate('SF_OpportunityCreatedDate', FALSE);
-		$this->_gd->createDate('SF_OpportunitySnapshotCreatedDate', FALSE);
-		$this->_gd->createDate('SF_OpportunityHistoryCreatedDate', FALSE);
-		$this->_gd->createDate('SF_OpportunityHistorySystemModstamp', FALSE);
-		$this->_gd->createDate('SF_TaskActivityDate', FALSE);
-		$this->_gd->createDate('SF_TaskSnapshotActivityDate', FALSE);
-		$this->_gd->createDate('SF_EventActivityDate', FALSE);
-		$this->_gd->createDate('SF_EventSnapshotActivityDate', FALSE);
-		$this->_gd->createDate('SF_CampaignStartDate', FALSE);
-		$this->_gd->createDate('SF_CampaignSnapshotStartDate', FALSE);
-		$this->_gd->createDate('SF_SnapshotDate', FALSE);
-		$this->createDataset('User');
-		$this->createDataset('UserSnapshot');
-		$this->createDataset('Account');
-		$this->createDataset('AccountSnapshot');
-		$this->createDataset('Opportunity');
-		$this->createDataset('OpportunitySnapshot');
-		$this->createDataset('OpportunityHistory');
-		$this->createDataset('Contact');
-		$this->createDataset('ContactSnapshot');
-		$this->createDataset('Task');
-		$this->createDataset('TaskSnapshot');
-		$this->createDataset('Event');
-		$this->createDataset('EventSnapshot');
-		$this->createDataset('Campaign');
-		$this->createDataset('CampaignSnapshot');
+		$userStrId = $this->_user->strId;
+		$config = Zend_Registry::get('config')->sfUser->$userStrId;
+
+		if (isset($config->dateDimensions) && count($config->dateDimensions)) {
+			foreach($config->dateDimensions as $dateDimension) {
+				$this->_gd->createDate($dateDimension, FALSE);
+			}
+		}
+		foreach($config->tables as $table => $tableConfig) {
+			$this->createDataset($table);
+			if ($tableConfig->snapshot) {
+				$this->createDataset($table . "Snapshot");
+			}
+		}
 	}
 
 	/**
@@ -256,21 +169,16 @@ class App_GoodDataExport
 	 */
 	public function loadData($all=false)
 	{
-		$this->loadDataset('User', $all);
-		$this->loadDataset('UserSnapshot', $all);
-		$this->loadDataset('Account', $all);
-		$this->loadDataset('AccountSnapshot', $all);
-		$this->loadDataset('Opportunity', $all);
-		$this->loadDataset('OpportunitySnapshot', $all);
-		$this->loadDataset('OpportunityHistory', $all);
-		$this->loadDataset('Contact', $all);
-		$this->loadDataset('ContactSnapshot', $all);
-		$this->loadDataset('Task', $all);
-		$this->loadDataset('TaskSnapshot', $all);
-		$this->loadDataset('Event', $all);
-		$this->loadDataset('EventSnapshot', $all);
-		$this->loadDataset('Campaign', $all);
-		$this->loadDataset('CampaignSnapshot', $all);
+		$userStrId = $this->_user->strId;
+		$config = Zend_Registry::get('config')->sfUser->$userStrId;
+
+		foreach($config->tables as $table => $tableConfig) {
+			$this->loadDataset($table, $all);
+			if ($tableConfig->snapshot) {
+				$this->loadDataset($table . "Snapshot", $all);
+			}
+		}
+
 		$this->_gd->updateReports();
 	}
 
@@ -289,7 +197,7 @@ class App_GoodDataExport
 	public function dump($sql, $file='')
 	{
 		$command = 'mysql -u '.$this->_config->db->login.' -p'.$this->_config->db->password.' -h '.$this->_config->db->host
-			.' '.$this->_config->db->db.' -B -e "'.$sql.'" | sed \'s/\"/\"\"/g\' | sed \'s/\t/","/g;s/^/"/;s/$/"/;s/\n//g\'';
+			.' '.$this->_user->dbName.' -B -e "'.$sql.'" | sed \'s/\"/\"\"/g\' | sed \'s/\t/","/g;s/^/"/;s/$/"/;s/\n//g\'';
 
 		if ($file) {
 			$command .= ' > '.$file;

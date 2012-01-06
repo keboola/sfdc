@@ -1,0 +1,71 @@
+<schema>
+	<name>Task</name>
+	<columns>
+		<column>
+			<name>Id</name>
+			<title>ID (Task)</title>
+			<ldmType>CONNECTION_POINT</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>Task</folder>
+		</column>
+		<column>
+			<name>isDeleted</name>
+			<title>isDeleted (TaskSnapshot)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>Task</folder>
+		</column>
+		<column>
+			<name>AccountId</name>
+			<title>AccountId (Task)</title>
+			<ldmType>REFERENCE</ldmType>
+			<reference>Id</reference>
+			<schemaReference>Account</schemaReference>
+			<folder>Task</folder>
+		</column>
+		<column>
+			<name>OwnerId</name>
+			<title>OwnerId (Task)</title>
+			<ldmType>REFERENCE</ldmType>
+			<reference>Id</reference>
+			<schemaReference>User</schemaReference>
+			<folder>Task</folder>
+		</column>
+		<column>
+			<name>ActivityDate</name>
+			<title>ActivityDate (Task)</title>
+			<ldmType>DATE</ldmType>
+			<format>yyyy-MM-dd</format>
+			<schemaReference>SF_TaskActivityDate</schemaReference>
+			<folder>Task</folder>
+		</column>
+		<column>
+			<name>Priority</name>
+			<title>Priority (Task)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>Task</folder>
+		</column>
+		<column>
+			<name>Status</name>
+			<title>Status (Task)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>Task</folder>
+		</column>
+		<column>
+			<name>Subject</name>
+			<title>Subject (Task)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>Task</folder>
+		</column>
+		<column>
+			<name>IsClosed</name>
+			<title>IsClosed (Task)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>Task</folder>
+		</column>
+	</columns>
+</schema>

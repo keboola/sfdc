@@ -52,8 +52,6 @@ try {
 
 $config = Zend_Registry::get('config');
 
-
-
 if($opts->getOption('id')) {
 	$userTable = new Model_BiUser();
 	$user = $userTable->fetchRow(array('id=?' => $opts->getOption('id')));
@@ -65,7 +63,7 @@ if($opts->getOption('id')) {
 		throw new Exception("Missing GoodData project ID for user {$user->name} ({$user->id})");
 	}
 
-	$gd = new App_GoodDataExport($user->gdProject, $user->id, $config);
+	$gd = new App_GoodDataExport($user->gdProject, $user, $config);
 
 	if ($opts->getOption('setup'))	{
 		$gd->setup();

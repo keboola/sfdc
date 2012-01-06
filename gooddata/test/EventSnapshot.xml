@@ -1,0 +1,73 @@
+<schema>
+	<name>EventSnapshot</name>
+	<columns>
+		<column>
+			<name>Id</name>
+			<title>ID (EventSnapshot)</title>
+			<ldmType>CONNECTION_POINT</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>EventSnapshot</folder>
+		</column>
+		<column>
+			<name>isDeleted</name>
+			<title>isDeleted (EventSnapshot)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>EventSnapshot</folder>
+		</column>
+		<column>
+			<name>snapshotNumber</name>
+			<title>snapshotNumber (EventSnapshot)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>EventSnapshot</folder>
+		</column>
+		<column>
+			<name>snapshotDate</name>
+			<title>snapshotDate (EventSnapshot)</title>
+			<ldmType>DATE</ldmType>
+			<format>yyyy-MM-dd</format>
+			<schemaReference>SF_SnapshotDate</schemaReference>
+			<folder>EventSnapshot</folder>
+		</column>
+		<column>
+			<name>EventId</name>
+			<title>EventId (EventSnapshot)</title>
+			<ldmType>REFERENCE</ldmType>
+			<reference>Id</reference>
+			<schemaReference>Event</schemaReference>
+			<folder>EventSnapshot</folder>
+		</column>
+		<column>
+			<name>AccountId</name>
+			<title>AccountId (EventSnapshot)</title>
+			<ldmType>REFERENCE</ldmType>
+			<reference>Id</reference>
+			<schemaReference>Account</schemaReference>
+			<folder>EventSnapshot</folder>
+		</column>
+		<column>
+			<name>OwnerId</name>
+			<title>OwnerId (EventSnapshot)</title>
+			<ldmType>REFERENCE</ldmType>
+			<reference>Id</reference>
+			<schemaReference>User</schemaReference>
+			<folder>EventSnapshot</folder>
+		</column>
+		<column>
+			<name>ActivityDate</name>
+			<title>ActivityDate (EventSnapshot)</title>
+			<ldmType>DATE</ldmType>
+			<format>yyyy-MM-dd</format>
+			<schemaReference>SF_EventSnapshotActivityDate</schemaReference>
+			<folder>EventSnapshot</folder>
+		</column>
+		<column>
+			<name>Subject</name>
+			<title>Subject (EventSnapshot)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>EventSnapshot</folder>
+		</column>
+	</columns>
+</schema>

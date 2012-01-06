@@ -33,9 +33,9 @@ class App_Db_Table extends Zend_Db_Table
 	 * @param $idUser
 	 * @return void
 	 */
-	public function prepareDeleteCheck($idUser)
+	public function prepareDeleteCheck()
 	{
-		$this->update(array("isDeletedCheck" => 1), array('_idUser=?' => $idUser));
+		$this->update(array("isDeletedCheck" => 1), array('1=?' => 1));
 	}
 
 	/**
@@ -43,9 +43,9 @@ class App_Db_Table extends Zend_Db_Table
 	 * @param $idUser
 	 * @return void
 	 */
-	public function deleteCheck($idUser)
+	public function deleteCheck()
 	{
-		$this->update(array("isDeleted" => 1), array('_idUser=?' => $idUser, "isDeletedCheck=?" => 1, "Id!=?" => '--empty--'));
+		$this->update(array("isDeleted" => 1), array("isDeletedCheck=?" => 1, "Id!=?" => '--empty--'));
 	}
 
 	/**
@@ -56,25 +56,25 @@ class App_Db_Table extends Zend_Db_Table
 	 * @param $snapshotNumber
 	 * @return void
 	 */
-	public function createSnapshot($user, $snapshotNumber)
+	public function createSnapshot($snapshotNumber)
 	{
-		$items = $this->fetchAll(array('_idUser=?' => $user));
+		$items = $this->fetchAll();
 		$snapshotTable = new $this->_snapshotTableClass;
 		foreach ($items as $item) {
 			$data = $item->toArray();
 			unset($data['_id']);
 			unset($data['isDeletedCheck']);
 			$data['snapshotNumber'] = $snapshotNumber;
-			$snapshotTable->add($data);
+			$snapshotTable->insertOrSet($data);
 		}
 	}
 
 	public function insertOrSet($data)
 	{
 		if ($this->_isSnapshotTable) {
-			$condition = array('_idUser=?' => $data['_idUser'], 'Id=?' => $data['Id'], 'snapshotNumber=?' => $data['snapshotNumber']);
+			$condition = array('Id=?' => $data['Id'], 'snapshotNumber=?' => $data['snapshotNumber']);
 		} else {
-			$condition = array('_idUser=?' => $data['_idUser'], 'Id=?' => $data['Id']);
+			$condition = array('Id=?' => $data['Id']);
 			$data['isDeletedCheck'] = 0;
 			$data['isDeleted'] = 0;
 		}

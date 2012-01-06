@@ -9,6 +9,13 @@
 			<folder>OpportunityHistory</folder>
 		</column>
 		<column>
+			<name>isDeleted</name>
+			<title>isDeleted (OpportunityHistory)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>OpportunityHistory</folder>
+		</column>
+		<column>
 			<name>Amount</name>
 			<title>Amount (OpportunityHistory)</title>
 			<ldmType>FACT</ldmType>

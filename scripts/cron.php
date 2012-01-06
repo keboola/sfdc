@@ -40,6 +40,28 @@ if (!$idUser) {
 	exit;
 }
 
+$userTable = new Model_BiUser();
+$user = $userTable->fetchRow(array('id=?' => $opts->getOption('id')));
+
+if (!$user) {
+	throw new Exception("User not found ({$opts->getOption('id')})");
+}
+
+// connect do db
+$dbData = Zend_Db::factory('pdo_mysql', array(
+	'host'		=> $config->db->host,
+	'username'	=> $config->db->login,
+	'password'	=> $config->db->password,
+	'dbname'	=> $user->dbName
+));
+
+// test připojení k db
+$dbData->getConnection();
+$dbData->query('SET NAMES utf8');
+
+// nastavení db adapteru pro všechny potomky Zend_Db_Table
+Zend_Db_Table::setDefaultAdapter($dbData);
+
 foreach($usersTable->fetchAll(array('id=?' => $idUser)) as $user) {
 	// Import
 	print "Importing data\n";
@@ -53,7 +75,7 @@ foreach($usersTable->fetchAll(array('id=?' => $idUser)) as $user) {
 	}
 
 	// Export
-	$export = new App_GoodDataExport($user->gdProject, $user->id, $config);
+	$export = new App_GoodDataExport($user->gdProject, $user, $config);
 	$export->loadData();
 }
 

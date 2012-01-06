@@ -1,0 +1,74 @@
+<schema>
+	<name>Campaign</name>
+	<columns>
+		<column>
+			<name>Id</name>
+			<title>ID (Campaign)</title>
+			<ldmType>CONNECTION_POINT</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>Campaign</folder>
+		</column>
+		<column>
+			<name>isDeleted</name>
+			<title>isDeleted (Campaign)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>Campaign</folder>
+		</column>
+        <column>
+            <name>OwnerId</name>
+            <title>OwnerId (Campaign)</title>
+            <ldmType>REFERENCE</ldmType>
+            <reference>Id</reference>
+            <schemaReference>User</schemaReference>
+            <folder>Campaign</folder>
+        </column>
+		<column>
+			<name>Name</name>
+			<title>Name (Campaign)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>Campaign</folder>
+		</column>
+		<column>
+			<name>ExpectedRevenue</name>
+			<title>ExpectedRevenue (Campaign)</title>
+			<ldmType>FACT</ldmType>
+			<folder>Campaign</folder>
+		</column>
+		<column>
+			<name>BudgetedCost</name>
+			<title>BudgetedCost (Campaign)</title>
+			<ldmType>FACT</ldmType>
+			<folder>Campaign</folder>
+		</column>
+		<column>
+			<name>ActualCost</name>
+			<title>ActualCost (Campaign)</title>
+			<ldmType>FACT</ldmType>
+			<folder>Campaign</folder>
+		</column>
+		<column>
+			<name>StartDate</name>
+			<title>StartDate (Campaign)</title>
+			<ldmType>DATE</ldmType>
+			<format>yyyy-MM-dd</format>
+			<schemaReference>SF_CampaignStartDate</schemaReference>
+			<folder>Campaign</folder>
+		</column>
+		<column>
+			<name>Type</name>
+			<title>Type (Campaign)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>Campaign</folder>
+		</column>
+		<column>
+			<name>Status</name>
+			<title>Status (Campaign)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>Campaign</folder>
+		</column>
+	</columns>
+</schema>

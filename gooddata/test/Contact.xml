@@ -1,0 +1,26 @@
+<schema>
+	<name>Contact</name>
+	<columns>
+		<column>
+			<name>Id</name>
+			<title>ID (Contact)</title>
+			<ldmType>CONNECTION_POINT</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>Contact</folder>
+		</column>
+		<column>
+			<name>isDeleted</name>
+			<title>isDeleted (Contact)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>Contact</folder>
+		</column>
+        <column>
+            <name>Name</name>
+            <title>Name (Contact)</title>
+            <ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>Contact</folder>
+        </column>
+	</columns>
+</schema>

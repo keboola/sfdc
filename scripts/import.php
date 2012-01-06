@@ -37,8 +37,26 @@ $config = Zend_Registry::get('config');
 if (!$opts->getOption('id')) {
 	echo $opts->getUsageMessage();
 } else {
+
 	$user = $userTable->fetchRow(array('id=?' => $opts->getOption('id')));
+
 	if ($user) {
+
+		// connect do db
+		$dbData = Zend_Db::factory('pdo_mysql', array(
+			'host'		=> $config->db->host,
+			'username'	=> $config->db->login,
+			'password'	=> $config->db->password,
+			'dbname'	=> $user->dbName
+		));
+
+		// test připojení k db
+		$dbData->getConnection();
+		$dbData->query('SET NAMES utf8');
+
+		// nastavení db adapteru pro všechny potomky Zend_Db_Table
+		Zend_Db_Table::setDefaultAdapter($dbData);
+
 		$user->revalidateAccessToken();
 		$import = new App_SalesForceImport($user);
 		$import->importAll();
