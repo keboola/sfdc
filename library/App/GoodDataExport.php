@@ -76,13 +76,11 @@ class App_GoodDataExport
 		switch($table) {
 
 			case 'User':
-				// TODO load only last modified
 				$sql = 'SELECT t.Id, t.isDeleted, t.Name '
 					. 'FROM User t '
 					. 'WHERE t._idUser = '.$this->_idUser;
 				break;
 			case 'UserSnapshot':
-				// TODO load only last modified
 				$sql = 'SELECT CONCAT(t.snapshotNumber, t.Id) AS Id, t.isDeleted, t.snapshotNumber, s.snapshotDate AS snapshotDate, t.Id as UserId, t.Name '
 					. 'FROM UserSnapshot t '
 					. 'LEFT JOIN bi_snapshot s ON t.snapshotNumber = s.snapshotNumber '
@@ -90,13 +88,11 @@ class App_GoodDataExport
 				break;
 
 			case 'Campaign':
-				// TODO load only last modified
 				$sql = 'SELECT t.Id, t.isDeleted, t.OwnerId, t.Name, t.ExpectedRevenue, t.BudgetedCost, t.ActualCost, t.StartDate, t.Type, t.Status '
 					. 'FROM Campaign t '
 					. 'WHERE t._idUser = '.$this->_idUser;
 				break;
 			case 'CampaignSnapshot':
-				// TODO load only last modified
 				$sql = 'SELECT CONCAT(t.snapshotNumber, t.Id) AS Id, t.isDeleted, t.snapshotNumber, s.snapshotDate AS snapshotDate, t.Id as CampaignId, t.OwnerId, t.Name, t.ExpectedRevenue, t.BudgetedCost, t.ActualCost, t.StartDate, t.Type, t.Status '
 					. 'FROM CampaignSnapshot t '
 					. 'LEFT JOIN bi_snapshot s ON t.snapshotNumber = s.snapshotNumber '
@@ -104,13 +100,11 @@ class App_GoodDataExport
 				break;
 
 			case 'Account':
-				// TODO load only last modified
 				$sql = 'SELECT t.Id, t.isDeleted, t.Name, t.Type '
 					. 'FROM Account t '
 					. 'WHERE t._idUser = '.$this->_idUser;
 				break;
 			case 'AccountSnapshot':
-				// TODO load only last modified
 				$sql = 'SELECT CONCAT(t.snapshotNumber, t.Id) AS Id, t.isDeleted, t.snapshotNumber, s.snapshotDate AS snapshotDate, t.Id as AccountId, t.Name, t.Type '
 					. 'FROM AccountSnapshot t '
 					. 'LEFT JOIN bi_snapshot s ON t.snapshotNumber = s.snapshotNumber '
@@ -118,13 +112,11 @@ class App_GoodDataExport
 				break;
 
 			case 'Contact':
-				// TODO load only last modified
 				$sql = 'SELECT t.Id, t.isDeleted, t.Name '
 					. 'FROM Contact t '
 					. 'WHERE t._idUser = '.$this->_idUser;
 				break;
 			case 'ContactSnapshot':
-				// TODO load only last modified
 				$sql = 'SELECT CONCAT(t.snapshotNumber, t.Id) AS Id, t.isDeleted, t.snapshotNumber, s.snapshotDate AS snapshotDate, t.Id as ContactId, t.Name '
 					. 'FROM ContactSnapshot t '
 					. 'LEFT JOIN bi_snapshot s ON t.snapshotNumber = s.snapshotNumber '
@@ -132,13 +124,11 @@ class App_GoodDataExport
 				break;
 
 			case 'Event':
-				// TODO load only last modified
 				$sql = 'SELECT t.Id, t.isDeleted, t.AccountId, t.OwnerId, t.ActivityDate, t.Subject '
 					. 'FROM Event t '
 					. 'WHERE t._idUser = '.$this->_idUser;
 				break;
 			case 'EventSnapshot':
-				// TODO load only last modified
 				$sql = 'SELECT CONCAT(t.snapshotNumber, t.Id) AS Id, t.isDeleted, t.snapshotNumber, s.snapshotDate AS snapshotDate, t.Id as EventId, t.AccountId, t.OwnerId, t.ActivityDate, t.Subject '
 					. 'FROM EventSnapshot t '
 					. 'LEFT JOIN bi_snapshot s ON t.snapshotNumber = s.snapshotNumber '
@@ -146,13 +136,11 @@ class App_GoodDataExport
 				break;
 
 			case 'Task':
-				// TODO load only last modified
 				$sql = 'SELECT t.Id, t.isDeleted, t.AccountId, t.OwnerId, t.ActivityDate, t.Priority, t.Status, t.Subject, t.IsClosed '
 					. 'FROM Task t '
 					. 'WHERE t._idUser = '.$this->_idUser;
 				break;
 			case 'TaskSnapshot':
-				// TODO load only last modified
 				$sql = 'SELECT CONCAT(t.snapshotNumber, t.Id) AS Id, t.isDeleted, t.snapshotNumber, s.snapshotDate AS snapshotDate, t.Id as TaskId, t.AccountId, t.OwnerId, t.ActivityDate, t.Priority, t.Status, t.Subject, t.IsClosed '
 					. 'FROM TaskSnapshot t '
 					. 'LEFT JOIN bi_snapshot s ON t.snapshotNumber = s.snapshotNumber '
@@ -160,16 +148,19 @@ class App_GoodDataExport
 				break;
 
 			case 'Opportunity':
-				// TODO load only last modified
-				$sql = 'SELECT t.Id, t.isDeleted, t.AccountId, t.Amount, t.ExpectedRevenue, t.CloseDate, t.CreatedDate, t.IsWon, t.IsClosed, t.Name, t.StageName, t.OwnerId '
+				$sql = 'SELECT t.Id, t.isDeleted, t.AccountId, t.Amount, t.ExpectedRevenue, t.CloseDate, t.CreatedDate, t.IsWon, t.IsClosed, t.Name, t.StageName, t.ForecastCategory, t.Probability, t.OwnerId '
 					. 'FROM Opportunity t '
 					. 'WHERE t._idUser = '.$this->_idUser;
 				break;
 			case 'OpportunitySnapshot':
-				// TODO load only last modified
-				$sql = 'SELECT CONCAT(t.snapshotNumber, t.Id) AS Id, t.isDeleted, t.snapshotNumber, s.snapshotDate AS snapshotDate, t.Id as OpportunityId, t.AccountId, t.Amount, t.ExpectedRevenue, t.CloseDate, t.CreatedDate, t.IsWon, t.IsClosed, t.Name, t.StageName, t.OwnerId '
+				$sql = 'SELECT CONCAT(t.snapshotNumber, t.Id) AS Id, t.isDeleted, t.snapshotNumber, s.snapshotDate AS snapshotDate, t.Id as OpportunityId, t.AccountId, t.Amount, t.ExpectedRevenue, t.CloseDate, t.CreatedDate, t.IsWon, t.IsClosed, t.Name, t.StageName, t.ForecastCategory, t.Probability, t.OwnerId '
 					. 'FROM OpportunitySnapshot t '
 					. 'LEFT JOIN bi_snapshot s ON t.snapshotNumber = s.snapshotNumber '
+					. 'WHERE t._idUser = '.$this->_idUser;
+				break;
+			case 'OpportunityHistory':
+				$sql = 'SELECT t.Id, t.Amount, t.ExpectedRevenue, t.CloseDate, t.CreatedDate, t.StageName, t.ForecastCategory, t.Probability, t.OpportunityId, t.SystemModstamp '
+					. 'FROM OpportunityHistory t '
 					. 'WHERE t._idUser = '.$this->_idUser;
 				break;
 
@@ -229,8 +220,11 @@ class App_GoodDataExport
 	{
 		$this->_gd->createDate('SF_OpportunityCloseDate', FALSE);
 		$this->_gd->createDate('SF_OpportunitySnapshotCloseDate', FALSE);
+		$this->_gd->createDate('SF_OpportunityHistoryCloseDate', FALSE);
 		$this->_gd->createDate('SF_OpportunityCreatedDate', FALSE);
 		$this->_gd->createDate('SF_OpportunitySnapshotCreatedDate', FALSE);
+		$this->_gd->createDate('SF_OpportunityHistoryCreatedDate', FALSE);
+		$this->_gd->createDate('SF_OpportunityHistorySystemModstamp', FALSE);
 		$this->_gd->createDate('SF_TaskActivityDate', FALSE);
 		$this->_gd->createDate('SF_TaskSnapshotActivityDate', FALSE);
 		$this->_gd->createDate('SF_EventActivityDate', FALSE);
@@ -244,6 +238,7 @@ class App_GoodDataExport
 		$this->createDataset('AccountSnapshot');
 		$this->createDataset('Opportunity');
 		$this->createDataset('OpportunitySnapshot');
+		$this->createDataset('OpportunityHistory');
 		$this->createDataset('Contact');
 		$this->createDataset('ContactSnapshot');
 		$this->createDataset('Task');
@@ -252,7 +247,6 @@ class App_GoodDataExport
 		$this->createDataset('EventSnapshot');
 		$this->createDataset('Campaign');
 		$this->createDataset('CampaignSnapshot');
-
 	}
 
 	/**
@@ -268,6 +262,7 @@ class App_GoodDataExport
 		$this->loadDataset('AccountSnapshot', $all);
 		$this->loadDataset('Opportunity', $all);
 		$this->loadDataset('OpportunitySnapshot', $all);
+		$this->loadDataset('OpportunityHistory', $all);
 		$this->loadDataset('Contact', $all);
 		$this->loadDataset('ContactSnapshot', $all);
 		$this->loadDataset('Task', $all);

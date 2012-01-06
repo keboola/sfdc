@@ -103,8 +103,22 @@
 			<folder>OpportunitySnapshot</folder>
 		</column>
 		<column>
+			<name>ForecastCategory</name>
+			<title>StageName (OpportunitySnapshot)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>OpportunitySnapshot</folder>
+		</column>
+		<column>
+			<name>Probability</name>
+			<title>Probability (OpportunitySnapshot)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>DECIMAL(10,2)</dataType>
+			<folder>OpportunitySnapshot</folder>
+		</column>
+		<column>
 			<name>OwnerId</name>
-			<title>OwnerId (Account)</title>
+			<title>OwnerId (OpportunitySnapshot)</title>
 			<ldmType>REFERENCE</ldmType>
 			<reference>Id</reference>
 			<schemaReference>User</schemaReference>

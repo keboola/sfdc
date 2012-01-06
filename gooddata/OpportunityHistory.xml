@@ -1,0 +1,77 @@
+<schema>
+	<name>OpportunityHistory</name>
+	<columns>
+		<column>
+			<name>Id</name>
+			<title>ID (OpportunityHistory)</title>
+			<ldmType>CONNECTION_POINT</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>OpportunityHistory</folder>
+		</column>
+		<column>
+			<name>Amount</name>
+			<title>Amount (OpportunityHistory)</title>
+			<ldmType>FACT</ldmType>
+			<folder>OpportunityHistory</folder>
+		</column>
+		<column>
+			<name>ExpectedRevenue</name>
+			<title>ExpectedRevenue (OpportunityHistory)</title>
+			<ldmType>FACT</ldmType>
+			<folder>OpportunityHistory</folder>
+		</column>
+		<column>
+			<name>CloseDate</name>
+			<title>CloseDate (OpportunityHistory)</title>
+			<ldmType>DATE</ldmType>
+			<format>yyyy-MM-dd</format>
+			<schemaReference>SF_OpportunityHistoryCloseDate</schemaReference>
+			<folder>OpportunityHistory</folder>
+		</column>
+		<column>
+			<name>CreatedDate</name>
+			<title>CreatedDate (OpportunityHistory)</title>
+			<ldmType>DATE</ldmType>
+			<format>yyyy-MM-dd</format>
+			<schemaReference>SF_OpportunityHistoryCreatedDate</schemaReference>
+			<folder>OpportunityHistory</folder>
+		</column>
+		<column>
+			<name>StageName</name>
+			<title>StageName (OpportunityHistory)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>OpportunityHistory</folder>
+		</column>
+		<column>
+			<name>ForecastCategory</name>
+			<title>ForecastCategory (OpportunityHistory)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>OpportunityHistory</folder>
+		</column>
+		<column>
+			<name>Probability</name>
+			<title>Probability (OpportunityHistory)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>DECIMAL(10,2)</dataType>
+			<folder>OpportunityHistory</folder>
+		</column>
+		<column>
+			<name>OpportunityId</name>
+			<title>OpportunityId (OpportunityHistory)</title>
+			<ldmType>REFERENCE</ldmType>
+			<reference>Id</reference>
+			<schemaReference>Opportunity</schemaReference>
+			<folder>OpportunityHistory</folder>
+		</column>
+		<column>
+			<name>SystemModstamp</name>
+			<title>SystemModstamp (OpportunityHistory)</title>
+			<ldmType>DATE</ldmType>
+			<format>yyyy-MM-dd</format>
+			<schemaReference>SF_OpportunityHistorySystemModstamp</schemaReference>
+			<folder>OpportunityHistory</folder>
+		</column>
+	</columns>
+</schema>

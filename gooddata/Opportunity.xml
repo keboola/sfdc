@@ -80,8 +80,22 @@
 			<folder>Opportunity</folder>
 		</column>
 		<column>
+			<name>ForecastCategory</name>
+			<title>ForecastCategory (Opportunity)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>Opportunity</folder>
+		</column>
+		<column>
+			<name>Probability</name>
+			<title>Probability (Opportunity)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>DECIMAL(10,2)</dataType>
+			<folder>Opportunity</folder>
+		</column>
+		<column>
 			<name>OwnerId</name>
-			<title>OwnerId (Account)</title>
+			<title>OwnerId (Opportunity)</title>
 			<ldmType>REFERENCE</ldmType>
 			<reference>Id</reference>
 			<schemaReference>User</schemaReference>

@@ -19,6 +19,7 @@ class App_SalesForceImport
 		$this->importContacts();
 		$this->importUsers();
 		$this->importOpportunities();
+		$this->importOpportunityHistory();
 		$this->importAccounts();
 		$this->importTasks();
 		$this->importEvents();
@@ -65,11 +66,18 @@ class App_SalesForceImport
 	public function importOpportunities()
 	{
 //		$query = "SELECT Id,AccountId,Amount,ExpectedRevenue,CloseDate,CreatedDate,IsWon,IsClosed,Name,StageName,OwnerId FROM Opportunity";
-		$query = "SELECT Id,AccountId,Amount,CloseDate,CreatedDate,IsWon,IsClosed,Name,StageName,OwnerId FROM Opportunity";
+		$query = "SELECT Id,AccountId,Amount,CloseDate,CreatedDate,IsWon,IsClosed,Name,StageName,ForecastCategory,Probability,OwnerId FROM Opportunity";
 		$this->_processImport($query, "Model_Opportunity");
 	}
 
-	private function _processImport($query, $tableClass, $emptyRow=false)
+	public function importOpportunityHistory()
+	{
+		$query = "SELECT Amount,CloseDate,CreatedDate,ForecastCategory,Id,OpportunityId,Probability,StageName,SystemModstamp FROM OpportunityHistory";
+		$this->_processImport($query, "Model_OpportunityHistory", false, false);
+	}
+
+
+	private function _processImport($query, $tableClass, $emptyRow=false, $createSnapshot=true)
 	{
 		$response = $this->_query($query);
 		$dbTable = new $tableClass;
@@ -88,7 +96,9 @@ class App_SalesForceImport
 
 		$dbTable->deleteCheck($this->_user->id);
 
-		$dbTable->createSnapshot($this->_user->id, $this->_snapshotNumber);
+		if ($createSnapshot) {
+			$dbTable->createSnapshot($this->_user->id, $this->_snapshotNumber);
+		}
 	}
 
 	private function _query($query, $queryUrl = '') {
