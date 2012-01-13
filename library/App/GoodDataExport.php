@@ -90,10 +90,21 @@ class App_GoodDataExport
 			return;
 		}
 		$tableConfig = $tablesConfig->$tableId;
-		if ($isSnapshotTable) {
-			$sql = "SELECT CONCAT(t.snapshotNumber, t.Id) AS Id, t.isDeleted, t.snapshotNumber, s.snapshotDate AS snapshotDate, t.Id as {$tableId}Id, {$tableConfig->exportQueryColumns} FROM {$table} t LEFT JOIN bi_snapshot s ON t.snapshotNumber = s.snapshotNumber";
+
+		$queryColumns = "";
+
+		if (is_string($tableConfig->exportQueryColumns)) {
+			$queryColumns = $tableConfig->exportQueryColumns;
+		} elseif (count($tableConfig->exportQueryColumns->toArray())) {
+			$queryColumns = join (", ", $tableConfig->exportQueryColumns->toArray());
 		} else {
-			$sql = "SELECT t.Id, t.isDeleted, {$tableConfig->exportQueryColumns} FROM {$table} t";
+			throw new Exception("Export query columns configuration error for {$table}");
+		}
+
+		if ($isSnapshotTable) {
+			$sql = "SELECT CONCAT(t.snapshotNumber, t.Id) AS Id, t.isDeleted, t.snapshotNumber, s.snapshotDate AS snapshotDate, t.Id as {$tableId}Id, {$queryColumns} FROM {$table} t LEFT JOIN bi_snapshot s ON t.snapshotNumber = s.snapshotNumber";
+		} else {
+			$sql = "SELECT t.Id, t.isDeleted, {$queryColumns} FROM {$table} t";
 		}
 
 		if ($structure) {
@@ -155,8 +166,10 @@ class App_GoodDataExport
 			}
 		}
 		foreach($config->tables as $table => $tableConfig) {
+//			$this->_gd->dropDataset($table);
 			$this->createDataset($table);
 			if ($tableConfig->snapshot) {
+//				$this->_gd->dropDataset($table . "Snapshot");
 				$this->createDataset($table . "Snapshot");
 			}
 		}

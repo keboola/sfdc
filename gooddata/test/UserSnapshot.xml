@@ -1,49 +1,49 @@
 <schema>
-	<name>UserSnapshot</name>
+	<name>SF_UserSnapshot</name>
 	<columns>
 		<column>
 			<name>Id</name>
-			<title>ID (UserSnapshot)</title>
+			<title>ID (SF_UserSnapshot)</title>
 			<ldmType>CONNECTION_POINT</ldmType>
 			<dataType>VARCHAR(255)</dataType>
-			<folder>UserSnapshot</folder>
+			<folder>SF_UserSnapshot</folder>
 		</column>
 		<column>
 			<name>isDeleted</name>
-			<title>isDeleted (UserSnapshot)</title>
+			<title>isDeleted (SF_UserSnapshot)</title>
 			<ldmType>ATTRIBUTE</ldmType>
 			<dataType>INT</dataType>
-			<folder>UserSnapshot</folder>
+			<folder>SF_UserSnapshot</folder>
 		</column>
 		<column>
 			<name>snapshotNumber</name>
-			<title>snapshotNumber (UserSnapshot)</title>
+			<title>snapshotNumber (SF_UserSnapshot)</title>
 			<ldmType>ATTRIBUTE</ldmType>
 			<dataType>INT</dataType>
-			<folder>UserSnapshot</folder>
+			<folder>SF_UserSnapshot</folder>
 		</column>
 		<column>
 			<name>snapshotDate</name>
-			<title>snapshotDate (UserSnapshot)</title>
+			<title>snapshotDate (SF_UserSnapshot)</title>
 			<ldmType>DATE</ldmType>
 			<format>yyyy-MM-dd</format>
 			<schemaReference>SF_SnapshotDate</schemaReference>
-			<folder>UserSnapshot</folder>
+			<folder>SF_UserSnapshot</folder>
 		</column>
 		<column>
 			<name>UserId</name>
-			<title>UserId (UserSnapshot)</title>
+			<title>UserId (SF_UserSnapshot)</title>
 			<ldmType>REFERENCE</ldmType>
 			<reference>Id</reference>
-			<schemaReference>User</schemaReference>
-			<folder>UserSnapshot</folder>
+			<schemaReference>SF_User</schemaReference>
+			<folder>SF_UserSnapshot</folder>
 		</column>
         <column>
             <name>Name</name>
-            <title>Name (UserSnapshot)</title>
+            <title>Name (SF_UserSnapshot)</title>
             <ldmType>ATTRIBUTE</ldmType>
 			<dataType>VARCHAR(255)</dataType>
-			<folder>UserSnapshot</folder>
+			<folder>SF_UserSnapshot</folder>
         </column>
 	</columns>
 </schema>

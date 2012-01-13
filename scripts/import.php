@@ -15,10 +15,12 @@ $application->bootstrap(array('base', 'autoload', 'config', 'db'));
 
 // Setup console input
 $opts = new Zend_Console_Getopt(array(
-	'id|i=s'	=> 'Id of user'
+	'id|i=s'	=> 'Id of user',
+	'table|t=s' => 'Table'
 ));
 $opts->setHelp(array(
-	'i'	=> 'Id of user'
+	'i'	=> 'Id of user',
+	't'	=> 'Table to import'
 ));
 try {
 	$opts->parse();
@@ -59,7 +61,11 @@ if (!$opts->getOption('id')) {
 
 		$user->revalidateAccessToken();
 		$import = new App_SalesForceImport($user);
-		$import->importAll();
+		if($opts->getOption('table')) {
+			$import->import($opts->getOption('table'));
+		} else {
+			$import->importAll();
+		}
 
 	} else {
 		echo "Wrong user id!\n";

@@ -1,74 +1,72 @@
 <schema>
-	<name>Campaign</name>
+	<name>SF_Campaign</name>
 	<columns>
 		<column>
 			<name>Id</name>
-			<title>ID (Campaign)</title>
+			<title>ID (SF_Campaign)</title>
 			<ldmType>CONNECTION_POINT</ldmType>
 			<dataType>VARCHAR(255)</dataType>
-			<folder>Campaign</folder>
+			<folder>SF_Campaign</folder>
 		</column>
 		<column>
 			<name>isDeleted</name>
-			<title>isDeleted (Campaign)</title>
+			<title>isDeleted (SF_Campaign)</title>
 			<ldmType>ATTRIBUTE</ldmType>
 			<dataType>INT</dataType>
-			<folder>Campaign</folder>
+			<folder>SF_Campaign</folder>
 		</column>
         <column>
             <name>OwnerId</name>
-            <title>OwnerId (Campaign)</title>
-            <ldmType>REFERENCE</ldmType>
-            <reference>Id</reference>
-            <schemaReference>User</schemaReference>
-            <folder>Campaign</folder>
+            <title>OwnerId (SF_Campaign)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
         </column>
 		<column>
 			<name>Name</name>
-			<title>Name (Campaign)</title>
+			<title>Name (SF_Campaign)</title>
 			<ldmType>ATTRIBUTE</ldmType>
 			<dataType>VARCHAR(255)</dataType>
-			<folder>Campaign</folder>
+			<folder>SF_Campaign</folder>
 		</column>
 		<column>
 			<name>ExpectedRevenue</name>
-			<title>ExpectedRevenue (Campaign)</title>
+			<title>ExpectedRevenue (SF_Campaign)</title>
 			<ldmType>FACT</ldmType>
-			<folder>Campaign</folder>
+			<folder>SF_Campaign</folder>
 		</column>
 		<column>
 			<name>BudgetedCost</name>
-			<title>BudgetedCost (Campaign)</title>
+			<title>BudgetedCost (SF_Campaign)</title>
 			<ldmType>FACT</ldmType>
-			<folder>Campaign</folder>
+			<folder>SF_Campaign</folder>
 		</column>
 		<column>
 			<name>ActualCost</name>
-			<title>ActualCost (Campaign)</title>
+			<title>ActualCost (SF_Campaign)</title>
 			<ldmType>FACT</ldmType>
-			<folder>Campaign</folder>
+			<folder>SF_Campaign</folder>
 		</column>
 		<column>
 			<name>StartDate</name>
-			<title>StartDate (Campaign)</title>
+			<title>StartDate (SF_Campaign)</title>
 			<ldmType>DATE</ldmType>
 			<format>yyyy-MM-dd</format>
 			<schemaReference>SF_CampaignStartDate</schemaReference>
-			<folder>Campaign</folder>
+			<folder>SF_Campaign</folder>
 		</column>
 		<column>
 			<name>Type</name>
-			<title>Type (Campaign)</title>
+			<title>Type (SF_Campaign)</title>
 			<ldmType>ATTRIBUTE</ldmType>
 			<dataType>VARCHAR(255)</dataType>
-			<folder>Campaign</folder>
+			<folder>SF_Campaign</folder>
 		</column>
 		<column>
 			<name>Status</name>
-			<title>Status (Campaign)</title>
+			<title>Status (SF_Campaign)</title>
 			<ldmType>ATTRIBUTE</ldmType>
 			<dataType>VARCHAR(255)</dataType>
-			<folder>Campaign</folder>
+			<folder>SF_Campaign</folder>
 		</column>
 	</columns>
 </schema>

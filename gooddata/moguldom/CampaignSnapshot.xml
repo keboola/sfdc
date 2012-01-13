@@ -1,97 +1,97 @@
 <schema>
-	<name>CampaignSnapshot</name>
+	<name>SF_CampaignSnapshot</name>
 	<columns>
 		<column>
 			<name>Id</name>
-			<title>ID (CampaignSnapshot)</title>
+			<title>ID (SF_CampaignSnapshot)</title>
 			<ldmType>CONNECTION_POINT</ldmType>
 			<dataType>VARCHAR(255)</dataType>
-			<folder>CampaignSnapshot</folder>
+			<folder>SF_CampaignSnapshot</folder>
 		</column>
 		<column>
 			<name>isDeleted</name>
-			<title>isDeleted (CampaignSnapshot)</title>
+			<title>isDeleted (SF_CampaignSnapshot)</title>
 			<ldmType>ATTRIBUTE</ldmType>
 			<dataType>INT</dataType>
-			<folder>CampaignSnapshot</folder>
+			<folder>SF_CampaignSnapshot</folder>
 		</column>
 		<column>
 			<name>snapshotNumber</name>
-			<title>snapshotNumber (CampaignSnapshot)</title>
+			<title>snapshotNumber (SF_CampaignSnapshot)</title>
 			<ldmType>ATTRIBUTE</ldmType>
 			<dataType>INT</dataType>
-			<folder>CampaignSnapshot</folder>
+			<folder>SF_CampaignSnapshot</folder>
 		</column>
 		<column>
 			<name>snapshotDate</name>
-			<title>snapshotDate (CampaignSnapshot)</title>
+			<title>snapshotDate (SF_CampaignSnapshot)</title>
 			<ldmType>DATE</ldmType>
 			<format>yyyy-MM-dd</format>
 			<schemaReference>SF_SnapshotDate</schemaReference>
-			<folder>CampaignSnapshot</folder>
+			<folder>SF_CampaignSnapshot</folder>
 		</column>
 		<column>
 			<name>CampaignId</name>
-			<title>CampaignId (CampaignSnapshot)</title>
+			<title>CampaignId (SF_CampaignSnapshot)</title>
 			<ldmType>REFERENCE</ldmType>
 			<reference>Id</reference>
-			<schemaReference>Campaign</schemaReference>
-			<folder>CampaignSnapshot</folder>
+			<schemaReference>SF_Campaign</schemaReference>
+			<folder>SF_CampaignSnapshot</folder>
 		</column>
         <column>
             <name>OwnerId</name>
-            <title>OwnerId (CampaignSnapshot)</title>
+            <title>OwnerId (SF_CampaignSnapshot)</title>
             <ldmType>REFERENCE</ldmType>
             <reference>Id</reference>
-            <schemaReference>User</schemaReference>
-            <folder>CampaignSnapshot</folder>
+            <schemaReference>SF_User</schemaReference>
+            <folder>SF_CampaignSnapshot</folder>
         </column>
 		<column>
 			<name>Name</name>
-			<title>Name (CampaignSnapshot)</title>
+			<title>Name (SF_CampaignSnapshot)</title>
 			<ldmType>ATTRIBUTE</ldmType>
 			<dataType>VARCHAR(255)</dataType>
-			<folder>CampaignSnapshot</folder>
+			<folder>SF_CampaignSnapshot</folder>
 		</column>
 		<column>
 			<name>ExpectedRevenue</name>
-			<title>ExpectedRevenue (CampaignSnapshot)</title>
+			<title>ExpectedRevenue (SF_CampaignSnapshot)</title>
 			<ldmType>FACT</ldmType>
-			<folder>CampaignSnapshot</folder>
+			<folder>SF_CampaignSnapshot</folder>
 		</column>
 		<column>
 			<name>BudgetedCost</name>
-			<title>BudgetedCost (CampaignSnapshot)</title>
+			<title>BudgetedCost (SF_CampaignSnapshot)</title>
 			<ldmType>FACT</ldmType>
-			<folder>CampaignSnapshot</folder>
+			<folder>SF_CampaignSnapshot</folder>
 		</column>
 		<column>
 			<name>ActualCost</name>
-			<title>ActualCost (CampaignSnapshot)</title>
+			<title>ActualCost (SF_CampaignSnapshot)</title>
 			<ldmType>FACT</ldmType>
-			<folder>CampaignSnapshot</folder>
+			<folder>SF_CampaignSnapshot</folder>
 		</column>
 		<column>
 			<name>StartDate</name>
-			<title>StartDate (CampaignSnapshot)</title>
+			<title>StartDate (SF_CampaignSnapshot)</title>
 			<ldmType>DATE</ldmType>
 			<format>yyyy-MM-dd</format>
 			<schemaReference>SF_CampaignSnapshotStartDate</schemaReference>
-			<folder>CampaignSnapshot</folder>
+			<folder>SF_CampaignSnapshot</folder>
 		</column>
 		<column>
 			<name>Type</name>
-			<title>Type (CampaignSnapshot)</title>
+			<title>Type (SF_CampaignSnapshot)</title>
 			<ldmType>ATTRIBUTE</ldmType>
 			<dataType>VARCHAR(255)</dataType>
-			<folder>CampaignSnapshot</folder>
+			<folder>SF_CampaignSnapshot</folder>
 		</column>
 		<column>
 			<name>Status</name>
-			<title>Status (CampaignSnapshot)</title>
+			<title>Status (SF_CampaignSnapshot)</title>
 			<ldmType>ATTRIBUTE</ldmType>
 			<dataType>VARCHAR(255)</dataType>
-			<folder>CampaignSnapshot</folder>
+			<folder>SF_CampaignSnapshot</folder>
 		</column>
 	</columns>
 </schema>

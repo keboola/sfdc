@@ -1,26 +1,40 @@
 <schema>
-	<name>Contact</name>
+	<name>SF_Contact</name>
 	<columns>
 		<column>
 			<name>Id</name>
-			<title>ID (Contact)</title>
+			<title>ID (SF_Contact)</title>
 			<ldmType>CONNECTION_POINT</ldmType>
 			<dataType>VARCHAR(255)</dataType>
-			<folder>Contact</folder>
+			<folder>SF_Contact</folder>
 		</column>
 		<column>
 			<name>isDeleted</name>
-			<title>isDeleted (Contact)</title>
+			<title>isDeleted (SF_Contact)</title>
 			<ldmType>ATTRIBUTE</ldmType>
 			<dataType>INT</dataType>
-			<folder>Contact</folder>
+			<folder>SF_Contact</folder>
 		</column>
         <column>
             <name>Name</name>
-            <title>Name (Contact)</title>
+            <title>Name (SF_Contact)</title>
             <ldmType>ATTRIBUTE</ldmType>
 			<dataType>VARCHAR(255)</dataType>
-			<folder>Contact</folder>
+			<folder>SF_Contact</folder>
         </column>
+		<column>
+			<name>AdAgencyId</name>
+			<title>AdAgencyId (SF_Contact)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>SF_Contact</folder>
+		</column>
+		<column>
+			<name>AccountId</name>
+			<title>AccountId (SF_Contact)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>SF_Contact</folder>
+		</column>
 	</columns>
 </schema>

@@ -1,49 +1,105 @@
 <schema>
-	<name>AccountSnapshot</name>
+	<name>SF_AccountSnapshot</name>
 	<columns>
 		<column>
 			<name>Id</name>
-			<title>ID (AccountSnapshot)</title>
+			<title>ID (SF_AccountSnapshot)</title>
 			<ldmType>CONNECTION_POINT</ldmType>
 			<dataType>VARCHAR(255)</dataType>
-			<folder>AccountSnapshot</folder>
+			<folder>SF_AccountSnapshot</folder>
 		</column>
 		<column>
 			<name>isDeleted</name>
-			<title>isDeleted (AccountSnapshot)</title>
+			<title>isDeleted (SF_AccountSnapshot)</title>
 			<ldmType>ATTRIBUTE</ldmType>
 			<dataType>INT</dataType>
-			<folder>AccountSnapshot</folder>
+			<folder>SF_AccountSnapshot</folder>
 		</column>
 		<column>
 			<name>snapshotNumber</name>
-			<title>snapshotNumber (AccountSnapshot)</title>
+			<title>snapshotNumber (SF_AccountSnapshot)</title>
 			<ldmType>ATTRIBUTE</ldmType>
 			<dataType>INT</dataType>
-			<folder>AccountSnapshot</folder>
+			<folder>SF_AccountSnapshot</folder>
 		</column>
 		<column>
 			<name>snapshotDate</name>
-			<title>snapshotDate (AccountSnapshot)</title>
+			<title>snapshotDate (SF_AccountSnapshot)</title>
 			<ldmType>DATE</ldmType>
 			<format>yyyy-MM-dd</format>
 			<schemaReference>SF_SnapshotDate</schemaReference>
-			<folder>AccountSnapshot</folder>
+			<folder>SF_AccountSnapshot</folder>
 		</column>
 		<column>
 			<name>AccountId</name>
-			<title>AccountId (AccountSnapshot)</title>
+			<title>AccountId (SF_AccountSnapshot)</title>
 			<ldmType>REFERENCE</ldmType>
 			<reference>Id</reference>
-			<schemaReference>Account</schemaReference>
-			<folder>AccountSnapshot</folder>
+			<schemaReference>SF_Account</schemaReference>
+			<folder>SF_AccountSnapshot</folder>
 		</column>
 		<column>
 			<name>Name</name>
-			<title>Name (AccountSnapshot)</title>
+			<title>Name (SF_AccountSnapshot)</title>
 			<ldmType>ATTRIBUTE</ldmType>
 			<dataType>VARCHAR(255)</dataType>
-			<folder>AccountSnapshot</folder>
+			<folder>SF_AccountSnapshot</folder>
+		</column>
+		<column>
+			<name>Industry</name>
+			<title>Industry (SF_AccountSnapshot)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>SF_AccountSnapshot</folder>
+		</column>
+		<column>
+			<name>BillingCity</name>
+			<title>BillingCity (SF_AccountSnapshot)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>SF_AccountSnapshot</folder>
+		</column>
+		<column>
+			<name>BillingState</name>
+			<title>BillingState (SF_AccountSnapshot)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>SF_AccountSnapshot</folder>
+		</column>
+		<column>
+			<name>BillingCountry</name>
+			<title>BillingCountry (SF_AccountSnapshot)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>SF_AccountSnapshot</folder>
+		</column>
+		<column>
+			<name>ShippingCity</name>
+			<title>ShippingCity (SF_AccountSnapshot)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>SF_AccountSnapshot</folder>
+		</column>
+		<column>
+			<name>ShippingState</name>
+			<title>ShippingState (SF_AccountSnapshot)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>SF_AccountSnapshot</folder>
+		</column>
+		<column>
+			<name>ShippingCountry</name>
+			<title>ShippingCountry (SF_AccountSnapshot)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>SF_AccountSnapshot</folder>
+		</column>
+		<column>
+			<name>TotalWonOpportunities</name>
+			<title>TotalWonOpportunities (SF_AccountSnapshot)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>SF_AccountSnapshot</folder>
 		</column>
 	</columns>
 </schema>

@@ -17,11 +17,12 @@ class Model_BiSnapshot extends Zend_Db_Table
 	public function getSnapshotNumber() {
 		$todayNumber = date("Ymd");
 		$todayDate = date("Y-m-d");
-		$snapshot = $this->fetchRow(array('snapshotNumber=?' => $todayNumber));
+		$snapshot = $this->fetchRow(array('snapshotDate=?' => $todayNumber));
 		if (!$snapshot) {
-			$this->insert(array('snapshotNumber' => $todayNumber, 'snapshotDate' => $todayDate));
+			$this->getAdapter()->query("INSERT INTO {$this->_name} SET snapshotNumber = CAST(UNIX_TIMESTAMP(DATE(NOW()))/86400 AS UNSIGNED), snapshotDate = '{$todayDate}'");
+			$snapshot = $this->fetchRow(array('snapshotDate=?' => $todayNumber));
 		}
-		return $todayNumber;
+		return $snapshot->snapshotNumber;
 	}
 
 }

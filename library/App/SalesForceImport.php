@@ -14,16 +14,46 @@ class App_SalesForceImport
 		$this->_snapshotNumber = $snapshotTable->getSnapshotNumber();
 	}
 
+
+	/**
+	 * imports all tables
+	 * @return void
+	 */
 	public function importAll()
 	{
 		$registry = Zend_Registry::getInstance();
 		$userStrId = $this->_user->strId;
 		foreach($registry->config->sfUser->$userStrId->tables as $table => $tableConfig) {
+			$this->import($table);
+		}
+	}
 
-			$response = $this->_query($tableConfig->importQuery);
+	/**
+	 * imports one table
+	 * @param $tableName
+	 * @return bool
+	 */
+	public function import($tableName) {
+		$registry = Zend_Registry::getInstance();
+		$userStrId = $this->_user->strId;
+		if(isset($registry->config->sfUser->$userStrId->tables->$tableName)) {
+			$tableConfig = $registry->config->sfUser->$userStrId->tables->$tableName;
+
+			$table = $tableName;
+			$query = '';
+			if (isset($tableConfig->importQuery)) {
+				$query = $tableConfig->importQuery;
+			}
+			if (isset($tableConfig->importQueryColumns) && count($tableConfig->importQueryColumns->toArray())) {
+				$query = "SELECT " . join(",", $tableConfig->importQueryColumns->toArray()) . " FROM {$table}";
+			}
+			if (!$query) {
+				throw new Exception("Table {$table} not configured.");
+			}
+			$response = $this->_query($query);
 
 			$tableClass = "Model_" . $table;
-			$dbTable = new $tableClass;
+			$dbTable = new Model_DataTable(null, null, $table);
 
 			$dbTable->prepareDeleteCheck();
 
@@ -81,6 +111,12 @@ class App_SalesForceImport
 		return $record;
 	}
 
+	/**
+	 * @throws Exception
+	 * @param $query
+	 * @param string $queryUrl
+	 * @return array|mixed
+	 */
 	private function _query($query, $queryUrl = '') {
 		if (!$queryUrl) {
 			$url = "{$this->_user->instanceUrl}/services/data/v23.0/query?q=" . urlencode($query);

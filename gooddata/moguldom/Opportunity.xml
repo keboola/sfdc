@@ -1,99 +1,199 @@
 <schema>
-	<name>Opportunity</name>
+	<name>SF_Opportunity</name>
 	<columns>
 		<column>
 			<name>Id</name>
-			<title>ID (Opportunity)</title>
+			<title>ID (SF_Opportunity)</title>
 			<ldmType>CONNECTION_POINT</ldmType>
 			<dataType>VARCHAR(255)</dataType>
-			<folder>Opportunity</folder>
+			<folder>SF_Opportunity</folder>
 		</column>
 		<column>
 			<name>isDeleted</name>
-			<title>isDeleted (Opportunity)</title>
+			<title>isDeleted (SF_Opportunity)</title>
 			<ldmType>ATTRIBUTE</ldmType>
 			<dataType>INT</dataType>
-			<folder>Opportunity</folder>
+			<folder>SF_Opportunity</folder>
 		</column>
         <column>
             <name>AccountId</name>
-            <title>AccountId (Opportunity)</title>
-            <ldmType>REFERENCE</ldmType>
-            <reference>Id</reference>
-            <schemaReference>Account</schemaReference>
-            <folder>Opportunity</folder>
+            <title>AccountId (SF_Opportunity)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+            <folder>SF_Opportunity</folder>
         </column>
 		<column>
 			<name>Amount</name>
-			<title>Amount (Opportunity)</title>
+			<title>Amount (SF_Opportunity)</title>
 			<ldmType>FACT</ldmType>
-			<folder>Opportunity</folder>
+			<folder>SF_Opportunity</folder>
 		</column>
 		<column>
 			<name>CloseDate</name>
-			<title>CloseDate (Opportunity)</title>
+			<title>CloseDate (SF_Opportunity)</title>
 			<ldmType>DATE</ldmType>
 			<format>yyyy-MM-dd</format>
 			<schemaReference>SF_OpportunityCloseDate</schemaReference>
-			<folder>Opportunity</folder>
+			<folder>SF_Opportunity</folder>
 		</column>
 		<column>
 			<name>CreatedDate</name>
-			<title>CreatedDate (Opportunity)</title>
+			<title>CreatedDate (SF_Opportunity)</title>
 			<ldmType>DATE</ldmType>
 			<format>yyyy-MM-dd</format>
 			<schemaReference>SF_OpportunityCreatedDate</schemaReference>
-			<folder>Opportunity</folder>
+			<folder>SF_Opportunity</folder>
 		</column>
 		<column>
 			<name>IsWon</name>
-			<title>IsWon (Opportunity)</title>
+			<title>IsWon (SF_Opportunity)</title>
 			<ldmType>ATTRIBUTE</ldmType>
 			<dataType>INT</dataType>
-			<folder>Opportunity</folder>
+			<folder>SF_Opportunity</folder>
 		</column>
 		<column>
 			<name>IsClosed</name>
-			<title>IsClosed (Opportunity)</title>
+			<title>IsClosed (SF_Opportunity)</title>
 			<ldmType>ATTRIBUTE</ldmType>
 			<dataType>INT</dataType>
-			<folder>Opportunity</folder>
+			<folder>SF_Opportunity</folder>
 		</column>
 		<column>
 			<name>Name</name>
-			<title>Name (Opportunity)</title>
+			<title>Name (SF_Opportunity)</title>
 			<ldmType>ATTRIBUTE</ldmType>
 			<dataType>VARCHAR(255)</dataType>
-			<folder>Opportunity</folder>
+			<folder>SF_Opportunity</folder>
 		</column>
 		<column>
 			<name>StageName</name>
-			<title>StageName (Opportunity)</title>
+			<title>StageName (SF_Opportunity)</title>
 			<ldmType>ATTRIBUTE</ldmType>
 			<dataType>VARCHAR(255)</dataType>
-			<folder>Opportunity</folder>
+			<folder>SF_Opportunity</folder>
 		</column>
 		<column>
 			<name>ForecastCategory</name>
-			<title>ForecastCategory (Opportunity)</title>
+			<title>ForecastCategory (SF_Opportunity)</title>
 			<ldmType>ATTRIBUTE</ldmType>
 			<dataType>VARCHAR(255)</dataType>
-			<folder>Opportunity</folder>
+			<folder>SF_Opportunity</folder>
 		</column>
 		<column>
 			<name>Probability</name>
-			<title>Probability (Opportunity)</title>
+			<title>Probability (SF_Opportunity)</title>
 			<ldmType>ATTRIBUTE</ldmType>
 			<dataType>DECIMAL(10,2)</dataType>
-			<folder>Opportunity</folder>
+			<folder>SF_Opportunity</folder>
 		</column>
 		<column>
 			<name>OwnerId</name>
-			<title>OwnerId (Opportunity)</title>
-			<ldmType>REFERENCE</ldmType>
-			<reference>Id</reference>
-			<schemaReference>User</schemaReference>
-			<folder>Opportunity</folder>
+			<title>OwnerId (SF_Opportunity)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>SF_Opportunity</folder>
+		</column>
+		<column>
+			<name>EndDate</name>
+			<title>EndDate (SF_Opportunity)</title>
+			<ldmType>DATE</ldmType>
+			<format>yyyy-MM-dd</format>
+			<schemaReference>SF_OpportunityEndDate</schemaReference>
+			<folder>SF_Opportunity</folder>
+		</column>
+		<column>
+			<name>FollowUpDate</name>
+			<title>FollowUpDate (SF_Opportunity)</title>
+			<ldmType>DATE</ldmType>
+			<format>yyyy-MM-dd</format>
+			<schemaReference>SF_OpportunityFollowUpDate</schemaReference>
+			<folder>SF_Opportunity</folder>
+		</column>
+		<column>
+			<name>Gift</name>
+			<title>Gift (SF_Opportunity)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>SF_Opportunity</folder>
+		</column>
+		<column>
+			<name>Industry</name>
+			<title>Industry (SF_Opportunity)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>SF_Opportunity</folder>
+		</column>
+		<column>
+			<name>LongTermOpportunities</name>
+			<title>LongTermOpportunities (SF_Opportunity)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>SF_Opportunity</folder>
+		</column>
+		<column>
+			<name>MarketingChannel</name>
+			<title>MarketingChannel (SF_Opportunity)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>SF_Opportunity</folder>
+		</column>
+		<column>
+			<name>NextStep1</name>
+			<title>NextStep1 (SF_Opportunity)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>SF_Opportunity</folder>
+		</column>
+		<column>
+			<name>ReasonLost</name>
+			<title>ReasonLost (SF_Opportunity)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>SF_Opportunity</folder>
+		</column>
+		<column>
+			<name>SalesChannel</name>
+			<title>SalesChannel (SF_Opportunity)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>SF_Opportunity</folder>
+		</column>
+		<column>
+			<name>SignedIOReceivedDate</name>
+			<title>SignedIOReceivedDate (SF_Opportunity)</title>
+			<ldmType>DATE</ldmType>
+			<format>yyyy-MM-dd</format>
+			<schemaReference>SF_OpportunitySignedIOReceivedDate</schemaReference>
+			<folder>SF_Opportunity</folder>
+		</column>
+		<column>
+			<name>SignedIOReceived</name>
+			<title>SignedIOReceived (SF_Opportunity)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>SF_Opportunity</folder>
+		</column>
+		<column>
+			<name>StartDate</name>
+			<title>StartDate (SF_Opportunity)</title>
+			<ldmType>DATE</ldmType>
+			<format>yyyy-MM-dd</format>
+			<schemaReference>SF_OpportunityStartDate</schemaReference>
+			<folder>SF_Opportunity</folder>
+		</column>
+		<column>
+			<name>TopMajorOpportunities</name>
+			<title>TopMajorOpportunities (SF_Opportunity)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>SF_Opportunity</folder>
+		</column>
+		<column>
+			<name>WinningCompetitor</name>
+			<title>WinningCompetitor (SF_Opportunity)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>SF_Opportunity</folder>
 		</column>
 	</columns>
 </schema>

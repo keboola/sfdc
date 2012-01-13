@@ -1,49 +1,49 @@
 <schema>
-	<name>SF_UserSnapshot</name>
+	<name>SF_AdAgencySnapshot</name>
 	<columns>
 		<column>
 			<name>Id</name>
-			<title>ID (SF_UserSnapshot)</title>
+			<title>ID (SF_AdAgencySnapshot)</title>
 			<ldmType>CONNECTION_POINT</ldmType>
 			<dataType>VARCHAR(255)</dataType>
-			<folder>SF_UserSnapshot</folder>
+			<folder>SF_AdAgencySnapshot</folder>
 		</column>
 		<column>
 			<name>isDeleted</name>
-			<title>isDeleted (SF_UserSnapshot)</title>
+			<title>isDeleted (SF_AdAgencySnapshot)</title>
 			<ldmType>ATTRIBUTE</ldmType>
 			<dataType>INT</dataType>
-			<folder>SF_UserSnapshot</folder>
+			<folder>SF_AdAgencySnapshot</folder>
 		</column>
 		<column>
 			<name>snapshotNumber</name>
-			<title>snapshotNumber (SF_UserSnapshot)</title>
+			<title>snapshotNumber (SF_AdAgencySnapshot)</title>
 			<ldmType>ATTRIBUTE</ldmType>
 			<dataType>INT</dataType>
-			<folder>SF_UserSnapshot</folder>
+			<folder>SF_AdAgencySnapshot</folder>
 		</column>
 		<column>
 			<name>snapshotDate</name>
-			<title>snapshotDate (SF_UserSnapshot)</title>
+			<title>snapshotDate (SF_AdAgencySnapshot)</title>
 			<ldmType>DATE</ldmType>
 			<format>yyyy-MM-dd</format>
 			<schemaReference>SF_SnapshotDate</schemaReference>
-			<folder>SF_UserSnapshot</folder>
+			<folder>SF_AdAgencySnapshot</folder>
 		</column>
 		<column>
-			<name>UserId</name>
-			<title>UserId (SF_UserSnapshot)</title>
+			<name>AdAgencyId</name>
+			<title>AdAgencyId (SF_AdAgencySnapshot)</title>
 			<ldmType>REFERENCE</ldmType>
 			<reference>Id</reference>
-			<schemaReference>SF_User</schemaReference>
-			<folder>SF_UserSnapshot</folder>
+			<schemaReference>SF_AdAgency</schemaReference>
+			<folder>SF_AdAgencySnapshot</folder>
 		</column>
         <column>
             <name>Name</name>
-            <title>Name (SF_UserSnapshot)</title>
+            <title>Name (SF_AdAgencySnapshot)</title>
             <ldmType>ATTRIBUTE</ldmType>
 			<dataType>VARCHAR(255)</dataType>
-			<folder>SF_UserSnapshot</folder>
+			<folder>SF_AdAgencySnapshot</folder>
         </column>
 	</columns>
 </schema>

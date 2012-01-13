@@ -10,7 +10,6 @@ class App_Db_Table extends Zend_Db_Table
 	 * @var string
 	 */
 	protected $_name;
-	protected $_snapshotTableClass;
 	protected $_isSnapshotTable = false;
 	protected $_rowClass = 'App_Db_Table_Row';
 
@@ -46,27 +45,6 @@ class App_Db_Table extends Zend_Db_Table
 	public function deleteCheck()
 	{
 		$this->update(array("isDeleted" => 1), array("isDeletedCheck=?" => 1, "Id!=?" => '--empty--'));
-	}
-
-	/**
-	 *
-	 * creates a snapshot in snapshot table
-	 *
-	 * @param $user
-	 * @param $snapshotNumber
-	 * @return void
-	 */
-	public function createSnapshot($snapshotNumber)
-	{
-		$items = $this->fetchAll();
-		$snapshotTable = new $this->_snapshotTableClass;
-		foreach ($items as $item) {
-			$data = $item->toArray();
-			unset($data['_id']);
-			unset($data['isDeletedCheck']);
-			$data['snapshotNumber'] = $snapshotNumber;
-			$snapshotTable->insertOrSet($data);
-		}
 	}
 
 	public function insertOrSet($data)

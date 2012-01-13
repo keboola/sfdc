@@ -1,26 +1,26 @@
 <schema>
-	<name>User</name>
+	<name>SF_User</name>
 	<columns>
 		<column>
 			<name>Id</name>
-			<title>ID (User)</title>
+			<title>ID (SF_User)</title>
 			<ldmType>CONNECTION_POINT</ldmType>
 			<dataType>VARCHAR(255)</dataType>
-			<folder>User</folder>
+			<folder>SF_User</folder>
 		</column>
 		<column>
 			<name>isDeleted</name>
-			<title>isDeleted (User)</title>
+			<title>isDeleted (SF_User)</title>
 			<ldmType>ATTRIBUTE</ldmType>
 			<dataType>INT</dataType>
-			<folder>User</folder>
+			<folder>SF_User</folder>
 		</column>
         <column>
             <name>Name</name>
-            <title>Name (User)</title>
+            <title>Name (SF_User)</title>
             <ldmType>ATTRIBUTE</ldmType>
 			<dataType>VARCHAR(255)</dataType>
-			<folder>User</folder>
+			<folder>SF_User</folder>
         </column>
 	</columns>
 </schema>

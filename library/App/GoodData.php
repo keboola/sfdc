@@ -125,6 +125,22 @@ class App_GoodData
 	}
 
 	/**
+	 *
+	 * Removes a dataset
+	 *
+	 * @param $name
+	 * @return void
+	 */
+	public function dropDataset($name) {
+		echo "\n".'*** Drop dataset: '. $name ."\n";
+		$maqlFile = ROOT_PATH.'/tmp/temp.maql';
+		file_put_contents($maqlFile, 'DROP ALL IN IF EXISTS {dataset.' . $name . '};' . "\n");
+		$command = 'ExecuteMaql(maqlFile="'.$maqlFile.'");';
+		$this->call($command);
+		system('rm -rf '.$maqlFile);
+	}
+
+	/**
 	 * Set of commands which create a dataset
 	 * @param $xml
 	 * @param $csv
