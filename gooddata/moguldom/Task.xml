@@ -10,7 +10,7 @@
 		</column>
 		<column>
 			<name>isDeleted</name>
-			<title>isDeleted (TaskSnapshot)</title>
+			<title>isDeleted (Task)</title>
 			<ldmType>ATTRIBUTE</ldmType>
 			<dataType>INT</dataType>
 			<folder>SF_Task</folder>
@@ -18,15 +18,17 @@
 		<column>
 			<name>AccountId</name>
 			<title>AccountId (SF_Task)</title>
-			<ldmType>ATTRIBUTE</ldmType>
-			<dataType>VARCHAR(255)</dataType>
+			<ldmType>REFERENCE</ldmType>
+			<reference>Id</reference>
+			<schemaReference>SF_Account</schemaReference>
 			<folder>SF_Task</folder>
 		</column>
 		<column>
 			<name>OwnerId</name>
 			<title>OwnerId (SF_Task)</title>
-			<ldmType>ATTRIBUTE</ldmType>
-			<dataType>VARCHAR(255)</dataType>
+			<ldmType>REFERENCE</ldmType>
+			<reference>Id</reference>
+			<schemaReference>SF_User</schemaReference>
 			<folder>SF_Task</folder>
 		</column>
 		<column>
@@ -63,6 +65,28 @@
 			<title>IsClosed (SF_Task)</title>
 			<ldmType>ATTRIBUTE</ldmType>
 			<dataType>INT</dataType>
+			<folder>SF_Task</folder>
+		</column>
+		<column>
+			<name>CallType</name>
+			<title>CallType (SF_Task)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>SF_Task</folder>
+		</column>
+		<column>
+			<name>Type</name>
+			<title>Type (SF_Task)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>SF_Task</folder>
+		</column>
+		<column>
+			<name>CreatedDate</name>
+			<title>CreatedDate (SF_Task)</title>
+			<ldmType>DATE</ldmType>
+			<format>yyyy-MM-dd</format>
+			<schemaReference>SF_TaskCreatedDate</schemaReference>
 			<folder>SF_Task</folder>
 		</column>
 	</columns>

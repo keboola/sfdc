@@ -23,6 +23,13 @@
 			<folder>SF_Account</folder>
 		</column>
 		<column>
+			<name>Type</name>
+			<title>Type (SF_Account)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>SF_Account</folder>
+		</column>
+		<column>
 			<name>Industry</name>
 			<title>Industry (SF_Account)</title>
 			<ldmType>ATTRIBUTE</ldmType>

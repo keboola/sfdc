@@ -15,13 +15,14 @@
 			<dataType>INT</dataType>
 			<folder>SF_Opportunity</folder>
 		</column>
-        <column>
-            <name>AccountId</name>
-            <title>AccountId (SF_Opportunity)</title>
-			<ldmType>ATTRIBUTE</ldmType>
-			<dataType>VARCHAR(255)</dataType>
-            <folder>SF_Opportunity</folder>
-        </column>
+		<column>
+			<name>AccountId</name>
+			<title>AccountId (SF_Opportunity)</title>
+			<ldmType>REFERENCE</ldmType>
+			<reference>Id</reference>
+			<schemaReference>SF_Account</schemaReference>
+			<folder>SF_Opportunity</folder>
+		</column>
 		<column>
 			<name>Amount</name>
 			<title>Amount (SF_Opportunity)</title>
@@ -89,8 +90,9 @@
 		<column>
 			<name>OwnerId</name>
 			<title>OwnerId (SF_Opportunity)</title>
-			<ldmType>ATTRIBUTE</ldmType>
-			<dataType>VARCHAR(255)</dataType>
+			<ldmType>REFERENCE</ldmType>
+			<reference>Id</reference>
+			<schemaReference>SF_User</schemaReference>
 			<folder>SF_Opportunity</folder>
 		</column>
 		<column>
@@ -128,13 +130,6 @@
 			<title>LongTermOpportunities (SF_Opportunity)</title>
 			<ldmType>ATTRIBUTE</ldmType>
 			<dataType>INT</dataType>
-			<folder>SF_Opportunity</folder>
-		</column>
-		<column>
-			<name>MarketingChannel</name>
-			<title>MarketingChannel (SF_Opportunity)</title>
-			<ldmType>ATTRIBUTE</ldmType>
-			<dataType>VARCHAR(255)</dataType>
 			<folder>SF_Opportunity</folder>
 		</column>
 		<column>
@@ -193,6 +188,79 @@
 			<title>WinningCompetitor (SF_Opportunity)</title>
 			<ldmType>ATTRIBUTE</ldmType>
 			<dataType>VARCHAR(255)</dataType>
+			<folder>SF_Opportunity</folder>
+		</column>
+		<column>
+			<name>CampaignStartDate</name>
+			<title>CampaignStartDate (SF_Opportunity)</title>
+			<ldmType>DATE</ldmType>
+			<format>yyyy-MM-dd</format>
+			<schemaReference>SF_OpportunityCampaignStartDate</schemaReference>
+			<folder>SF_Opportunity</folder>
+		</column>
+		<column>
+			<name>CampaignEndDate</name>
+			<title>CampaignEndDate (SF_Opportunity)</title>
+			<ldmType>DATE</ldmType>
+			<format>yyyy-MM-dd</format>
+			<schemaReference>SF_OpportunityCampaignEndDate</schemaReference>
+			<folder>SF_Opportunity</folder>
+		</column>
+		<column>
+			<name>InvoiceLate</name>
+			<title>InvoiceLate (SF_Opportunity)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(10)</dataType>
+			<folder>SF_Opportunity</folder>
+		</column>
+		<column>
+			<name>MarketingChannel</name>
+			<title>MarketingChannel (SF_Opportunity)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>SF_Opportunity</folder>
+		</column>
+		<column>
+			<name>PaymentDueDate</name>
+			<title>PaymentDueDate (SF_Opportunity)</title>
+			<ldmType>DATE</ldmType>
+			<format>yyyy-MM-dd</format>
+			<schemaReference>SF_OpportunityPaymentDueDate</schemaReference>
+			<folder>SF_Opportunity</folder>
+		</column>
+		<column>
+			<name>PaymentOptionNet</name>
+			<title>PaymentOptionNet (SF_Opportunity)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>SF_Opportunity</folder>
+		</column>
+		<column>
+			<name>PaymentStatus</name>
+			<title>PaymentStatus (SF_Opportunity)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>SF_Opportunity</folder>
+		</column>
+		<column>
+			<name>TotalEarnings</name>
+			<title>TotalEarnings (SF_Opportunity)</title>
+			<ldmType>FACT</ldmType>
+			<dataType>DECIMAL(16,2)</dataType>
+			<folder>SF_Opportunity</folder>
+		</column>
+		<column>
+			<name>TotaleCPM</name>
+			<title>TotaleCPM (SF_Opportunity)</title>
+			<ldmType>FACT</ldmType>
+			<dataType>DECIMAL(16,2)</dataType>
+			<folder>SF_Opportunity</folder>
+		</column>
+		<column>
+			<name>TotalImpressions</name>
+			<title>TotalImpressions (SF_Opportunity)</title>
+			<ldmType>FACT</ldmType>
+			<dataType>DECIMAL(18,0)</dataType>
 			<folder>SF_Opportunity</folder>
 		</column>
 	</columns>

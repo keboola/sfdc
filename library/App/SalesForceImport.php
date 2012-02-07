@@ -40,12 +40,19 @@ class App_SalesForceImport
 			$tableConfig = $registry->config->sfUser->$userStrId->tables->$tableName;
 
 			$table = $tableName;
+			$sfTable = $tableName;
+
+			// Custom Table Name in SalesForce
+			if ($tableConfig->sfTableName) {
+				$sfTable  = $tableConfig->sfTableName;
+			}
+
 			$query = '';
 			if (isset($tableConfig->importQuery)) {
 				$query = $tableConfig->importQuery;
 			}
 			if (isset($tableConfig->importQueryColumns) && count($tableConfig->importQueryColumns->toArray())) {
-				$query = "SELECT " . join(",", $tableConfig->importQueryColumns->toArray()) . " FROM {$table}";
+				$query = "SELECT " . join(",", $tableConfig->importQueryColumns->toArray()) . " FROM {$sfTable}";
 			}
 			if (!$query) {
 				throw new Exception("Table {$table} not configured.");
