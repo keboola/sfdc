@@ -1,94 +1,94 @@
 <schema>
-	<name>TaskSnapshot</name>
+	<name>SF_TaskSnapshot</name>
 	<columns>
 		<column>
 			<name>Id</name>
-			<title>ID (TaskSnapshot)</title>
+			<title>ID (SF_TaskSnapshot)</title>
 			<ldmType>CONNECTION_POINT</ldmType>
 			<dataType>VARCHAR(255)</dataType>
-			<folder>TaskSnapshot</folder>
+			<folder>SF_TaskSnapshot</folder>
 		</column>
 		<column>
 			<name>isDeleted</name>
-			<title>isDeleted (TaskSnapshot)</title>
+			<title>isDeleted (SF_TaskSnapshot)</title>
 			<ldmType>ATTRIBUTE</ldmType>
 			<dataType>INT</dataType>
-			<folder>TaskSnapshot</folder>
+			<folder>SF_TaskSnapshot</folder>
 		</column>
 		<column>
 			<name>snapshotNumber</name>
-			<title>snapshotNumber (TaskSnapshot)</title>
+			<title>snapshotNumber (SF_TaskSnapshot)</title>
 			<ldmType>ATTRIBUTE</ldmType>
 			<dataType>INT</dataType>
-			<folder>TaskSnapshot</folder>
+			<folder>SF_TaskSnapshot</folder>
 		</column>
 		<column>
 			<name>snapshotDate</name>
-			<title>snapshotDate (TaskSnapshot)</title>
+			<title>snapshotDate (SF_TaskSnapshot)</title>
 			<ldmType>DATE</ldmType>
 			<format>yyyy-MM-dd</format>
 			<schemaReference>SF_SnapshotDate</schemaReference>
-			<folder>TaskSnapshot</folder>
+			<folder>SF_TaskSnapshot</folder>
 		</column>
 		<column>
 			<name>TaskId</name>
-			<title>TaskId (TaskSnapshot)</title>
+			<title>TaskId (SF_TaskSnapshot)</title>
 			<ldmType>REFERENCE</ldmType>
 			<reference>Id</reference>
-			<schemaReference>Task</schemaReference>
-			<folder>TaskSnapshot</folder>
+			<schemaReference>SF_Task</schemaReference>
+			<folder>SF_TaskSnapshot</folder>
 		</column>
 		<column>
 			<name>AccountId</name>
-			<title>AccountId (TaskSnapshot)</title>
+			<title>AccountId (SF_TaskSnapshot)</title>
 			<ldmType>REFERENCE</ldmType>
 			<reference>Id</reference>
-			<schemaReference>Account</schemaReference>
-			<folder>TaskSnapshot</folder>
+			<schemaReference>SF_Account</schemaReference>
+			<folder>SF_TaskSnapshot</folder>
 		</column>
 		<column>
 			<name>OwnerId</name>
-			<title>OwnerId (TaskSnapshot)</title>
+			<title>OwnerId (SF_TaskSnapshot)</title>
 			<ldmType>REFERENCE</ldmType>
 			<reference>Id</reference>
-			<schemaReference>User</schemaReference>
-			<folder>TaskSnapshot</folder>
+			<schemaReference>SF_User</schemaReference>
+			<folder>SF_TaskSnapshot</folder>
 		</column>
 		<column>
 			<name>ActivityDate</name>
-			<title>ActivityDate (TaskSnapshot)</title>
+			<title>ActivityDate (SF_TaskSnapshot)</title>
 			<ldmType>DATE</ldmType>
 			<format>yyyy-MM-dd</format>
 			<schemaReference>SF_TaskSnapshotActivityDate</schemaReference>
-			<folder>TaskSnapshot</folder>
+			<folder>SF_TaskSnapshot</folder>
 		</column>
 		<column>
 			<name>Priority</name>
-			<title>Priority (TaskSnapshot)</title>
+			<title>Priority (SF_TaskSnapshot)</title>
 			<ldmType>ATTRIBUTE</ldmType>
 			<dataType>VARCHAR(255)</dataType>
-			<folder>TaskSnapshot</folder>
+			<folder>SF_TaskSnapshot</folder>
 		</column>
 		<column>
 			<name>Status</name>
-			<title>Status (TaskSnapshot)</title>
+			<title>Status (SF_TaskSnapshot)</title>
 			<ldmType>ATTRIBUTE</ldmType>
 			<dataType>VARCHAR(255)</dataType>
-			<folder>TaskSnapshot</folder>
+			<folder>SF_TaskSnapshot</folder>
 		</column>
 		<column>
 			<name>Subject</name>
-			<title>Subject (TaskSnapshot)</title>
+			<title>Subject (SF_TaskSnapshot)</title>
 			<ldmType>ATTRIBUTE</ldmType>
 			<dataType>VARCHAR(255)</dataType>
-			<folder>TaskSnapshot</folder>
+			<folder>SF_TaskSnapshot</folder>
 		</column>
 		<column>
 			<name>IsClosed</name>
-			<title>IsClosed (TaskSnapshot)</title>
+			<title>IsClosed (SF_TaskSnapshot)</title>
 			<ldmType>ATTRIBUTE</ldmType>
 			<dataType>INT</dataType>
-			<folder>TaskSnapshot</folder>
+			<folder>SF_TaskSnapshot</folder>
 		</column>
 	</columns>
 </schema>

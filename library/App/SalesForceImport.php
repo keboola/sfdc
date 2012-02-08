@@ -119,6 +119,9 @@ class App_SalesForceImport
 	}
 
 	/**
+	 *
+	 * Query for SOQL, handles paging
+	 *
 	 * @throws Exception
 	 * @param $query
 	 * @param string $queryUrl
@@ -150,5 +153,58 @@ class App_SalesForceImport
 		}
 		return $response;
 	}
+
+	/**
+	 *
+	 * Simple request to API, does not handle paging
+	 *
+	 * @throws Exception
+	 * @param $url
+	 * @return mixed
+	 */
+	private function _request($url) {
+
+		$curl = curl_init($this->_user->instanceUrl . $url);
+		curl_setopt($curl, CURLOPT_HEADER, false);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($curl, CURLOPT_HTTPHEADER, array("Authorization: OAuth {$this->_user->accessToken}"));
+
+		$json_response = curl_exec($curl);
+		curl_close($curl);
+
+		$response = json_decode($json_response, true);
+		// Query more
+		// if (isset($response['done']) && $response['done'] === false && $response['nextRecordsUrl'] != '') {
+		//	$responseMore = $this->_query($response['nextRecordsUrl']);
+		//	$response = array_merge_recursive($response, $responseMore);
+		// }
+		if (isset($response[0]['errorCode'])) {
+			throw new Exception($response[0]['errorCode'] . ': '. $response[0]['message']);
+		}
+		return $response;
+
+	}
+
+	/**
+	 *
+	 * Describe one SF object
+	 *
+	 * @param $object
+	 * @return string
+	 */
+	public function describe($object) {
+		return $this->_request("/services/data/v23.0/sobjects/{$object}/describe");
+	}
+
+	/**
+	 * List all SF Objects
+	 *
+	 * @return string
+	 */
+	public function listObjects() {
+		return $this->_request("/services/data/v23.0/sobjects/");
+	}
+
+
 
 }

@@ -1,49 +1,49 @@
 <schema>
-	<name>ContactSnapshot</name>
+	<name>SF_ContactSnapshot</name>
 	<columns>
 		<column>
 			<name>Id</name>
-			<title>ID (ContactSnapshot)</title>
+			<title>ID (SF_ContactSnapshot)</title>
 			<ldmType>CONNECTION_POINT</ldmType>
 			<dataType>VARCHAR(255)</dataType>
-			<folder>ContactSnapshot</folder>
+			<folder>SF_ContactSnapshot</folder>
 		</column>
 		<column>
 			<name>isDeleted</name>
-			<title>isDeleted (ContactSnapshot)</title>
+			<title>isDeleted (SF_ContactSnapshot)</title>
 			<ldmType>ATTRIBUTE</ldmType>
 			<dataType>INT</dataType>
-			<folder>ContactSnapshot</folder>
+			<folder>SF_ContactSnapshot</folder>
 		</column>
 		<column>
 			<name>snapshotNumber</name>
-			<title>snapshotNumber (ContactSnapshot)</title>
+			<title>snapshotNumber (SF_ContactSnapshot)</title>
 			<ldmType>ATTRIBUTE</ldmType>
 			<dataType>INT</dataType>
-			<folder>ContactSnapshot</folder>
+			<folder>SF_ContactSnapshot</folder>
 		</column>
 		<column>
 			<name>snapshotDate</name>
-			<title>snapshotDate (ContactSnapshot)</title>
+			<title>snapshotDate (SF_ContactSnapshot)</title>
 			<ldmType>DATE</ldmType>
 			<format>yyyy-MM-dd</format>
 			<schemaReference>SF_SnapshotDate</schemaReference>
-			<folder>ContactSnapshot</folder>
+			<folder>SF_ContactSnapshot</folder>
 		</column>
 		<column>
 			<name>ContactId</name>
-			<title>ContactId (ContactSnapshot)</title>
+			<title>ContactId (SF_ContactSnapshot)</title>
 			<ldmType>REFERENCE</ldmType>
 			<reference>Id</reference>
-			<schemaReference>Contact</schemaReference>
-			<folder>ContactSnapshot</folder>
+			<schemaReference>SF_Contact</schemaReference>
+			<folder>SF_ContactSnapshot</folder>
 		</column>
         <column>
             <name>Name</name>
-            <title>Name (ContactSnapshot)</title>
+            <title>Name (SF_ContactSnapshot)</title>
             <ldmType>ATTRIBUTE</ldmType>
 			<dataType>VARCHAR(255)</dataType>
-			<folder>ContactSnapshot</folder>
+			<folder>SF_ContactSnapshot</folder>
         </column>
 	</columns>
 </schema>

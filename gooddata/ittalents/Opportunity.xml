@@ -24,12 +24,6 @@
             <folder>SF_Opportunity</folder>
         </column>
 		<column>
-			<name>Amount</name>
-			<title>Amount (SF_Opportunity)</title>
-			<ldmType>FACT</ldmType>
-			<folder>SF_Opportunity</folder>
-		</column>
-		<column>
 			<name>ExpectedRevenue</name>
 			<title>ExpectedRevenue (SF_Opportunity)</title>
 			<ldmType>FACT</ldmType>

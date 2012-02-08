@@ -1,56 +1,56 @@
 <schema>
-	<name>OpportunitySnapshot</name>
+	<name>SF_OpportunitySnapshot</name>
 	<columns>
 		<column>
 			<name>Id</name>
-			<title>ID (OpportunitySnapshot)</title>
+			<title>ID (SF_OpportunitySnapshot)</title>
 			<ldmType>CONNECTION_POINT</ldmType>
 			<dataType>VARCHAR(255)</dataType>
-			<folder>OpportunitySnapshot</folder>
+			<folder>SF_OpportunitySnapshot</folder>
 		</column>
 		<column>
 			<name>isDeleted</name>
-			<title>isDeleted (OpportunitySnapshot)</title>
+			<title>isDeleted (SF_OpportunitySnapshot)</title>
 			<ldmType>ATTRIBUTE</ldmType>
 			<dataType>INT</dataType>
-			<folder>OpportunitySnapshot</folder>
+			<folder>SF_OpportunitySnapshot</folder>
 		</column>
 		<column>
 			<name>snapshotNumber</name>
-			<title>snapshotNumber (OpportunitySnapshot)</title>
+			<title>snapshotNumber (SF_OpportunitySnapshot)</title>
 			<ldmType>ATTRIBUTE</ldmType>
 			<dataType>INT</dataType>
-			<folder>OpportunitySnapshot</folder>
+			<folder>SF_OpportunitySnapshot</folder>
 		</column>
 		<column>
 			<name>snapshotDate</name>
-			<title>snapshotDate (OpportunitySnapshot)</title>
+			<title>snapshotDate (SF_OpportunitySnapshot)</title>
 			<ldmType>DATE</ldmType>
 			<format>yyyy-MM-dd</format>
 			<schemaReference>SF_SnapshotDate</schemaReference>
-			<folder>OpportunitySnapshot</folder>
+			<folder>SF_OpportunitySnapshot</folder>
 		</column>
 		<column>
 			<name>OpportunityId</name>
-			<title>OpportunityId (OpportunitySnapshot)</title>
+			<title>OpportunityId (SF_OpportunitySnapshot)</title>
 			<ldmType>REFERENCE</ldmType>
 			<reference>Id</reference>
-			<schemaReference>Opportunity</schemaReference>
-			<folder>OpportunitySnapshot</folder>
+			<schemaReference>SF_Opportunity</schemaReference>
+			<folder>SF_OpportunitySnapshot</folder>
 		</column>
         <column>
             <name>AccountId</name>
-            <title>AccountId (OpportunitySnapshot)</title>
+            <title>AccountId (SF_OpportunitySnapshot)</title>
             <ldmType>REFERENCE</ldmType>
             <reference>Id</reference>
-            <schemaReference>Account</schemaReference>
-            <folder>OpportunitySnapshot</folder>
+            <schemaReference>SF_Account</schemaReference>
+            <folder>SF_OpportunitySnapshot</folder>
         </column>
 		<column>
 			<name>Amount</name>
-			<title>Amount (OpportunitySnapshot)</title>
+			<title>Amount (SF_OpportunitySnapshot)</title>
 			<ldmType>FACT</ldmType>
-			<folder>OpportunitySnapshot</folder>
+			<folder>SF_OpportunitySnapshot</folder>
 		</column>
 		<column>
 			<name>ExpectedRevenue</name>
@@ -60,69 +60,69 @@
 		</column>
 		<column>
 			<name>CloseDate</name>
-			<title>CloseDate (OpportunitySnapshot)</title>
+			<title>CloseDate (SF_OpportunitySnapshot)</title>
 			<ldmType>DATE</ldmType>
 			<format>yyyy-MM-dd</format>
 			<schemaReference>SF_OpportunitySnapshotCloseDate</schemaReference>
-			<folder>OpportunitySnapshot</folder>
+			<folder>SF_OpportunitySnapshot</folder>
 		</column>
 		<column>
 			<name>CreatedDate</name>
-			<title>CreatedDate (OpportunitySnapshot)</title>
+			<title>CreatedDate (SF_OpportunitySnapshot)</title>
 			<ldmType>DATE</ldmType>
 			<format>yyyy-MM-dd</format>
 			<schemaReference>SF_OpportunitySnapshotCreatedDate</schemaReference>
-			<folder>OpportunitySnapshot</folder>
+			<folder>SF_OpportunitySnapshot</folder>
 		</column>
 		<column>
 			<name>IsWon</name>
-			<title>IsWon (OpportunitySnapshot)</title>
+			<title>IsWon (SF_OpportunitySnapshot)</title>
 			<ldmType>ATTRIBUTE</ldmType>
 			<dataType>INT</dataType>
-			<folder>OpportunitySnapshot</folder>
+			<folder>SF_OpportunitySnapshot</folder>
 		</column>
 		<column>
 			<name>IsClosed</name>
-			<title>IsClosed (OpportunitySnapshot)</title>
+			<title>IsClosed (SF_OpportunitySnapshot)</title>
 			<ldmType>ATTRIBUTE</ldmType>
 			<dataType>INT</dataType>
-			<folder>OpportunitySnapshot</folder>
+			<folder>SF_OpportunitySnapshot</folder>
 		</column>
 		<column>
 			<name>Name</name>
-			<title>Name (OpportunitySnapshot)</title>
+			<title>Name (SF_OpportunitySnapshot)</title>
 			<ldmType>ATTRIBUTE</ldmType>
 			<dataType>VARCHAR(255)</dataType>
-			<folder>OpportunitySnapshot</folder>
+			<folder>SF_OpportunitySnapshot</folder>
 		</column>
 		<column>
 			<name>StageName</name>
-			<title>StageName (OpportunitySnapshot)</title>
+			<title>StageName (SF_OpportunitySnapshot)</title>
 			<ldmType>ATTRIBUTE</ldmType>
 			<dataType>VARCHAR(255)</dataType>
-			<folder>OpportunitySnapshot</folder>
+			<folder>SF_OpportunitySnapshot</folder>
 		</column>
 		<column>
 			<name>ForecastCategory</name>
-			<title>ForecastCategory (OpportunitySnapshot)</title>
+			<title>ForecastCategory (SF_OpportunitySnapshot)</title>
 			<ldmType>ATTRIBUTE</ldmType>
 			<dataType>VARCHAR(255)</dataType>
-			<folder>OpportunitySnapshot</folder>
+			<folder>SF_OpportunitySnapshot</folder>
 		</column>
 		<column>
 			<name>Probability</name>
-			<title>Probability (OpportunitySnapshot)</title>
+			<title>Probability (SF_OpportunitySnapshot)</title>
 			<ldmType>ATTRIBUTE</ldmType>
 			<dataType>DECIMAL(10,2)</dataType>
-			<folder>OpportunitySnapshot</folder>
+			<folder>SF_OpportunitySnapshot</folder>
 		</column>
 		<column>
 			<name>OwnerId</name>
-			<title>OwnerId (OpportunitySnapshot)</title>
+			<title>OwnerId (SF_OpportunitySnapshot)</title>
 			<ldmType>REFERENCE</ldmType>
 			<reference>Id</reference>
-			<schemaReference>User</schemaReference>
-			<folder>OpportunitySnapshot</folder>
+			<schemaReference>SF_User</schemaReference>
+			<folder>SF_OpportunitySnapshot</folder>
 		</column>
 	</columns>
 </schema>
