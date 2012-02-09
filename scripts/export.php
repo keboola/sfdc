@@ -63,7 +63,8 @@ if($opts->getOption('id')) {
 		throw new Exception("Missing GoodData project ID for user {$user->name} ({$user->id})");
 	}
 
-	$gd = new App_GoodDataExport($user->gdProject, $user, $config);
+	$exportConfig = new Zend_Config_Ini(ROOT_PATH . '/gooddata/' . $user->strId . '/config.ini', 'salesforce', Array('allowModifications' => true));
+	$gd = new App_GoodDataExport($user->gdProject, $user, $config, $exportConfig);
 
 	if ($opts->getOption('setup'))	{
 		$gd->setup();

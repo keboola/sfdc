@@ -49,13 +49,18 @@ class App_GoodDataExport
 	 */
 	private $_idProject;
 
+	/**
+	 * @var Zend_Config
+	 */
+	private $_exportConfig;
+
 
 	/**
 	 * @param $idProject
 	 * @param $idUser
 	 * @param $config
 	 */
-	public function __construct($idProject, $user, $config)
+	public function __construct($idProject, $user, $config, $exportConfig)
 	{
 		$this->_gd = new App_GoodData($config->gooddata->username, $config->gooddata->password, $idProject);
 
@@ -63,6 +68,7 @@ class App_GoodDataExport
 		$this->_idUser = $user->id;
 		$this->_user = $user;
 		$this->_config = $config;
+		$this->_exportConfig = $exportConfig;
 
 		$this->_xmlPath = realpath(APPLICATION_PATH . '/../gooddata/' . $user->strId);
 		$this->_tmpPath = realpath(APPLICATION_PATH . '/../tmp');
@@ -77,8 +83,7 @@ class App_GoodDataExport
 	 */
 	public function dumpTable($table, $return=false, $structure=false, $all=false)
 	{
-		$userStrId = $this->_user->strId;
-		$tablesConfig = Zend_Registry::get('config')->sfUser->$userStrId->tables;
+		$tablesConfig = $this->_exportConfig->tables;
 
 		$isSnapshotTable = false;
 		$tableId = $table;
@@ -157,15 +162,12 @@ class App_GoodDataExport
 	 */
 	public function setup()
 	{
-		$userStrId = $this->_user->strId;
-		$config = Zend_Registry::get('config')->sfUser->$userStrId;
-
-		if (isset($config->dateDimensions) && count($config->dateDimensions)) {
-			foreach($config->dateDimensions as $dateDimension) {
+		if (isset($this->_exportConfig->dateDimensions) && count($this->_exportConfig->dateDimensions)) {
+			foreach($this->_exportConfig->dateDimensions as $dateDimension) {
 				$this->_gd->createDate($dateDimension, FALSE);
 			}
 		}
-		foreach($config->tables as $table => $tableConfig) {
+		foreach($this->_exportConfig->tables as $table => $tableConfig) {
 //			$this->_gd->dropDataset($table);
 			$this->createDataset($table);
 			if ($tableConfig->snapshot) {
@@ -182,10 +184,7 @@ class App_GoodDataExport
 	 */
 	public function loadData($all=false)
 	{
-		$userStrId = $this->_user->strId;
-		$config = Zend_Registry::get('config')->sfUser->$userStrId;
-
-		foreach($config->tables as $table => $tableConfig) {
+		foreach($this->_exportConfig->tables as $table => $tableConfig) {
 			$this->loadDataset($table, $all);
 			if ($tableConfig->snapshot) {
 				$this->loadDataset($table . "Snapshot", $all);

@@ -58,6 +58,9 @@ foreach($usersQuery as $user) {
 		'dbname'	=> $user->dbName
 	));
 
+	// Konfigurace importu a exportu
+	$importExportConfig = new Zend_Config_Ini(ROOT_PATH . '/gooddata/' . $user->strId . '/config.ini', 'salesforce', Array('allowModifications' => true));
+
 	// test připojení k db
 	$dbData->getConnection();
 	$dbData->query('SET NAMES utf8');
@@ -70,7 +73,7 @@ foreach($usersQuery as $user) {
 		// Import
 		print "Importing data\n";
 		$user->revalidateAccessToken();
-		$import = new App_SalesForceImport($user);
+		$import = new App_SalesForceImport($user, $importExportConfig);
 		$import->importAll();
 		print "Importing done\n";
 	}
@@ -81,7 +84,7 @@ foreach($usersQuery as $user) {
 			print "Missing GoodData project ID for user {$user->name} ({$user->id})\n";
 		} else {
 			// Export
-			$export = new App_GoodDataExport($user->gdProject, $user, $config);
+			$export = new App_GoodDataExport($user->gdProject, $user, $config, $importExportConfig);
 			$export->loadData();
 		}
 	}

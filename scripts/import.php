@@ -60,7 +60,9 @@ if (!$opts->getOption('id')) {
 		Zend_Db_Table::setDefaultAdapter($dbData);
 
 		$user->revalidateAccessToken();
-		$import = new App_SalesForceImport($user);
+
+		$importConfig = new Zend_Config_Ini(ROOT_PATH . '/gooddata/' . $user->strId . '/config.ini', 'salesforce', Array('allowModifications' => true));
+		$import = new App_SalesForceImport($user, $importConfig);
 		if($opts->getOption('table')) {
 			$import->import($opts->getOption('table'));
 		} else {
