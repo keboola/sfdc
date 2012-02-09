@@ -32,51 +32,59 @@ echo 'Start: '.date('j. n. Y H:i:s', $start)."\n";
 $usersTable = new Model_BiUser();
 $config = Zend_Registry::get('config');
 
-$idUser = $opts->getOption('id');
-$config = Zend_Registry::get('config');
-
-if (!$idUser) {
-	echo $opts->getUsageMessage();
-	exit;
-}
-
 $userTable = new Model_BiUser();
-$user = $userTable->fetchRow(array('id=?' => $opts->getOption('id')));
+$idUser = $opts->getOption('id');
 
-if (!$user) {
-	throw new Exception("User not found ({$opts->getOption('id')})");
+if ($idUser) {
+	$usersQuery = $usersTable->fetchAll(array('id=?' => $idUser));
+} else {
+	$usersQuery = $usersTable->fetchAll();
 }
 
-// connect do db
-$dbData = Zend_Db::factory('pdo_mysql', array(
-	'host'		=> $config->db->host,
-	'username'	=> $config->db->login,
-	'password'	=> $config->db->password,
-	'dbname'	=> $user->dbName
-));
+foreach($usersQuery as $user) {
 
-// test připojení k db
-$dbData->getConnection();
-$dbData->query('SET NAMES utf8');
-
-// nastavení db adapteru pro všechny potomky Zend_Db_Table
-Zend_Db_Table::setDefaultAdapter($dbData);
-
-foreach($usersTable->fetchAll(array('id=?' => $idUser)) as $user) {
-	// Import
-	print "Importing data\n";
-	$user->revalidateAccessToken();
-	$import = new App_SalesForceImport($user);
-	$import->importAll();
-	print "Importing done\n";
-
-	if (!$user->gdProject) {
-		throw new Exception("Missing GoodData project ID for user {$user->name} ({$user->id})");
+	if (!$user->export && !$user->import) {
+		continue;
 	}
 
-	// Export
-	$export = new App_GoodDataExport($user->gdProject, $user, $config);
-	$export->loadData();
+	print "\n**************************************************\n";
+	print "User {$user->strId}\n\n";
+
+	// connect do db
+	$dbData = Zend_Db::factory('pdo_mysql', array(
+		'host'		=> $config->db->host,
+		'username'	=> $config->db->login,
+		'password'	=> $config->db->password,
+		'dbname'	=> $user->dbName
+	));
+
+	// test připojení k db
+	$dbData->getConnection();
+	$dbData->query('SET NAMES utf8');
+
+	// nastavení db adapteru pro všechny potomky Zend_Db_Table
+	Zend_Db_Table::setDefaultAdapter($dbData);
+
+	if ($user->import) {
+
+		// Import
+		print "Importing data\n";
+		$user->revalidateAccessToken();
+		$import = new App_SalesForceImport($user);
+		$import->importAll();
+		print "Importing done\n";
+	}
+
+	if ($user->export) {
+
+		if (!$user->gdProject) {
+			print "Missing GoodData project ID for user {$user->name} ({$user->id})\n";
+		} else {
+			// Export
+			$export = new App_GoodDataExport($user->gdProject, $user, $config);
+			$export->loadData();
+		}
+	}
 }
 
 $end = time();
