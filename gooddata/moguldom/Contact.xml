@@ -25,15 +25,17 @@
 		<column>
 			<name>AdAgencyId</name>
 			<title>AdAgencyId (SF_Contact)</title>
-			<ldmType>ATTRIBUTE</ldmType>
-			<dataType>VARCHAR(255)</dataType>
+			<ldmType>REFERENCE</ldmType>
+			<reference>Id</reference>
+			<schemaReference>SF_AdAgency</schemaReference>
 			<folder>SF_Contact</folder>
 		</column>
 		<column>
 			<name>AccountId</name>
 			<title>AccountId (SF_Contact)</title>
-			<ldmType>ATTRIBUTE</ldmType>
-			<dataType>VARCHAR(255)</dataType>
+			<ldmType>REFERENCE</ldmType>
+			<reference>Id</reference>
+			<schemaReference>SF_Account</schemaReference>
 			<folder>SF_Contact</folder>
 		</column>
 	</columns>
