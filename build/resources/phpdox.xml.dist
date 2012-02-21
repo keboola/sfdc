@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<phpdox xmlns="http://phpdox.de/config">
+
+ <project name="BiSalesforce" source="application" workdir="build/results/phpdox">
+  <collector publiconly="false">
+   <include mask="*.php" />
+   <exclude mask="*Autoload.php" />
+  </collector>
+
+  <generator output="build">
+   <build engine="html" enabled="true" output="results/api"/>
+  </generator>
+ </project>
+
+ <project name="BiSalesforceAppLib" source="library/App" workdir="build/results/phpdox-app-lib">
+  <collector publiconly="false">
+   <include mask="*.php" />
+   <exclude mask="*Autoload.php" />
+  </collector>
+
+  <generator output="build">
+   <build engine="html" enabled="true" output="results/api-app-lib"/>
+  </generator>
+ </project>
+
+</phpdox>

@@ -3,3 +3,4 @@ exec
 *.swp
 nbproject
 .idea
+cache.properties
