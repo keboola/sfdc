@@ -3,9 +3,9 @@
  * GoodData API class
  * @author Jakub Matejka <jakub@keboola.com>
  * @date 29.6.11, 13:51
- *
+ * 
  */
-
+ 
 class App_GoodData
 {
 	/**
@@ -29,7 +29,7 @@ class App_GoodData
 	 */
 	private $_idProject;
 
-
+	
 	/**
 	 * @param $username
 	 * @param $password
@@ -57,13 +57,25 @@ class App_GoodData
 
 		if (strpos($output, '503 Service Unavailable')
 			|| strpos($output, 'Error invoking GoodData WebDav API')
-			|| strpos($output, '404 Not Found')) {
+			|| strpos($output, '404 Not Found')
+			|| strpos($output, '500 Internal Server Error')) {
+
+			$log = Zend_Registry::get('log');
+			$log->log('GoodData Service Unavailable', Zend_Log::NOTICE, array(
+				'pid' => $this->_idProject
+			));
 			sleep(60);
 			$this->call($args, $reportErrors);
-			App_Debug::log('GD Service Unavailable');
 		} else {
 			if ($reportErrors && strpos($output, 'ERROR')) {
-				App_Debug::send($output, null, 'debug.log');
+				$debugFile = ROOT_PATH . '/tmp/debug-' . date('Ymd-His').'.log';
+				system('mv debug.log ' . $debugFile);
+				$log = Zend_Registry::get('log');
+				$log->log('GoodData export error', Zend_Log::ERR, array(
+					'pid'		=> $this->_idProject,
+					'error'		=> $output,
+					'debugFile' => $debugFile
+				));
 			}
 
 			echo $output;
@@ -85,6 +97,7 @@ class App_GoodData
 		$command = 'UseDateDimension(name="'.$name.'", includeTime="'.($includeTime ? 'true' : 'false').'");';
 		$command .= 'GenerateMaql(maqlFile="'.$maqlFile.'");';
 		$command .= 'ExecuteMaql(maqlFile="'.$maqlFile.'");';
+		$command .= 'TransferData();';
 
 		$this->call($command);
 		system('rm -rf '.$maqlFile);
@@ -120,22 +133,6 @@ class App_GoodData
 		$command .= 'GenerateMaql(maqlFile="'.$maqlFile.'");';
 		$command .= 'ExecuteMaql(maqlFile="'.$maqlFile.'");';
 
-		$this->call($command);
-		system('rm -rf '.$maqlFile);
-	}
-
-	/**
-	 *
-	 * Removes a dataset
-	 *
-	 * @param $name
-	 * @return void
-	 */
-	public function dropDataset($name) {
-		echo "\n".'*** Drop dataset: '. $name ."\n";
-		$maqlFile = ROOT_PATH.'/tmp/temp.maql';
-		file_put_contents($maqlFile, 'DROP ALL IN IF EXISTS {dataset.' . $name . '};' . "\n");
-		$command = 'ExecuteMaql(maqlFile="'.$maqlFile.'");';
 		$this->call($command);
 		system('rm -rf '.$maqlFile);
 	}

@@ -1,17 +1,11 @@
 <?php
-require_once("config.php");
 
-defined('ROOT_PATH') || define('ROOT_PATH', realpath(dirname(__FILE__) . '/..'));
+define('ROOT_PATH', dirname(dirname(__FILE__)));
 define('APPLICATION_PATH', ROOT_PATH . '/application');
-defined('APPLICATION_ENV') || define('APPLICATION_ENV', (getenv('APPLICATION_ENV') ? getenv('APPLICATION_ENV')
-	: 'production'));
-
-set_include_path(implode(PATH_SEPARATOR, array(
-			realpath(APPLICATION_PATH . '/../library'), get_include_path(),
-		)));
+set_include_path(implode(PATH_SEPARATOR, array(realpath(ROOT_PATH . '/library'), get_include_path())));
 require_once 'Zend/Application.php';
-$application = new Zend_Application(APPLICATION_ENV, APPLICATION_PATH . '/configs/application.ini');
-$application->bootstrap(array('base', 'autoload', 'config', 'db'));
+$application = new Zend_Application('application', APPLICATION_PATH . '/configs/application.ini');
+$application->bootstrap(array("base", "autoload", "config", "db", "debug"));
 
 // Setup console input
 $opts = new Zend_Console_Getopt(array(
@@ -37,7 +31,6 @@ echo 'Start: '.date('j. n. Y H:i:s', $start)."\n";
 $userTable = new Model_BiUser();
 $config = Zend_Registry::get('config');
 
-
 if (!$opts->getOption('id')) {
 	echo $opts->getUsageMessage();
 } else {
@@ -62,7 +55,8 @@ if (!$opts->getOption('id')) {
 		Zend_Db_Table::setDefaultAdapter($dbData);
 
 		$user->revalidateAccessToken();
-		$sf = new App_SalesForceImport($user);
+		$sfConfig = new Zend_Config_Ini(ROOT_PATH . '/gooddata/' . $user->strId . '/config.ini', 'salesforce', Array('allowModifications' => true));
+		$sf = new App_SalesForceImport($user, $sfConfig);
 
 		if ($opts->getOption("describe")) {
 			print_r($sf->describe($opts->getOption('describe')));

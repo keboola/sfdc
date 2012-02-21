@@ -3,15 +3,15 @@ class App_SalesForceImport
 {
 	private $_user;
 
-	private $_config;
+	private $_sfConfig;
 
 	/**
 	 * @param $idUser
 	 */
-	public function __construct($user, $config)
+	public function __construct($user, $sfConfig)
 	{
 		$this->_user = $user;
-		$this->_config = $config;
+		$this->_sfConfig = $sfConfig;
 		$this->_registry = Zend_Registry::getInstance();
 		$snapshotTable = new Model_BiSnapshot();
 		$this->_snapshotNumber = $snapshotTable->getSnapshotNumber();
@@ -24,7 +24,7 @@ class App_SalesForceImport
 	 */
 	public function importAll()
 	{
-		foreach($this->_config->tables as $table => $tableConfig) {
+		foreach($this->_sfConfig->tables as $table => $tableConfig) {
 			$this->import($table);
 		}
 	}
@@ -35,8 +35,8 @@ class App_SalesForceImport
 	 * @return bool
 	 */
 	public function import($tableName) {
-		if(isset($this->_config->tables->$tableName)) {
-			$tableConfig = $this->_config->tables->$tableName;
+		if(isset($this->_sfConfig->tables->$tableName)) {
+			$tableConfig = $this->_sfConfig->tables->$tableName;
 
 			$table = $tableName;
 			$sfTable = $tableName;

@@ -1,28 +1,12 @@
 <?php
 
-require_once("config.php");
-
-define('ROOT_PATH', dirname(dirname($_SERVER['SCRIPT_FILENAME'])));
+define('ROOT_PATH', dirname(dirname(__FILE__)));
 define('APPLICATION_PATH', ROOT_PATH . '/application');
-defined('APPLICATION_ENV') || define('APPLICATION_ENV', (getenv('APPLICATION_ENV') ? getenv('APPLICATION_ENV')
-	: 'production'));
-
-
-// Ensure library/ is on include_path
-set_include_path(implode(PATH_SEPARATOR, array(
-	realpath(APPLICATION_PATH . '/../library'),
-	get_include_path(),
-)));
-
-/** Zend_Application */
+set_include_path(implode(PATH_SEPARATOR, array(realpath(ROOT_PATH . '/library'), get_include_path())));
 require_once 'Zend/Application.php';
+$application = new Zend_Application('application', APPLICATION_PATH . '/configs/application.ini');
+$application->bootstrap(array("base", "autoload", "config", "db", "debug", "log"));
 
-// Create application, bootstrap, and run
-$application = new Zend_Application(
-	'production',
-	APPLICATION_PATH . '/configs/application.ini'
-);
-$application->bootstrap();
 
 // Setup console input
 $opts = new Zend_Console_Getopt(array(

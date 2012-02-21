@@ -10,30 +10,13 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		date_default_timezone_set('Europe/Prague');
 
 		$front = Zend_Controller_Front::getInstance();
-		//$front->setParam('noErrorHandler', true);
-
-		// Setup of Nette Debug
-		require_once "Nette/Utils/exceptions.php";
-		require_once "Nette/Utils/shortcuts.php";
-		require_once "Nette/Debug/Debug.php";
-		$registry = Zend_Registry::getInstance();
-
-		define('NETTE', TRUE);
-		define('NETTE_DIR', APPLICATION_PATH.'/../library/Nette');
-		define('NETTE_VERSION_ID', 907); // v0.9.7
-		define('NETTE_PACKAGE', 'PHP 5.2 prefixed');
-
-		//if (APPLICATION_ENV == 'development') {
-			NDebug::enable();
-		/*} else {
-			NDebug::enable('production', APPLICATION_PATH.'/../logs/php-error.log', $registry->config->adminEmail);
-		}*/
 	}
 
 	protected function _initAutoload()
 	{
 		$autoloader = Zend_Loader_Autoloader::getInstance();
 		$autoloader->registerNamespace('App_');
+		$autoloader->registerNamespace('Ladybug');
 
 		$resourceLoader = new Zend_Loader_Autoloader_Resource(array(
 		    'basePath'      => APPLICATION_PATH,
@@ -55,13 +38,9 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 
 	protected function _initConfig()
 	{
-		$registry = Zend_Registry::getInstance();
-
-		$configCommon = new Zend_Config_Ini(APPLICATION_PATH . '/configs/common.ini', 'common', Array('allowModifications' => true));
-		$config = new Zend_Config_Ini(APPLICATION_PATH . '/configs/config.ini', 'config', Array('allowModifications' => true));
-		$configMerged = $configCommon->merge($config);
-		$configMerged->setReadOnly();
-		$registry->config = $configMerged;
+		$config = new Zend_Config_Ini(APPLICATION_PATH . '/configs/config.ini', 'config');
+		Zend_Registry::set('config', $config);
+		return $config;
 	}
 
 	protected function _initDb()
@@ -73,7 +52,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 			'host'		=> $registry->config->db->host,
 			'username'	=> $registry->config->db->login,
 			'password'	=> $registry->config->db->password,
-			'dbname'	=> $registry->config->db->db
+			'dbname'	=> $registry->config->db->name
 		));
 
 		// test připojení k db
@@ -83,6 +62,32 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		// nastavení db adapteru pro všechny potomky Zend_Db_Table
 		Zend_Db_Table::setDefaultAdapter($db);
 		Zend_Registry::set('db', $db);
+	}
+
+
+	protected function _initDebug()
+	{
+		$config = $this->bootstrap('config')->getResource('config');
+
+		if (!defined('APPLICATION_ENV')) {
+			define('APPLICATION_ENV', $config->app->env);
+		}
+
+		if (APPLICATION_ENV == 'development') {
+			ini_set('display_startup_errors', 1);
+			ini_set('display_errors', 1);
+			Ladybug\Loader::loadHelpers();
+		}
+
+		if (isset($_SERVER['HOSTNAME']))
+			$_SERVER['SERVER_NAME'] = $_SERVER['HOSTNAME'];
+
+		require_once 'Nette/NDebugger.php';
+		NDebugger::enable();
+		NDebugger::$logDirectory = ROOT_PATH.'/logs';
+		NDebugger::$email = $config->app->admin;
+		NDebugger::$productionMode = (APPLICATION_ENV == 'production');
+		NLogger::$emailSnooze = 3600;
 	}
 
 	/**

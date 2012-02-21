@@ -1,16 +1,11 @@
 <?php
 
-defined('ROOT_PATH') || define('ROOT_PATH', realpath(dirname(__FILE__) . '/..'));
+define('ROOT_PATH', dirname(dirname(__FILE__)));
 define('APPLICATION_PATH', ROOT_PATH . '/application');
-defined('APPLICATION_ENV') || define('APPLICATION_ENV', (getenv('APPLICATION_ENV') ? getenv('APPLICATION_ENV')
-	: 'production'));
-
-set_include_path(implode(PATH_SEPARATOR, array(
-	realpath(APPLICATION_PATH . '/../library'), get_include_path(),
-)));
+set_include_path(implode(PATH_SEPARATOR, array(realpath(ROOT_PATH . '/library'), get_include_path())));
 require_once 'Zend/Application.php';
-$application = new Zend_Application(APPLICATION_ENV, APPLICATION_PATH . '/configs/application.ini');
-$application->bootstrap(array('base', 'autoload', 'config', 'db'));
+$application = new Zend_Application('application', APPLICATION_PATH . '/configs/application.ini');
+$application->bootstrap(array("base", "autoload", "config", "db", "debug", "log"));
 
 // Setup console input
 $opts = new Zend_Console_Getopt(array(
@@ -19,6 +14,7 @@ $opts = new Zend_Console_Getopt(array(
 $opts->setHelp(array(
 	'i'	=> 'Id of user'
 ));
+
 try {
 	$opts->parse();
 } catch (Zend_Console_Getopt_Exception $e) {
@@ -26,11 +22,19 @@ try {
 	exit;
 }
 
+$lock = new App_Lock(Zend_Registry::get('db'), 'cron-import');
+if (!$lock->lock()) {
+	die('Already running' . PHP_EOL);
+}
+
+NDebugger::timer('cron');
+
 $start = time();
 echo 'Start: '.date('j. n. Y H:i:s', $start)."\n";
 
 $usersTable = new Model_BiUser();
 $config = Zend_Registry::get('config');
+$log = Zend_Registry::get('log');
 
 $userTable = new Model_BiUser();
 $idUser = $opts->getOption('id');
@@ -69,13 +73,18 @@ foreach($usersQuery as $user) {
 	Zend_Db_Table::setDefaultAdapter($dbData);
 
 	if ($user->import) {
-
 		// Import
 		print "Importing data\n";
+		NDebugger::timer('account');
 		$user->revalidateAccessToken();
 		$import = new App_SalesForceImport($user, $importExportConfig);
 		$import->importAll();
 		print "Importing done\n";
+		$duration = NDebugger::timer('account');
+
+		$log->log("SalesForce Cron Import for user {$user->id}", Zend_Log::INFO, array(
+			'duration'	=> $duration
+		));
 	}
 
 	if ($user->export) {
@@ -83,12 +92,25 @@ foreach($usersQuery as $user) {
 		if (!$user->gdProject) {
 			print "Missing GoodData project ID for user {$user->name} ({$user->id})\n";
 		} else {
+
 			// Export
+			NDebugger::timer('account');
 			$export = new App_GoodDataExport($user->gdProject, $user, $config, $importExportConfig);
 			$export->loadData();
+			$duration = NDebugger::timer('account');
+			$log->log("SalesForce Cron Export for user {$user->id}", Zend_Log::INFO, array(
+				'duration'	=> $duration
+			));
 		}
 	}
 }
 
 $end = time();
 echo 'End: '.date('j. n. Y H:i:s', $end).', Run time: '.round(($end-$start)/60)." min\n";
+
+$duration = NDebugger::timer('cron');
+$log->log('SalesForce Cron Completed', Zend_Log::INFO, array(
+	'duration'	=> $duration
+));
+
+$lock->unlock();
