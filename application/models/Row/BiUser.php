@@ -44,4 +44,28 @@ class Model_Row_BiUser extends Zend_Db_Table_Row_Abstract
 		$this->save();
 
 	}
+
+	/**
+	 * Checks for valid data including date
+	 * @return bool
+	 */
+	public function hasValidData() {
+		$timeZone = date_default_timezone_get();
+		$valid = false;
+		$lastImportTimestampUtc = strtotime($this->lastImportDate);
+		$lastExportTimestampUtc = strtotime($this->lastExportDate);
+
+		// GoodData timezone
+		date_default_timezone_set("America/Los_Angeles");
+
+		if (date("Y-m-d", $lastImportTimestampUtc) == date("Y-m-d") &&
+			date("Y-m-d", $lastExportTimestampUtc) == date("Y-m-d") &&
+			$lastImportTimestampUtc < $lastExportTimestampUtc)
+		{
+			$valid = true;
+		}
+		date_default_timezone_set($timeZone);
+		return $valid;
+	}
+
 }

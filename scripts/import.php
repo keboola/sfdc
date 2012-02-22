@@ -60,6 +60,8 @@ if (!$opts->getOption('id')) {
 			$import->import($opts->getOption('table'));
 		} else {
 			$import->importAll();
+			$user->lastImportDate = date("Y-m-d H:i:s");
+			$user->save();
 		}
 
 	} else {

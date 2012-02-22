@@ -36,6 +36,9 @@ $usersTable = new Model_BiUser();
 $config = Zend_Registry::get('config');
 $log = Zend_Registry::get('log');
 
+$log->log('SalesForce Cron Starting', Zend_Log::INFO);
+
+
 $userTable = new Model_BiUser();
 $idUser = $opts->getOption('id');
 
@@ -78,13 +81,28 @@ foreach($usersQuery as $user) {
 		NDebugger::timer('account');
 		$user->revalidateAccessToken();
 		$import = new App_SalesForceImport($user, $importExportConfig);
-		$import->importAll();
-		print "Importing done\n";
-		$duration = NDebugger::timer('account');
+		try {
+			$import->importAll();
+			print "Importing done\n";
+			$duration = NDebugger::timer('account');
+			$user->lastImportDate = date("Y-m-d H:i:s");
+			$user->save();
 
-		$log->log("SalesForce Cron Import for user {$user->id}", Zend_Log::INFO, array(
-			'duration'	=> $duration
-		));
+			$log->log("SalesForce Cron Import for user {$user->strId} ({$user->id})", Zend_Log::INFO, array(
+				'duration'	=> $duration
+			));
+		} catch(Exception $e) {
+			print "Import failed\n";
+			$duration = NDebugger::timer('account');
+			print $e->getMessage() . "\n";
+			print $e->getTraceAsString();
+			$log->log("SalesForce Cron Import for user {$user->strId} ({$user->id}) Failed", Zend_Log::ERR, array(
+				'err'	=> $e->getMessage() . "\n". $e->getTraceAsString()
+			));
+			// Do not continue with exports
+			continue;
+		}
+
 	}
 
 	if ($user->export) {
@@ -92,15 +110,16 @@ foreach($usersQuery as $user) {
 		if (!$user->gdProject) {
 			print "Missing GoodData project ID for user {$user->name} ({$user->id})\n";
 		} else {
-
 			// Export
 			NDebugger::timer('account');
 			$export = new App_GoodDataExport($user->gdProject, $user, $config, $importExportConfig);
 			$export->loadData();
 			$duration = NDebugger::timer('account');
-			$log->log("SalesForce Cron Export for user {$user->id}", Zend_Log::INFO, array(
+			$log->log("SalesForce Cron Export for user {$user->strId} ({$user->id})", Zend_Log::INFO, array(
 				'duration'	=> $duration
 			));
+			$user->lastExportDate = date("Y-m-d H:i:s");
+			$user->save();
 		}
 	}
 }

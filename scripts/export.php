@@ -54,6 +54,8 @@ if($opts->getOption('id')) {
 		$gd->setup();
 	} elseif ($opts->getOption('load')) {
 		$gd->loadData($opts->getOption('all'));
+		$user->lastExportDate = date("Y-m-d H:i:s");
+		$user->save();
 	} elseif ($opts->getOption('update')) {
 		$gd->updateStructure($opts->getOption('update'));
 	} elseif ($opts->getOption('dump')) {

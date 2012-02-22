@@ -116,5 +116,25 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 
 		ZendX_JQuery::enableView($view);
     }
+
+	protected function _initRouter()
+	{
+		$frontController = Zend_Controller_Front::getInstance();
+		$router = $frontController->getRouter();
+
+		$router->addRoute('dataCheck', new Zend_Controller_Router_Route(
+			'data-check/:id',
+			array(
+				'module' => 'default',
+				'controller' => 'data-check',
+				'action' => 'index',
+				'userId' => null
+			)
+		));
+
+
+		return $router;
+	}
+
 }
 
