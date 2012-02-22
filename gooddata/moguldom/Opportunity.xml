@@ -263,5 +263,30 @@
 			<dataType>DECIMAL(18,0)</dataType>
 			<folder>SF_Opportunity</folder>
 		</column>
+		<column>
+			<name>InvoicePaidDate</name>
+			<title>InvoicePaidDate (SF_Opportunity)</title>
+			<ldmType>DATE</ldmType>
+			<format>yyyy-MM-dd</format>
+			<schemaReference>SF_OpportunityInvoicePaidDate</schemaReference>
+			<folder>SF_Opportunity</folder>
+		</column>
+		<column>
+			<name>InvoiceSentDate</name>
+			<title>InvoiceSentDate (SF_Opportunity)</title>
+			<ldmType>DATE</ldmType>
+			<format>yyyy-MM-dd</format>
+			<schemaReference>SF_OpportunityInvoiceSentDate</schemaReference>
+			<folder>SF_Opportunity</folder>
+		</column>
+
+
+		<column>
+			<name>InvoicedToPaid</name>
+			<title>InvoicedToPaid (SF_Opportunity)</title>
+			<ldmType>FACT</ldmType>
+			<dataType>DECIMAL(18,0)</dataType>
+			<folder>SF_Opportunity</folder>
+		</column>
 	</columns>
 </schema>
