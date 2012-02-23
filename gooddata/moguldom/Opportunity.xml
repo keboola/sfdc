@@ -279,8 +279,6 @@
 			<schemaReference>SF_OpportunityInvoiceSentDate</schemaReference>
 			<folder>SF_Opportunity</folder>
 		</column>
-
-
 		<column>
 			<name>InvoicedToPaid</name>
 			<title>InvoicedToPaid (SF_Opportunity)</title>
