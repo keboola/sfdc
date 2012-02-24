@@ -106,10 +106,16 @@ class App_GoodDataExport
 			throw new Exception("Export query columns configuration error for {$table}");
 		}
 
+		$joins = '';
+		if ($tableConfig->joins) {
+			$joins = $tableConfig->joins;
+		}
+
 		if ($isSnapshotTable) {
-			$sql = "SELECT CONCAT(t.snapshotNumber, t.Id) AS Id, t.isDeleted, t.snapshotNumber, s.snapshotDate AS snapshotDate, t.Id as {$tableId}Id, {$queryColumns} FROM {$table} t LEFT JOIN bi_snapshot s ON t.snapshotNumber = s.snapshotNumber";
+			$sql = "SELECT CONCAT(t.snapshotNumber, t.Id) AS Id, t.isDeleted, t.snapshotNumber, s.snapshotDate AS snapshotDate, t.Id as {$tableId}Id, {$queryColumns}
+					FROM {$table} t LEFT JOIN bi_snapshot s ON t.snapshotNumber = s.snapshotNumber {$joins}";
 		} else {
-			$sql = "SELECT t.Id, t.isDeleted, {$queryColumns} FROM {$table} t";
+			$sql = "SELECT t.Id, t.isDeleted, {$queryColumns} FROM {$table} t {$joins}";
 		}
 
 		if ($structure) {
@@ -194,6 +200,15 @@ class App_GoodDataExport
 		$this->_gd->updateReports();
 	}
 
+	/**
+	 * Execute custom MAQL
+	 * @param string $maql
+	 * @return void
+	 */
+	public function executeMaql($maql)
+	{
+		$this->_gd->executeMaql($maql);
+	}
 
 	public function idProject()
 	{

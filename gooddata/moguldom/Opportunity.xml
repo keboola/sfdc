@@ -74,6 +74,14 @@
 			<folder>SF_Opportunity</folder>
 		</column>
 		<column>
+			<name>StageId</name>
+			<title>StageId (SF_Opportunity)</title>
+			<ldmType>REFERENCE</ldmType>
+			<reference>Id</reference>
+			<schemaReference>SF_OpportunityStage</schemaReference>
+			<folder>SF_Opportunity</folder>
+		</column>
+		<column>
 			<name>ForecastCategory</name>
 			<title>ForecastCategory (SF_Opportunity)</title>
 			<ldmType>ATTRIBUTE</ldmType>

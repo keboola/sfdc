@@ -3,9 +3,9 @@
  * GoodData API class
  * @author Jakub Matejka <jakub@keboola.com>
  * @date 29.6.11, 13:51
- * 
+ *
  */
- 
+
 class App_GoodData
 {
 	/**
@@ -29,7 +29,7 @@ class App_GoodData
 	 */
 	private $_idProject;
 
-	
+
 	/**
 	 * @param $username
 	 * @param $password
@@ -170,6 +170,26 @@ class App_GoodData
 
 		$this->call($command);
 	}
+
+	/**
+	 * Set of commands which create a date
+	 * @param $name
+	 * @param $includeTime
+	 * @return void
+	 */
+	public function executeMaql($maql)
+	{
+		echo "\n".'*** Execute MAQL: '.$maql."\n";
+		$maqlFile = ROOT_PATH.'/tmp/temp.maql';
+		file_put_contents($maqlFile, $maql);
+
+		$command .= 'ExecuteMaql(maqlFile="'.$maqlFile.'");';
+		$command .= 'TransferData();';
+
+		$this->call($command);
+		system('rm -rf '.$maqlFile);
+	}
+
 
 	/**
 	 * @static

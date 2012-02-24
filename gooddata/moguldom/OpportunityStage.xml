@@ -1,0 +1,41 @@
+<schema>
+	<name>SF_OpportunityStage</name>
+	<columns>
+		<column>
+			<name>Id</name>
+			<title>ID (SF_OpportunityStage)</title>
+			<ldmType>CONNECTION_POINT</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>SF_OpportunityStage</folder>
+		</column>
+		<column>
+			<name>isDeleted</name>
+			<title>isDeleted (SF_OpportunityStage)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>SF_OpportunityStage</folder>
+		</column>
+		<column>
+			<name>MasterLabel</name>
+			<title>MasterLabel (SF_OpportunityStage)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>SF_OpportunityStage</folder>
+		</column>
+		<column>
+			<name>DefaultProbability</name>
+			<title>DefaultProbability (SF_OpportunityStage)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>SF_OpportunityStage</folder>
+		</column>
+		<column>
+			<name>SortOrder</name>
+			<title>SortOrder (SF_OpportunityStage)</title>
+			<ldmType>LABEL</ldmType>
+			<format>INT</format>
+			<reference>MasterLabel</reference>
+			<folder>SF_OpportunityStage</folder>
+		</column>
+	</columns>
+</schema>

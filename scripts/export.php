@@ -17,6 +17,7 @@ $opts = new Zend_Console_Getopt(array(
 	'project|p=s'	=> 'GoodData project PID for setup',
 	'setup|s-i'		=> 'setup datasets in GoodData',
 	'update|u-s'	=> 'update dataset structure in GoodData',
+	'maql|m-s'		=> 'execute MAQL',
 ));
 $opts->setHelp(array(
 	'a' => 'load all',
@@ -26,6 +27,7 @@ $opts->setHelp(array(
 	'p' => 'GoodData project PID for setup',
 	's' => 'Setup datasets in GoodData',
 	'u' => 'Update dataset structure in GoodData',
+	'm' => 'Execute MAQL'
 ));
 try {
 	$opts->parse();
@@ -60,6 +62,8 @@ if($opts->getOption('id')) {
 		$gd->updateStructure($opts->getOption('update'));
 	} elseif ($opts->getOption('dump')) {
 		echo $gd->dumpTable($opts->getOption('dump'), true, false, true);
+	} elseif ($opts->getOption('maql')) {
+		echo $gd->executeMaql($opts->getOption('maql'));
 	} else {
 		echo $opts->getUsageMessage();
 	}
