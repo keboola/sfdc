@@ -120,7 +120,7 @@ class App_GoodDataExport
 
 		if ($structure) {
 			$sql .= ' LIMIT 1';
-		} elseif (!$all) {
+		} elseif (!$all && !$tableConfig->exportFull) {
 			$sql .= ' WHERE t.lastModificationDate > \''.date('Y-m-d', strtotime('-4 days')).'\'';
 		}
 

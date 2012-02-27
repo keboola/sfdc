@@ -294,5 +294,19 @@
 			<dataType>DECIMAL(18,0)</dataType>
 			<folder>SF_Opportunity</folder>
 		</column>
+		<column>
+			<name>InvoiceDueToPaidDays</name>
+			<title>InvoiceDueToPaidDays (SF_Opportunity)</title>
+			<ldmType>FACT</ldmType>
+			<dataType>DECIMAL(18,0)</dataType>
+			<folder>SF_Opportunity</folder>
+		</column>
+		<column>
+			<name>InvoiceDueToPaid</name>
+			<title>InvoiceDueToPaid (SF_Opportunity)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>SF_Opportunity</folder>
+		</column>
 	</columns>
 </schema>
