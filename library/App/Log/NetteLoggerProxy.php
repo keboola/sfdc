@@ -38,7 +38,7 @@ class App_Log_NetteLoggerProxy extends NLogger
 			foreach ($message as $i => $part) {
 				$part = trim($part);
 				if (strpos($part, '@@') === 0) {
-					$debugFile = ROOT_PATH . '/logs/' . trim(str_replace('@@', '', $part));
+					$debugFile = NDebugger::$logDirectory . '/' . trim(str_replace('@@', '', $part));
 					unset($message[$i]);
 					break;
 				}
