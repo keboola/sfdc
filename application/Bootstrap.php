@@ -68,6 +68,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 	protected function _initDebug()
 	{
 		$config = $this->bootstrap('config')->getResource('config');
+		$log = $this->bootstrap('log')->getResource('log');
 
 		if (!defined('APPLICATION_ENV')) {
 			define('APPLICATION_ENV', $config->app->env);
@@ -87,7 +88,19 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		NDebugger::$logDirectory = ROOT_PATH.'/logs';
 		NDebugger::$email = $config->app->admin;
 		NDebugger::$productionMode = (APPLICATION_ENV == 'production');
+		NDebugger::$logger = new App_Log_NetteLoggerProxy($log);
 		NLogger::$emailSnooze = 3600;
+	}
+
+	protected function _initDebugLogUploader()
+	{
+		$log = 	$this->bootstrap('log')->getResource('log');
+		$config = $this->bootstrap('config')->getResource('config');
+
+		$attachmentUploader = new App_Log_DebugLogUploader($config->attachmentUploader);
+		$log->setDebugLogUploader($attachmentUploader);
+
+		return $attachmentUploader;
 	}
 
 	/**

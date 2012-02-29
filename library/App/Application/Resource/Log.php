@@ -19,7 +19,7 @@ class App_Application_Resource_Log extends Zend_Application_Resource_ResourceAbs
 		$bootstrap = $this->getBootstrap();
 		$config = $bootstrap->bootstrap('config')->getResource('config');
 
-		$log = new Zend_Log();
+		$log = new App_Log();
 		$log->setEventItem('app', $config->app->name);
 
 		$syslogOptions = isset($options['syslog']) ? $options['syslog'] : array();

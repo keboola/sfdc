@@ -48,7 +48,7 @@ class App_GoodData
 	 * @param bool $reportErrors
 	 * @return void
 	 */
-	public function call($args, $reportErrors=true)
+	public function call($args, $reportErrors = TRUE)
 	{
 		$command = self::CLI_PATH.' -u '.$this->_username.' -p '.$this->_password.' -e \'OpenProject(id="'.$this->_idProject.'");';
 		$command .= $args;
@@ -67,14 +67,20 @@ class App_GoodData
 			sleep(60);
 			$this->call($args, $reportErrors);
 		} else {
+
+			$debugFile = ROOT_PATH . '/tmp/debug-' . date('Ymd-His').'.log';
+			system('mv debug.log ' . $debugFile);
+
+			$log = Zend_Registry::get('log');
 			if ($reportErrors && strpos($output, 'ERROR')) {
-				$debugFile = ROOT_PATH . '/tmp/debug-' . date('Ymd-His').'.log';
-				system('mv debug.log ' . $debugFile);
-				$log = Zend_Registry::get('log');
-				$log->log('GoodData export error', Zend_Log::ERR, array(
-					'pid'		=> $this->_idProject,
-					'error'		=> $output,
-					'debugFile' => $debugFile
+				$log->logWithAttachment('GoodData export error', Zend_Log::ERR, $debugFile, array(
+					'pid' => $this->_idProject,
+					'error' => $output,
+				));
+			} else {
+				$log->logWithAttachment('GoodData export debug', Zend_Log::INFO, $debugFile, array(
+					'pid' => $this->_idProject,
+					'output' => $output,
 				));
 			}
 

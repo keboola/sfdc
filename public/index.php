@@ -1,5 +1,4 @@
 <?php
-
 define('ROOT_PATH', dirname(dirname(__FILE__)));
 define('APPLICATION_PATH', ROOT_PATH . '/application');
 set_include_path(implode(PATH_SEPARATOR, array(realpath(ROOT_PATH . '/library'), get_include_path())));
