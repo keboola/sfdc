@@ -37,31 +37,38 @@ if (!$opts->getOption('id')) {
 
 	if ($user) {
 
-		// connect do db
-		$dbData = Zend_Db::factory('pdo_mysql', array(
-			'host'		=> $config->db->host,
-			'username'	=> $config->db->login,
-			'password'	=> $config->db->password,
-			'dbname'	=> $user->dbName
-		));
+		try {
 
-		// test připojení k db
-		$dbData->getConnection();
-		$dbData->query('SET NAMES utf8');
+			// connect do db
+			$dbData = Zend_Db::factory('pdo_mysql', array(
+				'host'		=> $config->db->host,
+				'username'	=> $config->db->login,
+				'password'	=> $config->db->password,
+				'dbname'	=> $user->dbName
+			));
 
-		// nastavení db adapteru pro všechny potomky Zend_Db_Table
-		Zend_Db_Table::setDefaultAdapter($dbData);
+			// test připojení k db
+			$dbData->getConnection();
+			$dbData->query('SET NAMES utf8');
 
-		$user->revalidateAccessToken();
+			// nastavení db adapteru pro všechny potomky Zend_Db_Table
+			Zend_Db_Table::setDefaultAdapter($dbData);
 
-		$importConfig = new Zend_Config_Ini(ROOT_PATH . '/gooddata/' . $user->strId . '/config.ini', 'salesforce', Array('allowModifications' => true));
-		$import = new App_SalesForceImport($user, $importConfig);
-		if($opts->getOption('table')) {
-			$import->import($opts->getOption('table'));
-		} else {
-			$import->importAll();
-			$user->lastImportDate = date("Y-m-d H:i:s");
-			$user->save();
+			$user->revalidateAccessToken();
+
+			$importConfig = new Zend_Config_Ini(ROOT_PATH . '/gooddata/' . $user->strId . '/config.ini', 'salesforce', Array('allowModifications' => true));
+			$import = new App_SalesForceImport($user, $importConfig);
+			if($opts->getOption('table')) {
+				$import->import($opts->getOption('table'));
+			} else {
+				$import->importAll();
+				$user->lastImportDate = date("Y-m-d H:i:s");
+				$user->save();
+			}
+
+		} catch(Exception $e) {
+			$debugFile = NDebugger::log($e, NDebugger::ERROR);
+			echo "ERROR: " . $e->getMessage() . PHP_EOL;
 		}
 
 	} else {

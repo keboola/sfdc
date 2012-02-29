@@ -23,8 +23,13 @@ try {
 }
 
 $lock = new App_Lock(Zend_Registry::get('db'), 'cron-import');
+$log = Zend_Registry::get('log');
+
 if (!$lock->lock()) {
+	$log->log("Salesforce Cron already running", Zend_Log::INFO);
 	die('Already running' . PHP_EOL);
+
+
 }
 
 NDebugger::timer('cron');
@@ -34,10 +39,9 @@ echo 'Start: '.date('j. n. Y H:i:s', $start)."\n";
 
 $usersTable = new Model_BiUser();
 $config = Zend_Registry::get('config');
-$log = Zend_Registry::get('log');
+
 
 $log->log('SalesForce Cron Starting', Zend_Log::INFO);
-
 
 $userTable = new Model_BiUser();
 $idUser = $opts->getOption('id');
@@ -79,9 +83,9 @@ foreach($usersQuery as $user) {
 		// Import
 		print "Importing data\n";
 		NDebugger::timer('account');
-		$user->revalidateAccessToken();
-		$import = new App_SalesForceImport($user, $importExportConfig);
 		try {
+			$user->revalidateAccessToken();
+			$import = new App_SalesForceImport($user, $importExportConfig);
 			$import->importAll();
 			print "Importing done\n";
 			$duration = NDebugger::timer('account');
@@ -92,13 +96,11 @@ foreach($usersQuery as $user) {
 				'duration'	=> $duration
 			));
 		} catch(Exception $e) {
-			print "Import failed\n";
+
 			$duration = NDebugger::timer('account');
-			print $e->getMessage() . "\n";
-			print $e->getTraceAsString();
-			$log->log("SalesForce Cron Import for user {$user->strId} ({$user->id}) Failed", Zend_Log::ERR, array(
-				'err'	=> $e->getMessage() . "\n". $e->getTraceAsString()
-			));
+			$debugFile = NDebugger::log($e, NDebugger::ERROR);
+			echo "ERROR: Import failed: " . $e->getMessage() . PHP_EOL;
+
 			// Do not continue with exports
 			continue;
 		}
