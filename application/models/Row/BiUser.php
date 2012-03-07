@@ -37,7 +37,7 @@ class Model_Row_BiUser extends Zend_Db_Table_Row_Abstract
 
 		$response = json_decode($json_response, true);
 		if (isset($response['error'])) {
-			throw new Exception($response['error'] . ": " . $response['error_description']);
+			throw new Exception("Refreshing OAuth access token for user {$this->strId} ({$this->id}) failed: " . $response['error'] . ": " . $response['error_description']);
 		}
 		$this->accessToken = $response['access_token'];
 		$this->instanceUrl = $response['instance_url'];

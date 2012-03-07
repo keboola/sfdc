@@ -79,9 +79,12 @@ foreach($usersQuery as $user) {
 	// nastavení db adapteru pro všechny potomky Zend_Db_Table
 	Zend_Db_Table::setDefaultAdapter($dbData);
 
+	$message = "SalesForce Cron for user {$user->strId} ({$user->id}) starting";
+
 	if ($user->import) {
 		// Import
 		print "Importing data\n";
+
 		NDebugger::timer('account');
 		try {
 			$user->revalidateAccessToken();
@@ -124,6 +127,8 @@ foreach($usersQuery as $user) {
 			$user->save();
 		}
 	}
+
+	$message = "SalesForce Cron for user {$user->strId} ({$user->id}) finished";
 }
 
 $end = time();
