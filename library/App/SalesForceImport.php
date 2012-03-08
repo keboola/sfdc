@@ -66,6 +66,7 @@ class App_SalesForceImport
 			// Empty record
 			if ($tableConfig->emptyRecord) {
 				$data = array();
+
 				foreach($tableConfig->emptyRecord as $column => $value) {
 					$data[$column] = $value;
 				}
@@ -96,6 +97,14 @@ class App_SalesForceImport
 	 * @return array
 	 */
 	public function transformValues($record, $tableConfig) {
+		// Column aliases
+		if (isset($tableConfig->importQueryColumnAlias)) {
+			foreach($tableConfig->importQueryColumnAlias as $source => $destination) {
+				$record[$destination] = $record[$source];
+				unset($record[$source]);
+			}
+		}
+
 		// Empty values
 		if (isset($tableConfig->emptyColumn)) {
 			foreach($tableConfig->emptyColumn as $emptyColumnName => $emptyColumnValue) {
