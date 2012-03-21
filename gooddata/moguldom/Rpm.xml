@@ -1,0 +1,62 @@
+<schema>
+	<name>SF_RPM</name>
+	<columns>
+		<column>
+			<name>Id</name>
+			<title>ID (SF_RPM)</title>
+			<ldmType>CONNECTION_POINT</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>SF_RPM</folder>
+		</column>
+		<column>
+			<name>isDeleted</name>
+			<title>isDeleted (SF_RPM)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>SF_RPM</folder>
+		</column>
+		<column>
+			<name>Name</name>
+			<title>Name (SF_RPM)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>SF_RPM</folder>
+		</column>
+		<column>
+			<name>Site</name>
+			<title>Site (SF_RPM)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>SF_RPM</folder>
+		</column>
+		<column>
+			<name>RunDate</name>
+			<title>RunDate (SF_RPM)</title>
+			<ldmType>DATE</ldmType>
+			<format>yyyy-MM-dd</format>
+			<schemaReference>SF_RpmRunDate</schemaReference>
+			<folder>SF_RPM</folder>
+		</column>
+		<column>
+			<name>SitePageViews</name>
+			<title>SitePageViews (SF_RPM)</title>
+			<ldmType>FACT</ldmType>
+			<dataType>DECIMAL(18,0)</dataType>
+			<folder>SF_RPM</folder>
+		</column>
+		<column>
+			<name>SiteRevenue</name>
+			<title>SiteRevenue (SF_RPM)</title>
+			<ldmType>FACT</ldmType>
+			<dataType>DECIMAL(16,2)</dataType>
+			<folder>SF_RPM</folder>
+		</column>
+		<column>
+			<name>RPM</name>
+			<title>RPM (SF_RPM)</title>
+			<ldmType>FACT</ldmType>
+			<dataType>DECIMAL(16,2)</dataType>
+			<folder>SF_RPM</folder>
+		</column>
+	</columns>
+</schema>
