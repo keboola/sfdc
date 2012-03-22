@@ -5,7 +5,7 @@ define('APPLICATION_PATH', ROOT_PATH . '/application');
 set_include_path(implode(PATH_SEPARATOR, array(realpath(ROOT_PATH . '/library'), get_include_path())));
 require_once 'Zend/Application.php';
 $application = new Zend_Application('application', APPLICATION_PATH . '/configs/application.ini');
-$application->bootstrap(array("base", "autoload", "config", "db", "debug", "log", "debugLogUploader"));
+$application->bootstrap(array("base", "autoload", "config", "db", "debug", "log"));
 
 // Setup console input
 $opts = new Zend_Console_Getopt(array(

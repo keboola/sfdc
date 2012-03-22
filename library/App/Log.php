@@ -15,6 +15,13 @@ class App_Log extends Zend_Log
 	 */
 	protected $_debugLogUploader;
 
+
+	public function __construct(App_Log_DebugLogUploader $debugLogUploader, Zend_Log_Writer_Abstract $writer = null)
+	{
+		parent::__construct($writer);
+		$this->setDebugLogUploader($debugLogUploader);
+	}
+
 	public function logWithAttachment($message, $priority, $attachment, $extras = null)
 	{
 		$extras = (array) $extras;
@@ -37,7 +44,7 @@ class App_Log extends Zend_Log
 		return $this->_debugLogUploader;
 	}
 
-	public function setDebugLogUploader($attachmentUploader)
+	public function setDebugLogUploader(App_Log_DebugLogUploader $attachmentUploader)
 	{
 		$this->_debugLogUploader = $attachmentUploader;
 	}

@@ -92,17 +92,6 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		NLogger::$emailSnooze = 3600;
 	}
 
-	protected function _initDebugLogUploader()
-	{
-		$log = 	$this->bootstrap('log')->getResource('log');
-		$config = $this->bootstrap('config')->getResource('config');
-
-		$attachmentUploader = new App_Log_DebugLogUploader($config->attachmentUploader);
-		$log->setDebugLogUploader($attachmentUploader);
-
-		return $attachmentUploader;
-	}
-
 	/**
 	 * nastaví view a doctype a vybere skin tím, že nastaví prefix
 	 */
