@@ -108,7 +108,7 @@ class App_SalesForceImport
 		// Empty values
 		if (isset($tableConfig->emptyColumn)) {
 			foreach($tableConfig->emptyColumn as $emptyColumnName => $emptyColumnValue) {
-				if (!isset($record[$emptyColumnName]) || $record[$emptyColumnName] == null) {
+				if (!isset($record[$emptyColumnName]) || $record[$emptyColumnName] === null) {
 					$record[$emptyColumnName] = $emptyColumnValue;
 				}
 			}
