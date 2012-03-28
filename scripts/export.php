@@ -15,7 +15,7 @@ $opts = new Zend_Console_Getopt(array(
 	'id|i=i'		=> 'user id',
 	'load|l-i'		=> 'load data to datasets in GoodData',
 	'project|p=s'	=> 'GoodData project PID for setup',
-	'setup|s-i'		=> 'setup datasets in GoodData',
+	'setup|s-s'		=> 'setup datasets in GoodData',
 	'update|u-s'	=> 'update dataset structure in GoodData',
 	'maql|m-s'		=> 'execute MAQL',
 ));
@@ -53,7 +53,7 @@ if($opts->getOption('id')) {
 	$gd = new App_GoodDataExport($user->gdProject, $user, $config, $exportConfig);
 
 	if ($opts->getOption('setup'))	{
-		$gd->setup();
+		$gd->setup($opts->getOption('setup'));
 	} elseif ($opts->getOption('load')) {
 		$gd->loadData($opts->getOption('all'));
 		$user->lastExportDate = date("Y-m-d H:i:s");

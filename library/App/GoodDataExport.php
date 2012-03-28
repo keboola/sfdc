@@ -166,14 +166,17 @@ class App_GoodDataExport
 	 * Create data sets in GoodData
 	 * @return void
 	 */
-	public function setup()
+	public function setup($dataset=null)
 	{
-		if (isset($this->_exportConfig->dateDimensions) && count($this->_exportConfig->dateDimensions)) {
+		if (isset($this->_exportConfig->dateDimensions) && count($this->_exportConfig->dateDimensions) && !$dataset) {
 			foreach($this->_exportConfig->dateDimensions as $dateDimension) {
 				$this->_gd->createDate($dateDimension, FALSE);
 			}
 		}
 		foreach($this->_exportConfig->tables as $table => $tableConfig) {
+			if ($dataset && $table != $dataset) {
+				continue;
+			}
 //			$this->_gd->dropDataset($table);
 			$this->createDataset($table);
 			if ($tableConfig->snapshot) {

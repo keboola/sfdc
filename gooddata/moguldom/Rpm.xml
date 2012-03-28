@@ -58,5 +58,47 @@
 			<dataType>DECIMAL(16,2)</dataType>
 			<folder>SF_RPM</folder>
 		</column>
+		<column>
+			<name>AdNetworkPageViews</name>
+			<title>AdNetworkPageViews (SF_RPM)</title>
+			<ldmType>FACT</ldmType>
+			<dataType>DECIMAL(18,0)</dataType>
+			<folder>SF_RPM</folder>
+		</column>
+		<column>
+			<name>AdNetworkSiteRevenue</name>
+			<title>AdNetworkSiteRevenue (SF_RPM)</title>
+			<ldmType>FACT</ldmType>
+			<dataType>DECIMAL(16,2)</dataType>
+			<folder>SF_RPM</folder>
+		</column>
+		<column>
+			<name>AdNetworkRPM</name>
+			<title>AdNetworkRPM (SF_RPM)</title>
+			<ldmType>FACT</ldmType>
+			<dataType>DECIMAL(16,2)</dataType>
+			<folder>SF_RPM</folder>
+		</column>
+		<column>
+			<name>DirectSalesPageViews</name>
+			<title>DirectSalesPageViews (SF_RPM)</title>
+			<ldmType>FACT</ldmType>
+			<dataType>DECIMAL(18,0)</dataType>
+			<folder>SF_RPM</folder>
+		</column>
+		<column>
+			<name>DirectSalesSiteRevenue</name>
+			<title>DirectSalesSiteRevenue (SF_RPM)</title>
+			<ldmType>FACT</ldmType>
+			<dataType>DECIMAL(16,2)</dataType>
+			<folder>SF_RPM</folder>
+		</column>
+		<column>
+			<name>DirectSalesRPM</name>
+			<title>DirectSalesRPM (SF_RPM)</title>
+			<ldmType>FACT</ldmType>
+			<dataType>DECIMAL(16,2)</dataType>
+			<folder>SF_RPM</folder>
+		</column>
 	</columns>
 </schema>

@@ -308,5 +308,13 @@
 			<dataType>VARCHAR(255)</dataType>
 			<folder>SF_Opportunity</folder>
 		</column>
+		<column>
+			<name>RecordTypeId</name>
+			<title>RecordTypeId (SF_Opportunity)</title>
+			<ldmType>REFERENCE</ldmType>
+			<reference>Id</reference>
+			<schemaReference>SF_RecordType</schemaReference>
+			<folder>SF_Opportunity</folder>
+		</column>
 	</columns>
 </schema>
