@@ -91,8 +91,13 @@ class App_GoodDataExport
 			$isSnapshotTable = true;
 			$tableId = str_replace("Snapshot", "", $table);
 		}
+        $log = Zend_Registry::get("log");
 		if (!isset($tablesConfig->$tableId)) {
-			return;
+            $log->log("Missing table configuration for {$table}", Zend_Log::WARN, array(
+                'pid' => $this->_idProject,
+                'idUser' => $this->_idUser
+            ));
+			return false;
 		}
 		$tableConfig = $tablesConfig->$tableId;
 
@@ -100,10 +105,14 @@ class App_GoodDataExport
 
 		if (is_string($tableConfig->exportQueryColumns)) {
 			$queryColumns = $tableConfig->exportQueryColumns;
-		} elseif (count($tableConfig->exportQueryColumns->toArray())) {
+		} elseif (is_array($tableConfig->exportQueryColumns) && count($tableConfig->exportQueryColumns->toArray())) {
 			$queryColumns = join (", ", $tableConfig->exportQueryColumns->toArray());
 		} else {
-			throw new Exception("Export query columns configuration error for {$table}");
+            $log->log("Missing export configuration for {$table}", Zend_Log::WARN, array(
+                'pid' => $this->_idProject,
+                'idUser' => $this->_idUser
+            ));
+            return false;
 		}
 
 		$joins = '';
@@ -136,8 +145,9 @@ class App_GoodDataExport
 	 */
 	public function createDataset($dataset)
 	{
-		$this->dumpTable($dataset, false, true);
-		$this->_gd->createDataset($this->_xmlPath . '/'.$dataset.'.xml', $this->_tmpPath.'/'.$dataset.'.csv');
+		if ($this->dumpTable($dataset, false, true) !== false) {
+		    $this->_gd->createDataset($this->_xmlPath . '/'.$dataset.'.xml', $this->_tmpPath.'/'.$dataset.'.csv');
+        }
 	}
 
 	/**
@@ -147,8 +157,9 @@ class App_GoodDataExport
 	 */
 	public function loadDataset($dataset, $all=true)
 	{
-		$this->dumpTable($dataset, false, false, $all);
-		$this->_gd->loadData($this->_xmlPath . '/'.$dataset.'.xml', $this->_tmpPath.'/'.$dataset.'.csv', !$all);
+		if ($this->dumpTable($dataset, false, false, $all) !== false) {
+		    $this->_gd->loadData($this->_xmlPath . '/'.$dataset.'.xml', $this->_tmpPath.'/'.$dataset.'.csv', !$all);
+        }
 	}
 
 	/**
@@ -158,8 +169,9 @@ class App_GoodDataExport
 	 */
 	public function updateStructure($dataset)
 	{
-		$this->dumpTable($dataset, false, true);
-		$this->_gd->updateDataset($this->_xmlPath . '/'.$dataset.'.xml', $this->_tmpPath.'/'.$dataset.'.csv', $this->_idUser);
+		if ($this->dumpTable($dataset, false, true) !== false) {
+		    $this->_gd->updateDataset($this->_xmlPath . '/'.$dataset.'.xml', $this->_tmpPath.'/'.$dataset.'.csv', $this->_idUser);
+        }
 	}
 
 	/**

@@ -53,7 +53,11 @@ if($opts->getOption('id')) {
 	$gd = new App_GoodDataExport($user->gdProject, $user, $config, $exportConfig);
 
 	if ($opts->getOption('setup'))	{
-		$gd->setup($opts->getOption('setup'));
+        if ($opts->getOption('setup') && is_string($opts->getOption('setup'))) {
+            $gd->setup($opts->getOption('setup'));
+        } else {
+            $gd->setup();
+        }
 	} elseif ($opts->getOption('load')) {
 		$gd->loadData($opts->getOption('all'));
 		$user->lastExportDate = date("Y-m-d H:i:s");

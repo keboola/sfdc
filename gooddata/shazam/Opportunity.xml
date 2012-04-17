@@ -1,0 +1,126 @@
+<schema>
+    <name>Opportunity</name>
+    <title>Opportunity</title>
+    <columns>
+        <column>
+            <name>id</name>
+            <title>Id (Opportunity)</title>
+            <ldmType>CONNECTION_POINT</ldmType>
+            <dataType>VARCHAR(18)</dataType>
+            <folder>Opportunity</folder>
+        </column>
+        <column>
+            <name>isdeleted</name>
+            <title>isDeleted (Opportunity)</title>
+            <ldmType>ATTRIBUTE</ldmType>
+            <folder>Opportunity</folder>
+        </column>
+        <column>
+            <name>accountid</name>
+            <title>AccountId (Opportunity)</title>
+			<ldmType>REFERENCE</ldmType>
+			<reference>id</reference>
+			<schemaReference>Account</schemaReference>
+			<dataType>VARCHAR(18)</dataType>
+            <folder>Opportunity</folder>
+        </column>
+        <column>
+            <name>type</name>
+            <title>Type (Opportunity)</title>
+            <ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+            <folder>Opportunity</folder>
+        </column>
+        <column>
+            <name>currencyisocode</name>
+            <title>CurrencyIsoCode (Opportunity)</title>
+            <ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(3)</dataType>
+            <folder>Opportunity</folder>
+        </column>
+        <column>
+            <name>amount</name>
+            <title>Amount (Opportunity)</title>
+            <ldmType>FACT</ldmType>
+			<dataType>DECIMAL(16,2)</dataType>
+            <folder>Opportunity</folder>
+        </column>
+        <column>
+            <name>stagename</name>
+            <title>StageName (Opportunity)</title>
+            <ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+            <folder>Opportunity</folder>
+        </column>
+        <column>
+            <name>stagesortorder</name>
+            <title>StageSortOrder (Opportunity)</title>
+			<ldmType>LABEL</ldmType>
+			<format>INT</format>
+			<reference>stagename</reference>
+			<folder>Opportunity</folder>
+        </column>
+        <column>
+            <name>isclosed</name>
+            <title>IsClosed (Opportunity)</title>
+            <ldmType>ATTRIBUTE</ldmType>
+            <folder>Opportunity</folder>
+        </column>
+        <column>
+            <name>iswon</name>
+            <title>IsWon (Opportunity)</title>
+            <ldmType>ATTRIBUTE</ldmType>
+            <folder>Opportunity</folder>
+        </column>
+        <column>
+            <name>closedate</name>
+            <title>CloseDate (Opportunity)</title>
+            <ldmType>DATE</ldmType>
+            <folder>Opportunity</folder>
+            <format>yyyy-MM-dd</format>
+			<schemaReference>OpportunityCloseDate</schemaReference>
+        </column>
+        <column>
+            <name>startdate</name>
+            <title>StartDate (Opportunity)</title>
+            <ldmType>DATE</ldmType>
+            <folder>Opportunity</folder>
+            <format>yyyy-MM-dd</format>
+			<schemaReference>OpportunityStartDate</schemaReference>
+        </column>
+        <column>
+            <name>enddate</name>
+            <title>EndDate (Opportunity)</title>
+            <ldmType>DATE</ldmType>
+            <folder>Opportunity</folder>
+            <format>yyyy-MM-dd</format>
+			<schemaReference>OpportunityEndDate</schemaReference>
+        </column>
+        <column>
+            <name>closedlostreason</name>
+            <title>ClosedLostReason (Opportunity)</title>
+            <ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+            <folder>Opportunity</folder>
+        </column>
+        <column>
+            <name>hasopportunitylineitem</name>
+            <title>HasOpportunityLineItem (Opportunity)</title>
+            <ldmType>ATTRIBUTE</ldmType>
+            <folder>Opportunity</folder>
+        </column>
+        <column>
+            <name>probability</name>
+            <title>Probability (Opportunity)</title>
+            <ldmType>FACT</ldmType>
+            <folder>Opportunity</folder>
+        </column>
+        <column>
+            <name>weighted</name>
+            <title>Weighted (Opportunity)</title>
+            <ldmType>FACT</ldmType>
+			<dataType>DECIMAL(16,2)</dataType>
+            <folder>Opportunity</folder>
+        </column>
+    </columns>
+</schema>

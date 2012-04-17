@@ -1,0 +1,40 @@
+<schema>
+    <name>Account</name>
+    <title>Account</title>
+    <columns>
+        <column>
+            <name>id</name>
+            <title>Id (Account)</title>
+            <ldmType>CONNECTION_POINT</ldmType>
+            <dataType>VARCHAR(18)</dataType>
+            <folder>Account</folder>
+        </column>
+        <column>
+            <name>isdeleted</name>
+            <title>isDeleted (Account)</title>
+            <ldmType>ATTRIBUTE</ldmType>
+            <folder>Account</folder>
+        </column>
+        <column>
+            <name>name</name>
+            <title>Name (Account)</title>
+            <ldmType>ATTRIBUTE</ldmType>
+            <dataType>VARCHAR(255)</dataType>
+            <folder>Account</folder>
+        </column>
+        <column>
+            <name>accountstatus</name>
+            <title>AccountStatus (Account)</title>
+            <ldmType>ATTRIBUTE</ldmType>
+            <dataType>VARCHAR(255)</dataType>
+            <folder>Account</folder>
+        </column>
+        <column>
+            <name>region</name>
+            <title>Region (Account)</title>
+            <ldmType>ATTRIBUTE</ldmType>
+            <dataType>VARCHAR(255)</dataType>
+            <folder>Account</folder>
+        </column>
+    </columns>
+</schema>
