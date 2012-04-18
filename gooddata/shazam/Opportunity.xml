@@ -56,7 +56,7 @@
             <name>stagesortorder</name>
             <title>StageSortOrder (Opportunity)</title>
 			<ldmType>LABEL</ldmType>
-			<format>INT</format>
+			<dataType>INT</dataType>
 			<reference>stagename</reference>
 			<folder>Opportunity</folder>
         </column>
@@ -122,5 +122,20 @@
 			<dataType>DECIMAL(16,2)</dataType>
             <folder>Opportunity</folder>
         </column>
+		<column>
+			<name>ownerid</name>
+			<title>OwnerId (Opportunity)</title>
+			<ldmType>REFERENCE</ldmType>
+			<reference>Id</reference>
+			<schemaReference>User</schemaReference>
+			<folder>Opportunity</folder>
+		</column>
+		<column>
+			<name>businessline</name>
+			<title>BusinessLine (Opportunity)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>Opportunity</folder>
+		</column>
     </columns>
 </schema>
