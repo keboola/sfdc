@@ -137,5 +137,12 @@
 			<dataType>VARCHAR(255)</dataType>
 			<folder>Opportunity</folder>
 		</column>
+		<column>
+			<name>name</name>
+			<title>Name (Opportunity)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>Opportunity</folder>
+		</column>
     </columns>
 </schema>
