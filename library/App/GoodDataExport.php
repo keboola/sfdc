@@ -105,10 +105,10 @@ class App_GoodDataExport
 
 		if (is_string($tableConfig->exportQueryColumns)) {
 			$queryColumns = $tableConfig->exportQueryColumns;
-		} elseif (is_array($tableConfig->exportQueryColumns) && count($tableConfig->exportQueryColumns->toArray())) {
+		} elseif (is_array($tableConfig->exportQueryColumns->toArray()) && count($tableConfig->exportQueryColumns->toArray())) {
 			$queryColumns = join (", ", $tableConfig->exportQueryColumns->toArray());
 		} else {
-            $log->log("Missing export configuration for {$table}", Zend_Log::WARN, array(
+            $log->log("Missing export configuration for {$table}", Zend_Log::ERR, array(
                 'pid' => $this->_idProject,
                 'idUser' => $this->_idUser
             ));
