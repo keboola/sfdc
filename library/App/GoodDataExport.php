@@ -93,7 +93,7 @@ class App_GoodDataExport
 		}
         $log = Zend_Registry::get("log");
 		if (!isset($tablesConfig->$tableId)) {
-            $log->log("Missing table configuration for {$table}", Zend_Log::WARN, array(
+            $log->log("Missing table configuration for {$table}", Zend_Log::ERR, array(
                 'pid' => $this->_idProject,
                 'idUser' => $this->_idUser
             ));
@@ -101,11 +101,19 @@ class App_GoodDataExport
 		}
 		$tableConfig = $tablesConfig->$tableId;
 
+		if ($tableConfig->noExport) {
+			$log->log("Table {$table} not exported.", Zend_Log::INFO, array(
+				'pid' => $this->_idProject,
+				'idUser' => $this->_idUser
+			));
+			return false;
+		}
+
 		$queryColumns = "";
 
 		if (is_string($tableConfig->exportQueryColumns)) {
 			$queryColumns = $tableConfig->exportQueryColumns;
-		} elseif (is_array($tableConfig->exportQueryColumns->toArray()) && count($tableConfig->exportQueryColumns->toArray())) {
+		} elseif (count($tableConfig->exportQueryColumns)) {
 			$queryColumns = join (", ", $tableConfig->exportQueryColumns->toArray());
 		} else {
             $log->log("Missing export configuration for {$table}", Zend_Log::ERR, array(
@@ -183,6 +191,11 @@ class App_GoodDataExport
 		if (isset($this->_exportConfig->dateDimensions) && count($this->_exportConfig->dateDimensions) && !$dataset) {
 			foreach($this->_exportConfig->dateDimensions as $dateDimension) {
 				$this->_gd->createDate($dateDimension, FALSE);
+			}
+		}
+		if (isset($this->_exportConfig->dateTimeDimensions) && count($this->_exportConfig->dateTimeDimensions) && !$dataset) {
+			foreach($this->_exportConfig->dateTimeDimensions as $dateTimeDimension) {
+				$this->_gd->createDate($dateTimeDimension, TRUE);
 			}
 		}
 		foreach($this->_exportConfig->tables as $table => $tableConfig) {

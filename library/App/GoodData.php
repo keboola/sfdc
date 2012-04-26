@@ -189,7 +189,7 @@ class App_GoodData
 		$maqlFile = ROOT_PATH.'/tmp/temp.maql';
 		file_put_contents($maqlFile, $maql);
 
-		$command .= 'ExecuteMaql(maqlFile="'.$maqlFile.'");';
+		$command = 'ExecuteMaql(maqlFile="'.$maqlFile.'");';
 		$command .= 'TransferData();';
 
 		$this->call($command);
