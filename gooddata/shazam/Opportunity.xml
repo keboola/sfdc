@@ -144,5 +144,13 @@
 			<dataType>VARCHAR(255)</dataType>
 			<folder>Opportunity</folder>
 		</column>
+		<column>
+			<name>createddate</name>
+			<title>CreatedDate (Opportunity)</title>
+			<ldmType>DATE</ldmType>
+			<folder>Opportunity</folder>
+			<format>yyyy-MM-dd</format>
+			<schemaReference>OpportunityCreatedDate</schemaReference>
+		</column>
     </columns>
 </schema>
