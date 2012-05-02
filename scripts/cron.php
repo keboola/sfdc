@@ -22,15 +22,8 @@ try {
 	exit;
 }
 
-$lock = new App_Lock(Zend_Registry::get('db'), 'cron-import');
 $log = Zend_Registry::get('log');
 
-if (!$lock->lock()) {
-	$log->log("Salesforce Cron already running", Zend_Log::INFO);
-	die('Already running' . PHP_EOL);
-
-
-}
 
 NDebugger::timer('cron');
 
@@ -53,6 +46,18 @@ if ($idUser) {
 }
 
 foreach($usersQuery as $user) {
+
+	$lock = new App_Lock(Zend_Registry::get('db'), 'cron-salesforce-import-'  . $user->id);
+
+	if (!$lock->lock()) {
+		$log->log("Salesforce Cron for this user already running", Zend_Log::ERR, array(
+			"user" => $user->strId,
+			"userId" => $user->id
+		));
+		print "Salesforce Cron for this user already running\n";
+		continue;
+	}
+
 
 	if (!$user->export && !$user->import) {
 		continue;
@@ -129,6 +134,7 @@ foreach($usersQuery as $user) {
 	}
 
 	$message = "SalesForce Cron for user {$user->strId} ({$user->id}) finished";
+	$lock->unlock();
 }
 
 $end = time();
@@ -139,4 +145,3 @@ $log->log('SalesForce Cron Completed', Zend_Log::INFO, array(
 	'duration'	=> $duration
 ));
 
-$lock->unlock();
