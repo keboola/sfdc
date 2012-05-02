@@ -56,11 +56,9 @@ class App_SalesForceImport
 			if (!$query) {
 				throw new Exception("Table {$table} not configured.");
 			}
-			$response = $this->_query($query);
 
 			$tableClass = "Model_" . $table;
 			$dbTable = new Model_DataTable(null, null, $table);
-
 			$dbTable->prepareDeleteCheck();
 
 			// Empty record
@@ -74,13 +72,7 @@ class App_SalesForceImport
 				$dbTable->insertOrSet($data);
 			}
 
-			if ($response['totalSize'] > 0) {
-				foreach($response['records'] as $record) {
-					unset($record['attributes']);
-					$record = $this->transformValues($record, $tableConfig);
-					$dbTable->insertOrSet($record);
-				}
-			}
+			$response = $this->_query($query, $dbTable, $tableConfig);
 
 			$dbTable->deleteCheck();
 
@@ -133,11 +125,11 @@ class App_SalesForceImport
 	 * @throws Exception
 	 * @param $query
 	 * @param string $queryUrl
-	 * @return array|mixed
+	 * @return mixed
 	 */
-	private function _query($query, $queryUrl = '') {
+	private function _query($query, $dbTable, $tableConfig, $queryUrl='') {
 		if (!$queryUrl) {
-			$url = "{$this->_user->instanceUrl}/services/data/v23.0/query?q=" . urlencode($query);
+			$url = "{$this->_user->instanceUrl}/services/data/v24.0/query?q=" . urlencode($query);
 		} else {
 			$url = $this->_user->instanceUrl.$queryUrl;
 		}
@@ -150,11 +142,22 @@ class App_SalesForceImport
 		$json_response = curl_exec($curl);
 		curl_close($curl);
 
+		// var_dump($url);
+		// var_dump(strlen($json_response));
+
 		$response = json_decode($json_response, true);
+
+		if ($response['totalSize'] > 0) {
+			foreach($response['records'] as $record) {
+				unset($record['attributes']);
+				$record = $this->transformValues($record, $tableConfig);
+				$dbTable->insertOrSet($record);
+			}
+		}
+
 		// Query more
 		if (isset($response['done']) && $response['done'] === false && $response['nextRecordsUrl'] != '') {
-			$responseMore = $this->_query($query, $response['nextRecordsUrl']);
-			$response = array_merge_recursive($response, $responseMore);
+			$response = $this->_query($query, $dbTable, $tableConfig, $response['nextRecordsUrl']);
 		}
 		if (isset($response[0]['errorCode'])) {
 			throw new Exception($response[0]['errorCode'] . ': '. $response[0]['message']);
