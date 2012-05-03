@@ -1,0 +1,49 @@
+<schema>
+	<name>OpportunityStageHistory</name>
+	<columns>
+		<column>
+			<name>Id</name>
+			<title>ID (OpportunityStageHistory)</title>
+			<ldmType>CONNECTION_POINT</ldmType>
+			<dataType>VARCHAR(18)</dataType>
+			<folder>OpportunityStageHistory</folder>
+		</column>
+		<column>
+			<name>isDeleted</name>
+			<title>isDeleted (OpportunityStageHistory)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>OpportunityStageHistory</folder>
+		</column>
+		<column>
+			<name>OpportunityId</name>
+			<title>OpportunityId (OpportunityStageHistory)</title>
+			<ldmType>REFERENCE</ldmType>
+			<reference>Id</reference>
+			<schemaReference>Opportunity</schemaReference>
+			<folder>OpportunityStageHistory</folder>
+		</column>
+		<column>
+			<name>CreatedDate</name>
+			<title>CreatedDate (OpportunityStageHistory)</title>
+			<ldmType>DATE</ldmType>
+			<folder>OpportunityStageHistory</folder>
+			<format>yyyy-MM-dd</format>
+			<schemaReference>OpportunityStageHistoryCreatedDate</schemaReference>
+		</column>
+		<column>
+			<name>OldValue</name>
+			<title>OldValue (OpportunityStageHistory)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>OpportunityStageHistory</folder>
+		</column>
+		<column>
+			<name>NewValue</name>
+			<title>NewValue (OpportunityStageHistory)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>OpportunityStageHistory</folder>
+		</column>
+	</columns>
+</schema>

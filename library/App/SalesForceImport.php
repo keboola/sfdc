@@ -149,8 +149,8 @@ class App_SalesForceImport
 		$json_response = curl_exec($curl);
 		curl_close($curl);
 
-		// var_dump($url);
-		// var_dump(strlen($json_response));
+		var_dump($url);
+		var_dump(strlen($json_response));
 
 		$response = json_decode($json_response, true);
 

@@ -1,0 +1,269 @@
+<schema>
+	<name>Lead</name>
+	<columns>
+		<column>
+			<name>Id</name>
+			<title>ID (Lead)</title>
+			<ldmType>CONNECTION_POINT</ldmType>
+			<dataType>VARCHAR(18)</dataType>
+			<folder>Lead</folder>
+		</column>
+		<column>
+			<name>isDeleted</name>
+			<title>isDeleted (Lead)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>Lead</folder>
+		</column>
+		<column>
+			<name>CreatedDate</name>
+			<title>CreatedDate (Lead)</title>
+			<ldmType>DATE</ldmType>
+			<folder>Lead</folder>
+			<format>yyyy-MM-dd</format>
+			<schemaReference>LeadCreatedDate</schemaReference>
+		</column>
+		<column>
+			<name>CreatedDateJoined</name>
+			<title>CreatedDate (Lead, Opportunity)</title>
+			<ldmType>DATE</ldmType>
+			<folder>Lead</folder>
+			<format>yyyy-MM-dd</format>
+			<schemaReference>LeadOpportunityCreatedDate</schemaReference>
+		</column>
+        <column>
+            <name>Name</name>
+            <title>Name (Lead)</title>
+            <ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>Lead</folder>
+        </column>
+        <column>
+            <name>Region</name>
+            <title>Region (Lead)</title>
+            <ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>Lead</folder>
+        </column>
+        <column>
+            <name>Country</name>
+            <title>Country (Lead)</title>
+            <ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>Lead</folder>
+        </column>
+		<column>
+			<name>ConvertedDate</name>
+			<title>ConvertedDate (Lead)</title>
+			<ldmType>DATE</ldmType>
+			<folder>Lead</folder>
+			<format>yyyy-MM-dd</format>
+			<schemaReference>LeadConvertedDate</schemaReference>
+		</column>
+		<column>
+			<name>OwnerId</name>
+			<title>OwnerId (Lead)</title>
+			<ldmType>REFERENCE</ldmType>
+			<reference>Id</reference>
+			<schemaReference>User</schemaReference>
+			<folder>Lead</folder>
+		</column>
+		<column>
+			<name>Title</name>
+			<title>Title (Lead)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>Lead</folder>
+		</column>
+		<column>
+			<name>Industry</name>
+			<title>Industry (Lead)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>Lead</folder>
+		</column>
+		<column>
+			<name>Source</name>
+			<title>Source (Lead)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>Lead</folder>
+		</column>
+		<column>
+			<name>SourceSegment</name>
+			<title>SourceSegment (Lead)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>Lead</folder>
+		</column>
+		<column>
+			<name>SourceDetail</name>
+			<title>SourceDetail (Lead)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>Lead</folder>
+		</column>
+		<column>
+			<name>CTAOriginal</name>
+			<title>CTAOriginal (Lead)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>Lead</folder>
+		</column>
+		<column>
+			<name>MostRecentConversionEvent</name>
+			<title>MostRecentConversionEvent (Lead)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>Lead</folder>
+		</column>
+		<column>
+			<name>HubspotRecentConversionDate</name>
+			<title>HubspotRecentConversionDate (Lead)</title>
+			<ldmType>DATE</ldmType>
+			<folder>Lead</folder>
+			<format>yyyy-MM-dd</format>
+			<schemaReference>LeadHubspotRecentConversionDate</schemaReference>
+		</column>
+		<column>
+			<name>HubspotConversionEvents</name>
+			<title>HubspotConversionEvents (Lead)</title>
+			<ldmType>FACT</ldmType>
+			<folder>Lead</folder>
+		</column>
+		<column>
+			<name>HubspotConversionEventsAttr</name>
+			<title>HubspotConversionEventsAttr (Lead)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>Lead</folder>
+		</column>
+		<column>
+			<name>Pain</name>
+			<title>Pain (Lead)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>Lead</folder>
+		</column>
+		<column>
+			<name>Budget</name>
+			<title>Budget (Lead)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>Lead</folder>
+		</column>
+		<column>
+			<name>Status</name>
+			<title>Status (Lead)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>Lead</folder>
+		</column>
+
+		<column>
+			<name>FirmagraphicScore</name>
+			<title>FirmagraphicScore (Lead)</title>
+			<ldmType>FACT</ldmType>
+			<folder>Lead</folder>
+		</column>
+		<column>
+			<name>FirmagraphicScoreAttr</name>
+			<title>FirmagraphicScoreAttr (Lead)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>Lead</folder>
+		</column>
+		<column>
+			<name>FirmagraphicScoreCat</name>
+			<title>FirmagraphicScoreCat (Lead)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>Lead</folder>
+		</column>
+
+		<column>
+			<name>DemographicScore</name>
+			<title>DemographicScore (Lead)</title>
+			<ldmType>FACT</ldmType>
+			<folder>Lead</folder>
+		</column>
+		<column>
+			<name>DemographicScoreAttr</name>
+			<title>DemographicScoreAttr (Lead)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>Lead</folder>
+		</column>
+		<column>
+			<name>DemographicScoreCat</name>
+			<title>DemographicScoreCat (Lead)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>Lead</folder>
+		</column>
+
+		<column>
+			<name>SandlerScore</name>
+			<title>SandlerScore (Lead)</title>
+			<ldmType>FACT</ldmType>
+			<folder>Lead</folder>
+		</column>
+		<column>
+			<name>SandlerScoreAttr</name>
+			<title>SandlerScoreAttr (Lead)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>Lead</folder>
+		</column>
+		<column>
+			<name>SandlerScoreCat</name>
+			<title>SandlerScoreCat (Lead)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>Lead</folder>
+		</column>
+
+		<column>
+			<name>BehavioralScore</name>
+			<title>BehavioralScore (Lead)</title>
+			<ldmType>FACT</ldmType>
+			<folder>Lead</folder>
+		</column>
+		<column>
+			<name>BehavioralScoreAttr</name>
+			<title>BehavioralScoreAttr (Lead)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>Lead</folder>
+		</column>
+		<column>
+			<name>BehavioralScoreCat</name>
+			<title>BehavioralScoreCat (Lead)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>Lead</folder>
+		</column>
+
+		<column>
+			<name>TotalScore</name>
+			<title>TotalScore (Lead)</title>
+			<ldmType>FACT</ldmType>
+			<folder>Lead</folder>
+		</column>
+		<column>
+			<name>TotalScoreAttr</name>
+			<title>TotalScoreAttr (Lead)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>Lead</folder>
+		</column>
+		<column>
+			<name>TotalScoreCat</name>
+			<title>TotalScoreCat (Lead)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>Lead</folder>
+		</column>
+
+	</columns>
+</schema>

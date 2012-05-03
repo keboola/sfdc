@@ -1,0 +1,40 @@
+<schema>
+	<name>Product</name>
+	<columns>
+		<column>
+			<name>Id</name>
+			<title>ID (Product)</title>
+			<ldmType>CONNECTION_POINT</ldmType>
+			<dataType>VARCHAR(18)</dataType>
+			<folder>Product</folder>
+		</column>
+		<column>
+			<name>isDeleted</name>
+			<title>isDeleted (Product)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>Product</folder>
+		</column>
+        <column>
+            <name>Name</name>
+            <title>Name (Product)</title>
+            <ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>Product</folder>
+        </column>
+        <column>
+            <name>Family</name>
+            <title>Family (Product)</title>
+            <ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>Product</folder>
+        </column>
+        <column>
+            <name>ProductCode</name>
+            <title>ProductCode (Product)</title>
+            <ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>Product</folder>
+        </column>
+	</columns>
+</schema>

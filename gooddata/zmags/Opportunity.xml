@@ -1,0 +1,122 @@
+<schema>
+	<name>Opportunity</name>
+	<columns>
+		<column>
+			<name>Id</name>
+			<title>ID (Opportunity)</title>
+			<ldmType>CONNECTION_POINT</ldmType>
+			<dataType>VARCHAR(18)</dataType>
+			<folder>Opportunity</folder>
+		</column>
+		<column>
+			<name>isDeleted</name>
+			<title>isDeleted (Opportunity)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>Opportunity</folder>
+		</column>
+		<column>
+			<name>Name</name>
+			<title>Name (Opportunity)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>Opportunity</folder>
+		</column>
+		<column>
+			<name>Amount</name>
+			<title>Amount (Opportunity)</title>
+			<ldmType>FACT</ldmType>
+			<dataType>DECIMAL(16,2)</dataType>
+			<folder>Opportunity</folder>
+		</column>
+		<column>
+			<name>CreatedDate</name>
+			<title>CreatedDate (Opportunity)</title>
+			<ldmType>DATE</ldmType>
+			<folder>Opportunity</folder>
+			<format>yyyy-MM-dd</format>
+			<schemaReference>OpportunityCreatedDate</schemaReference>
+		</column>
+		<column>
+			<name>CreatedDateJoined</name>
+			<title>CreatedDateJoined (Opportunity, Lead)</title>
+			<ldmType>DATE</ldmType>
+			<folder>Opportunity</folder>
+			<format>yyyy-MM-dd</format>
+			<schemaReference>LeadOpportunityCreatedDate</schemaReference>
+		</column>
+		<column>
+			<name>CloseDate</name>
+			<title>CloseDate (Opportunity)</title>
+			<ldmType>DATE</ldmType>
+			<folder>Opportunity</folder>
+			<format>yyyy-MM-dd</format>
+			<schemaReference>OpportunityCloseDate</schemaReference>
+		</column>
+		<column>
+			<name>IsClosed</name>
+			<title>IsClosed (Opportunity)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>Opportunity</folder>
+		</column>
+		<column>
+			<name>StageName</name>
+			<title>StageName (Opportunity)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>Opportunity</folder>
+		</column>
+		<column>
+			<name>StageSortOrder</name>
+			<title>StageSortOrder (Opportunity)</title>
+			<ldmType>LABEL</ldmType>
+			<dataType>INT</dataType>
+			<reference>StageName</reference>
+			<folder>Opportunity</folder>
+		</column>
+		<column>
+			<name>ReasonForDisinterest</name>
+			<title>ReasonForDisinterest (Opportunity)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>Opportunity</folder>
+		</column>
+		<column>
+			<name>OwnerId</name>
+			<title>OwnerId (Opportunity)</title>
+			<ldmType>REFERENCE</ldmType>
+			<reference>Id</reference>
+			<schemaReference>User</schemaReference>
+			<folder>Opportunity</folder>
+		</column>
+		<column>
+			<name>AccountId</name>
+			<title>AccountId (Opportunity)</title>
+			<ldmType>REFERENCE</ldmType>
+			<reference>Id</reference>
+			<schemaReference>Account</schemaReference>
+			<folder>Opportunity</folder>
+		</column>
+		<column>
+			<name>ForecastCategoryName</name>
+			<title>ForecastCategoryName (Opportunity)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>Opportunity</folder>
+		</column>
+		<column>
+			<name>Probability</name>
+			<title>Probability (Opportunity)</title>
+			<ldmType>FACT</ldmType>
+			<folder>Opportunity</folder>
+		</column>
+		<column>
+			<name>ProbabilityAttr</name>
+			<title>ProbabilityAttr (Opportunity)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>Opportunity</folder>
+		</column>
+	</columns>
+</schema>
