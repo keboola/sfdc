@@ -72,7 +72,14 @@ class App_SalesForceImport
 				$dbTable->insertOrSet($data);
 			}
 
-			$response = $this->_query($query, $dbTable, $tableConfig);
+			$response = $this->_query($query);
+			$this->_parseResponse($response, $dbTable, $tableConfig);
+
+			// Query more
+			while (isset($response['done']) && $response['done'] === false && $response['nextRecordsUrl'] != '') {
+				$response = $this->_query($query, $response['nextRecordsUrl']);
+				$this->_parseResponse($response, $dbTable, $tableConfig);
+			}
 
 			$dbTable->deleteCheck();
 
@@ -127,7 +134,7 @@ class App_SalesForceImport
 	 * @param string $queryUrl
 	 * @return mixed
 	 */
-	private function _query($query, $dbTable, $tableConfig, $queryUrl='') {
+	private function _query($query, $queryUrl='') {
 		if (!$queryUrl) {
 			$url = "{$this->_user->instanceUrl}/services/data/v24.0/query?q=" . urlencode($query);
 		} else {
@@ -147,6 +154,21 @@ class App_SalesForceImport
 
 		$response = json_decode($json_response, true);
 
+		if (isset($response[0]['errorCode'])) {
+			throw new Exception($response[0]['errorCode'] . ': '. $response[0]['message']);
+		}
+		return $response;
+	}
+
+	/**
+	 * Parse response data and insert into DB
+	 *
+	 * @param $response
+	 * @param $dbTable
+	 * @param $tableConfig
+	 */
+	private function _parseResponse($response, $dbTable, $tableConfig)
+	{
 		if ($response['totalSize'] > 0) {
 			foreach($response['records'] as $record) {
 				unset($record['attributes']);
@@ -154,15 +176,6 @@ class App_SalesForceImport
 				$dbTable->insertOrSet($record);
 			}
 		}
-
-		// Query more
-		if (isset($response['done']) && $response['done'] === false && $response['nextRecordsUrl'] != '') {
-			$response = $this->_query($query, $dbTable, $tableConfig, $response['nextRecordsUrl']);
-		}
-		if (isset($response[0]['errorCode'])) {
-			throw new Exception($response[0]['errorCode'] . ': '. $response[0]['message']);
-		}
-		return $response;
 	}
 
 	/**
