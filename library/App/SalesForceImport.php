@@ -170,10 +170,56 @@ class App_SalesForceImport
 	private function _parseResponse($response, $dbTable, $tableConfig)
 	{
 		if ($response['totalSize'] > 0) {
-			foreach($response['records'] as $record) {
+			$ids = array();
+			$idsStrings = array();
+			$storedIds = array();
+			$recordsHash = array();
+
+			// Transofm values
+			foreach($response['records'] as $key => $record) {
 				unset($record['attributes']);
-				$record = $this->transformValues($record, $tableConfig);
-				$dbTable->insertOrSet($record);
+				$recordsHash[$record["Id"]] = $this->transformValues($record, $tableConfig);
+				$ids[] = $record["Id"];
+				$idsStrings[] = "'{$record["Id"]}'";
+			}
+
+			// get all records, if snapshot table, then in
+			$query = "Id IN (" . join(",", $idsStrings) . ")";
+			if ($dbTable->isSnapshotTable()) {
+				$query .= " AND snapshotNumber='{$dbTable->getSnapshotNumber()}'";
+			}
+			$storedRecords = $dbTable->fetchAll($query);
+
+			// Check for updates
+			foreach ($storedRecords as $storedRecord) {
+				$storedIds[] = $storedRecord["Id"];
+				$storedRecordArray = $storedRecord->toArray();
+				$recordModified = false;
+				foreach(array_keys($recordsHash[$storedRecord["Id"]]) as $recordKey) {
+					if ($recordKey != "Id") {
+						if ($storedRecordArray[$recordKey] != $recordsHash[$storedRecord["Id"]][$recordKey]) {
+							$recordModified = true;
+							continue;
+						}
+					}
+				}
+
+				// Modifications found
+				if ($recordModified) {
+					$row = $dbTable->fetchRow("_id = '{$storedRecordArray["_id"]}'");
+					$row->setFromArray($recordsHash[$storedRecord["Id"]]);
+					if ($row->isChanged() && !$dbTable->isSnapshotTable()) {
+						$row->lastModificationDate = date("Y-m-d");
+					}
+					$row->save();
+				}
+			}
+
+			// Insert new records
+			foreach(array_diff($ids, $storedIds) as $missingId) {
+				$data = $recordsHash[$missingId];
+				$data['lastModificationDate'] = date("Y-m-d");
+				$dbTable->insert($data);
 			}
 		}
 	}
