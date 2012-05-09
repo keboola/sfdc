@@ -245,6 +245,27 @@
 		</column>
 
 		<column>
+			<name>DataIntegrityScore</name>
+			<title>DataIntegrityScore (Lead)</title>
+			<ldmType>FACT</ldmType>
+			<folder>Lead</folder>
+		</column>
+		<column>
+			<name>DataIntegrityScoreAttr</name>
+			<title>DataIntegrityScoreAttr (Lead)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>Lead</folder>
+		</column>
+		<column>
+			<name>DataIntegrityScoreCat</name>
+			<title>DataIntegrityScoreCat (Lead)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>Lead</folder>
+		</column>
+
+		<column>
 			<name>TotalScore</name>
 			<title>TotalScore (Lead)</title>
 			<ldmType>FACT</ldmType>
