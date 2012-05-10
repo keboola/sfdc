@@ -42,9 +42,16 @@ class App_Db_Table extends Zend_Db_Table
 	 * @param $idUser
 	 * @return void
 	 */
-	public function deleteCheck()
+	public function deleteCheck($ids=null)
 	{
-		$this->update(array("isDeleted" => 1), array("isDeletedCheck=?" => 1, "Id!=?" => '--empty--'));
+		if ($ids===null)
+		{
+			$this->update(array("isDeleted" => 1), array("isDeletedCheck=?" => 1, "Id!=?" => '--empty--'));
+		}
+		else
+		{
+			$this->update(array("isDeleted" => 0, "isDeletedCheck" => 0), "isDeletedCheck = 1 AND Id IN (" . join(",", $ids) .")");
+		}
 	}
 
 	public function insertOrSet($data)

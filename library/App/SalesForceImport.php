@@ -135,6 +135,9 @@ class App_SalesForceImport
 	 * @return mixed
 	 */
 	private function _query($query, $queryUrl='') {
+
+		NDebugger::timer("query");
+
 		if (!$queryUrl) {
 			$url = "{$this->_user->instanceUrl}/services/data/v24.0/query?q=" . urlencode($query);
 		} else {
@@ -151,6 +154,16 @@ class App_SalesForceImport
 
 		var_dump($url);
 		var_dump(strlen($json_response));
+		$duration = NDebugger::timer("query");
+		var_dump($duration);
+
+		$log = Zend_Registry::get("log");
+		$log->log("SalesForce query finished.", Zend_Log::INFO, array(
+			"query" => $query,
+			"duration" => $duration,
+			"responseLength" => strlen($json_response),
+			"client" => $this->_user->name
+		));
 
 		$response = json_decode($json_response, true);
 
@@ -175,6 +188,16 @@ class App_SalesForceImport
 			$storedIds = array();
 			$recordsHash = array();
 
+			$durations = array(
+				"transformValues" => 0,
+				"getDbRecords" => 0,
+				"compareRecords" => 0,
+				"updateRecords" =>0,
+				"insertRecords" => 0,
+				"count" => $response['totalSize']
+			);
+
+			NDebugger::timer("transformValues");
 			// Transofm values
 			foreach($response['records'] as $key => $record) {
 				unset($record['attributes']);
@@ -182,19 +205,26 @@ class App_SalesForceImport
 				$ids[] = $record["Id"];
 				$idsStrings[] = "'{$record["Id"]}'";
 			}
+			$durations["transformValues"] = NDebugger::timer("transformValues");
 
+
+			NDebugger::timer("getDbRecords");
 			// get all records, if snapshot table, then in
 			$query = "Id IN (" . join(",", $idsStrings) . ")";
 			if ($dbTable->isSnapshotTable()) {
 				$query .= " AND snapshotNumber='{$dbTable->getSnapshotNumber()}'";
 			}
 			$storedRecords = $dbTable->fetchAll($query);
+			$durations["getDbRecords"] = NDebugger::timer("getRecords");
+
+			$dbTable->deleteCheck($idsStrings);
 
 			// Check for updates
 			foreach ($storedRecords as $storedRecord) {
 				$storedIds[] = $storedRecord["Id"];
 				$storedRecordArray = $storedRecord->toArray();
 				$recordModified = false;
+				NDebugger::timer("compareRecords");
 				foreach(array_keys($recordsHash[$storedRecord["Id"]]) as $recordKey) {
 					if ($recordKey != "Id") {
 						if ($storedRecordArray[$recordKey] != $recordsHash[$storedRecord["Id"]][$recordKey]) {
@@ -203,24 +233,43 @@ class App_SalesForceImport
 						}
 					}
 				}
+				$durations["compareRecords"] += NDebugger::timer("compareRecords");
 
 				// Modifications found
 				if ($recordModified) {
+					print "{$storedRecordArray["_id"]} / {$storedRecordArray["Id"]} modified\n";
+					var_dump($storedRecordArray);
+					var_dump($recordsHash[$storedRecord["Id"]]);
+					NDebugger::timer("updateRecords");
 					$row = $dbTable->fetchRow("_id = '{$storedRecordArray["_id"]}'");
 					$row->setFromArray($recordsHash[$storedRecord["Id"]]);
 					if ($row->isChanged() && !$dbTable->isSnapshotTable()) {
 						$row->lastModificationDate = date("Y-m-d");
 					}
+					if (!$dbTable->isSnapshotTable()) {
+						$row->isDeletedCheck = 0;
+						$row->isDeleted = 0;
+					}
+
 					$row->save();
+					$durations["updateRecords"] += NDebugger::timer("updateRecords");
 				}
 			}
 
+			NDebugger::timer("insertRecords");
 			// Insert new records
 			foreach(array_diff($ids, $storedIds) as $missingId) {
 				$data = $recordsHash[$missingId];
 				$data['lastModificationDate'] = date("Y-m-d");
+				if (!$dbTable->isSnapshotTable()) {
+					$data['isDeletedCheck'] = 0;
+					$data['isDeleted'] = 0;
+				}
 				$dbTable->insert($data);
 			}
+			$durations["insertRecords"] += NDebugger::timer("insertRecords");
+
+			var_dump($durations);
 		}
 	}
 
