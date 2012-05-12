@@ -237,9 +237,9 @@ class App_SalesForceImport
 
 				// Modifications found
 				if ($recordModified) {
-					print "{$storedRecordArray["_id"]} / {$storedRecordArray["Id"]} modified\n";
-					var_dump($storedRecordArray);
-					var_dump($recordsHash[$storedRecord["Id"]]);
+					// print "{$storedRecordArray["_id"]} / {$storedRecordArray["Id"]} modified\n";
+					// var_dump($storedRecordArray);
+					// var_dump($recordsHash[$storedRecord["Id"]]);
 					NDebugger::timer("updateRecords");
 					$row = $dbTable->fetchRow("_id = '{$storedRecordArray["_id"]}'");
 					$row->setFromArray($recordsHash[$storedRecord["Id"]]);

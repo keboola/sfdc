@@ -53,6 +53,8 @@ if (!$opts->getOption('id')) {
 			// nastavení db adapteru pro všechny potomky Zend_Db_Table
 			Zend_Db_Table::setDefaultAdapter($dbData);
 
+			NDebugger::timer('account');
+
 			$user->revalidateAccessToken();
 
 			$importConfig = new Zend_Config_Ini(ROOT_PATH . '/gooddata/' . $user->strId . '/config.ini', 'salesforce', Array('allowModifications' => true));
@@ -64,6 +66,10 @@ if (!$opts->getOption('id')) {
 				$user->lastImportDate = date("Y-m-d H:i:s");
 				$user->save();
 			}
+			$duration = NDebugger::timer('account');
+			$log->log("SalesForce Cron Import for user {$user->strId} ({$user->id})", Zend_Log::INFO, array(
+				'duration'	=> $duration
+			));
 
 		} catch(Exception $e) {
 			$debugFile = NDebugger::log($e, NDebugger::ERROR);
