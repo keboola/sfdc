@@ -27,6 +27,7 @@ echo 'Start: '.date('j. n. Y H:i:s', $start)."\n";
 
 $userTable = new Model_BiUser();
 $config = Zend_Registry::get('config');
+$log = Zend_Registry::get('log');
 
 if (!$opts->getOption('id')) {
 	echo $opts->getUsageMessage();
