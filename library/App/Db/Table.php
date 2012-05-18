@@ -34,6 +34,9 @@ class App_Db_Table extends Zend_Db_Table
 	 */
 	public function prepareDeleteCheck()
 	{
+		if ($this->isSnapshotTable()) {
+			return;
+		}
 		$this->update(array("isDeletedCheck" => 1), array('1=?' => 1));
 	}
 
@@ -44,6 +47,10 @@ class App_Db_Table extends Zend_Db_Table
 	 */
 	public function deleteCheck($ids=null)
 	{
+		if ($this->isSnapshotTable()) {
+			return;
+		}
+
 		if ($ids===null)
 		{
 			$this->update(array("isDeleted" => 1), array("isDeletedCheck=?" => 1, "Id!=?" => '--empty--'));
