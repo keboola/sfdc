@@ -11,12 +11,14 @@ $application->bootstrap(array("base", "autoload", "config", "db", "debug"));
 $opts = new Zend_Console_Getopt(array(
 	'id|i=s'	=> 'User ID',
 	'describe|d=s' => 'Describe',
-	'objects|o' => 'List objects'
+	'objects|o' => 'List objects',
+	'query|q=s' => 'Run a SOQL query'
 ));
 $opts->setHelp(array(
 	'i'	=> 'User ID',
 	'd'	=> 'Describe an object',
-	'o'	=> 'List all available objects'
+	'o'	=> 'List all available objects',
+	'q' => 'Run a SOQL query'
 ));
 try {
 	$opts->parse();
@@ -62,6 +64,8 @@ if (!$opts->getOption('id')) {
 			print_r($sf->describe($opts->getOption('describe')));
 		} else if ($opts->getOption("objects")) {
 			print_r($sf->listObjects());
+		} else if ($opts->getOption("query")) {
+			var_dump($sf->runQuery($opts->getOption("query")));
 		} else {
 			echo "No action!\n";
 		}

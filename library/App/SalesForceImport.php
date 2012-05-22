@@ -173,6 +173,27 @@ class App_SalesForceImport
 		return $response;
 	}
 
+	private function _parseRecord($record) {
+		unset($record['attributes']);
+		$result = array();
+		foreach($record as $key => $data) {
+			if ($key == "attributes") {
+				continue;
+			}
+
+			if (is_array($data)) {
+				$data = $this->_parseRecord($data);
+				foreach ($data as $innerKey => $innerData) {
+					$innerKey = $key . '.' . $innerKey;
+					$result[$innerKey] = $innerData;
+				}
+			} else {
+				$result[$key] = $data;
+			}
+		}
+		return $result;
+	}
+
 	/**
 	 * Parse response data and insert into DB
 	 *
@@ -200,11 +221,12 @@ class App_SalesForceImport
 			NDebugger::timer("transformValues");
 			// Transofm values
 			foreach($response['records'] as $key => $record) {
-				unset($record['attributes']);
+				$record = $this->_parseRecord($record);
 				$recordsHash[$record["Id"]] = $this->transformValues($record, $tableConfig);
 				$ids[] = $record["Id"];
 				$idsStrings[] = "'{$record["Id"]}'";
 			}
+
 			$durations["transformValues"] = NDebugger::timer("transformValues");
 
 
@@ -324,6 +346,15 @@ class App_SalesForceImport
 		return $this->_request("/services/data/v23.0/sobjects/");
 	}
 
+	/**
+	 * Run a SOQL query
+	 *
+	 * @return string
+	 */
+	public function runQuery($query) {
+		return $this->_query($query);
+
+	}
 
 
 }
