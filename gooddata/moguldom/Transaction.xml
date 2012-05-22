@@ -73,5 +73,12 @@
 			<dataType>DECIMAL(16,2)</dataType>
 			<folder>SF_Transaction</folder>
 		</column>
+		<column>
+			<name>RunDateNumber</name>
+			<title>RunDateNumber (SF_Transaction)</title>
+			<ldmType>FACT</ldmType>
+			<dataType>INT</dataType>
+			<folder>SF_Transaction</folder>
+		</column>
 	</columns>
 </schema>
