@@ -180,6 +180,12 @@ class App_GoodDataExport
 		if ($this->dumpTable($dataset, false, true) !== false) {
 		    $this->_gd->updateDataset($this->_xmlPath . '/'.$dataset.'.xml', $this->_tmpPath.'/'.$dataset.'.csv', $this->_idUser);
         }
+		if ($this->_exportConfig->tables->$dataset->snapshot)
+		{
+			if ($this->dumpTable($dataset . "Snapshot", false, true) !== false) {
+				$this->_gd->updateDataset($this->_xmlPath . '/'.$dataset.'Snapshot.xml', $this->_tmpPath.'/'.$dataset.'Snapshot.csv', $this->_idUser);
+			}
+		}
 	}
 
 	/**
