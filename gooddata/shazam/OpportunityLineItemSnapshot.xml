@@ -1,0 +1,85 @@
+<schema>
+	<name>OpportunityLineItemSnapshot</name>
+	<title>OpportunityLineItemSnapshot</title>
+	<columns>
+		<column>
+			<name>id</name>
+			<title>Id (OpportunityLineItemSnapshot)</title>
+			<ldmType>CONNECTION_POINT</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>OpportunityLineItemSnapshot</folder>
+		</column>
+		<column>
+			<name>isdeleted</name>
+			<title>isDeleted (OpportunityLineItemSnapshot)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<folder>OpportunityLineItemSnapshot</folder>
+		</column>
+		<column>
+			<name>snapshotNumber</name>
+			<title>snapshotNumber (OpportunityLineItemSnapshot)</title>
+			<ldmType>FACT</ldmType>
+			<dataType>INT</dataType>
+			<folder>OpportunityLineItemSnapshot</folder>
+		</column>
+		<column>
+			<name>snapshotDate</name>
+			<title>snapshotDate (OpportunityLineItemSnapshot)</title>
+			<ldmType>DATE</ldmType>
+			<format>yyyy-MM-dd</format>
+			<schemaReference>SnapshotDate</schemaReference>
+			<folder>OpportunityLineItemSnapshot</folder>
+		</column>
+		<column>
+			<name>OpportunityLineItemId</name>
+			<title>OpportunityLineItemId (OpportunityLineItemSnapshot)</title>
+			<ldmType>REFERENCE</ldmType>
+			<reference>id</reference>
+			<schemaReference>OpportunityLineItem</schemaReference>
+			<folder>OpportunityLineItemSnapshot</folder>
+		</column>
+		<column>
+			<name>opportunityid</name>
+			<title>OpportunityId (OpportunityLineItemSnapshot)</title>
+			<ldmType>REFERENCE</ldmType>
+			<reference>id</reference>
+			<schemaReference>Opportunity</schemaReference>
+			<dataType>VARCHAR(18)</dataType>
+			<folder>OpportunityLineItemSnapshot</folder>
+		</column>
+		<column>
+			<name>currencyisocode</name>
+			<title>CurrencyIsoCode (OpportunityLineItemSnapshot)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(3)</dataType>
+			<folder>OpportunityLineItemSnapshot</folder>
+		</column>
+		<column>
+			<name>quantity</name>
+			<title>Quantity (OpportunityLineItemSnapshot)</title>
+			<ldmType>FACT</ldmType>
+			<dataType>DECIMAL(16,2)</dataType>
+			<folder>OpportunityLineItemSnapshot</folder>
+		</column>
+		<column>
+			<name>unitprice</name>
+			<title>UnitPrice (OpportunityLineItemSnapshot)</title>
+			<ldmType>FACT</ldmType>
+			<dataType>DECIMAL(16,2)</dataType>
+			<folder>OpportunityLineItemSnapshot</folder>
+		</column>
+		<column>
+			<name>totalprice</name>
+			<title>TotalPrice (OpportunityLineItemSnapshot)</title>
+			<ldmType>FACT</ldmType>
+			<dataType>DECIMAL(16,2)</dataType>
+			<folder>OpportunityLineItemSnapshot</folder>
+		</column>
+		<column>
+			<name>hasrevenueschedule</name>
+			<title>HasRevenueSchedule (OpportunityLineItemSnapshot)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<folder>OpportunityLineItemSnapshot</folder>
+		</column>
+	</columns>
+</schema>

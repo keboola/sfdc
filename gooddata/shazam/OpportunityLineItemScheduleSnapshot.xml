@@ -1,0 +1,73 @@
+<schema>
+	<name>OpportunityLineItemScheduleSnapshot</name>
+	<title>OpportunityLineItemScheduleSnapshot</title>
+	<columns>
+		<column>
+			<name>id</name>
+			<title>Id (OpportunityLineItemScheduleSnapshot)</title>
+			<ldmType>CONNECTION_POINT</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>OpportunityLineItemScheduleSnapshot</folder>
+		</column>
+		<column>
+			<name>isdeleted</name>
+			<title>isDeleted (OpportunityLineItemScheduleSnapshot)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<folder>OpportunityLineItemScheduleSnapshot</folder>
+		</column>
+		<column>
+			<name>snapshotNumber</name>
+			<title>snapshotNumber (OpportunityLineItemScheduleSnapshot)</title>
+			<ldmType>FACT</ldmType>
+			<dataType>INT</dataType>
+			<folder>OpportunityLineItemScheduleSnapshot</folder>
+		</column>
+		<column>
+			<name>snapshotDate</name>
+			<title>snapshotDate (OpportunityLineItemScheduleSnapshot)</title>
+			<ldmType>DATE</ldmType>
+			<format>yyyy-MM-dd</format>
+			<schemaReference>SnapshotDate</schemaReference>
+			<folder>OpportunityLineItemScheduleSnapshot</folder>
+		</column>
+		<column>
+			<name>OpportunityLineItemScheduleId</name>
+			<title>OpportunityLineItemScheduleId (OpportunityLineItemScheduleSnapshot)</title>
+			<ldmType>REFERENCE</ldmType>
+			<reference>id</reference>
+			<schemaReference>OpportunityLineItemSchedule</schemaReference>
+			<folder>OpportunityLineItemScheduleSnapshot</folder>
+		</column>		
+		<column>
+			<name>opportunitylineitemi</name>
+			<title>OpportunityLineItemId (OpportunityLineItemScheduleSnapshot)</title>
+			<ldmType>REFERENCE</ldmType>
+			<reference>id</reference>
+			<schemaReference>OpportunityLineItem</schemaReference>
+			<dataType>VARCHAR(18)</dataType>
+			<folder>OpportunityLineItemScheduleSnapshot</folder>
+		</column>
+		<column>
+			<name>currencyisocode</name>
+			<title>CurrencyIsoCode (OpportunityLineItemScheduleSnapshot)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(3)</dataType>
+			<folder>OpportunityLineItemScheduleSnapshot</folder>
+		</column>
+		<column>
+			<name>revenue</name>
+			<title>Revenue (OpportunityLineItemScheduleSnapshot)</title>
+			<ldmType>FACT</ldmType>
+			<dataType>DECIMAL(16,2)</dataType>
+			<folder>OpportunityLineItemScheduleSnapshot</folder>
+		</column>
+		<column>
+			<name>scheduledate</name>
+			<title>ScheduleDate (OpportunityLineItemScheduleSnapshot)</title>
+			<ldmType>DATE</ldmType>
+			<folder>OpportunityLineItemScheduleSnapshot</folder>
+			<format>yyyy-MM-dd</format>
+			<schemaReference>OpportunityLineItemScheduleSnapshotScheduleDate</schemaReference>
+		</column>
+	</columns>
+</schema>

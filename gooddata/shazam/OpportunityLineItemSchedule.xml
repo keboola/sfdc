@@ -6,7 +6,7 @@
 			<name>id</name>
 			<title>Id (OpportunityLineItemSchedule)</title>
 			<ldmType>CONNECTION_POINT</ldmType>
-			<dataType>VARCHAR(18)</dataType>
+			<dataType>VARCHAR(255)</dataType>
 			<folder>OpportunityLineItemSchedule</folder>
 		</column>
 		<column>
