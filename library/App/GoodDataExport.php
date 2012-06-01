@@ -144,7 +144,9 @@ class App_GoodDataExport
 		$file = null;
 		if (!$return)
 			$file = $this->_tmpPath.'/'.$table.'.csv';
-		return $this->dump($sql, $file);
+		$data = $this->dump($sql, $file);
+		return $data;
+
 	}
 
 	/**
