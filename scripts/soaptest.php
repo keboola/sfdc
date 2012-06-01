@@ -7,15 +7,17 @@ require_once 'Zend/Application.php';
 $application = new Zend_Application('application', APPLICATION_PATH . '/configs/application.ini');
 $application->bootstrap(array("base", "autoload", "config", "db", "debug", "log"));
 
-define("USERNAME", "mmgcvj@gooddata.com");
-define("PASSWORD", "g00dd@t@");
-define("SECURITY_TOKEN", "G7O8IvbYZTIbtiNYf8WwYPwe");
+define("USERNAME", "gooddata@hubspot.com");
+define("PASSWORD", "Kebulacek23");
+define("SECURITY_TOKEN", "PSQEInRFXzkaZpYZGRTAmVAb7");
 
 require_once ('library/SalesForce/SforcePartnerClient.php');
 $mySforceConnection = new SforcePartnerClient();
 $mySforceConnection->createConnection("library/SalesForce/partner.wsdl.xml");
 $mySforceConnection->login(USERNAME, PASSWORD.SECURITY_TOKEN);
 
+
+var_dump($mySforceConnection->getDeleted("Contact", "2012-05-02T00:00:00Z", "2012-06-01T00:00:00Z"));
 
 /*
 // Setup console input

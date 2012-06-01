@@ -1,4 +1,5 @@
 <?
+require_once (ROOT_PATH . '/library/SalesForce/SforcePartnerClient.php');
 class App_SalesForceImport
 {
 	private $_user;
@@ -22,10 +23,10 @@ class App_SalesForceImport
 	 * imports all tables
 	 * @return void
 	 */
-	public function importAll()
+	public function importAll($incremental=false)
 	{
 		foreach($this->_sfConfig->tables as $table => $tableConfig) {
-			$this->import($table);
+			$this->import($table, null, $incremental);
 		}
 	}
 
@@ -34,7 +35,7 @@ class App_SalesForceImport
 	 * @param $tableName
 	 * @return bool
 	 */
-	public function import($tableName) {
+	public function import($tableName, $attribute=null, $incremental=false) {
 		if(isset($this->_sfConfig->tables->$tableName)) {
 			$tableConfig = $this->_sfConfig->tables->$tableName;
 
@@ -57,31 +58,72 @@ class App_SalesForceImport
 				throw new Exception("Table {$table} not configured.");
 			}
 
-			$tableClass = "Model_" . $table;
 			$dbTable = new Model_DataTable(null, null, $table);
-			$dbTable->prepareDeleteCheck();
 
-			// Empty record
-			if ($tableConfig->emptyRecord) {
-				$data = array();
+			if ($attribute) {
+				// Request only one attribute
 
-				foreach($tableConfig->emptyRecord as $column => $value) {
-					$data[$column] = $value;
+				$query = "SELECT Id, {$attribute} FROM {$sfTable}";
+				$response = $this->_query($query);
+				$this->_parseAttributeResponse($response, $dbTable, $tableConfig, $attribute, $tableName);
+				// Query more
+				while (isset($response['done']) && $response['done'] === false && $response['nextRecordsUrl'] != '') {
+					$response = $this->_query($query, $response['nextRecordsUrl']);
+					$this->_parseAttributeResponse($response, $dbTable, $tableConfig, $attribute, $tableName);
 				}
-				$data = $this->transformValues($data, $tableConfig);
-				$dbTable->insertOrSet($data);
+
+			} else {
+
+				if ($incremental) {
+
+					$query .= " WHERE LastModifiedDate > " . date("Y-m-d", strtotime("-1 week")) ."T00:00:00Z";
+					$response = $this->_query($query);
+					$this->_parseResponse($response, $dbTable, $tableConfig);
+					// Query more
+					while (isset($response['done']) && $response['done'] === false && $response['nextRecordsUrl'] != '') {
+						$response = $this->_query($query, $response['nextRecordsUrl']);
+						$this->_parseResponse($response, $dbTable, $tableConfig);
+					}
+
+					// get deleted records
+					$deleted = $this->_getDeletedRecords("Contact", $dbTable);
+					if (count($deleted)) {
+						$dbTable->getAdapter()->query("
+							UPDATE {$table}
+							SET
+								lastModificationDate = '" . date("Y-m-d") . "',
+								isDeleted = 1
+							WHERE Id IN ('" . join("','", $deleted) . "')
+						");
+					}
+
+				} else {
+
+					$dbTable->prepareDeleteCheck();
+
+					// Empty record
+					if ($tableConfig->emptyRecord) {
+						$data = array();
+
+						foreach($tableConfig->emptyRecord as $column => $value) {
+							$data[$column] = $value;
+						}
+						$data = $this->transformValues($data, $tableConfig);
+						$dbTable->insertOrSet($data);
+					}
+
+					$response = $this->_query($query);
+					$this->_parseResponse($response, $dbTable, $tableConfig);
+
+					// Query more
+					while (isset($response['done']) && $response['done'] === false && $response['nextRecordsUrl'] != '') {
+						$response = $this->_query($query, $response['nextRecordsUrl']);
+						$this->_parseResponse($response, $dbTable, $tableConfig);
+					}
+
+					$dbTable->deleteCheck();
+				}
 			}
-
-			$response = $this->_query($query);
-			$this->_parseResponse($response, $dbTable, $tableConfig);
-
-			// Query more
-			while (isset($response['done']) && $response['done'] === false && $response['nextRecordsUrl'] != '') {
-				$response = $this->_query($query, $response['nextRecordsUrl']);
-				$this->_parseResponse($response, $dbTable, $tableConfig);
-			}
-
-			$dbTable->deleteCheck();
 
 			if ($tableConfig->snapshot) {
 				$dbTable->createSnapshot($this->_snapshotNumber);
@@ -229,7 +271,6 @@ class App_SalesForceImport
 
 			$durations["transformValues"] = NDebugger::timer("transformValues");
 
-
 			NDebugger::timer("getDbRecords");
 			// get all records, if snapshot table, then in
 			$query = "Id IN (" . join(",", $idsStrings) . ")";
@@ -296,6 +337,45 @@ class App_SalesForceImport
 	}
 
 	/**
+	 * Parse response data and insert into DB, just one selected attribute
+	 *
+	 * @param $response
+	 * @param $dbTable
+	 * @param $tableConfig
+	 */
+	private function _parseAttributeResponse($response, $dbTable, $tableConfig, $attribute, $tableName)
+	{
+		if ($response['totalSize'] > 0) {
+			$recordsHash = array();
+
+			$durations = array(
+				"transformValues" => 0,
+				"updateRecords" =>0,
+				"count" => $response['totalSize']
+			);
+
+			if ($tableConfig->importQueryColumnAlias->$attribute) {
+				$attribute = $tableConfig->importQueryColumnAlias->$attribute;
+			}
+
+			// Transofm values
+			foreach($response['records'] as $key => $record) {
+				NDebugger::timer("transformValues");
+				$record = $this->_parseRecord($record);
+				$recordsHash[$record["Id"]] = $this->transformValues($record, $tableConfig);
+				$durations["transformValues"] += NDebugger::timer("transformValues");
+
+				NDebugger::timer("updateRecords");
+				// Direct update query to DB
+				$dbTable->getAdapter()->query("UPDATE {$tableName} SET {$attribute} = '?' WHERE Id = '{$record["Id"]}'", array($record[$attribute]));
+				$durations["updateRecords"] += NDebugger::timer("updateRecords");
+
+			}
+			var_dump($durations);
+		}
+	}
+
+	/**
 	 *
 	 * Simple request to API, does not handle paging
 	 *
@@ -323,6 +403,31 @@ class App_SalesForceImport
 			throw new Exception($response[0]['errorCode'] . ': '. $response[0]['message']);
 		}
 		return $response;
+
+	}
+
+	/**
+	 *
+	 * Returns deleted records in last 30 days
+	 *
+	 * @param $entity
+	 * @param Zend_Db_Table_Abstract $dbTable
+	 * @return array
+	 */
+	private function _getDeletedRecords($entity, Zend_Db_Table_Abstract $dbTable) {
+		$config = Zend_Registry::get("config");
+		$sfc = new SforcePartnerClient();
+		$sfc->createConnection("library/SalesForce/partner.wsdl.xml");
+		$passSecret = $dbTable->getAdapter()->fetchOne("SELECT AES_DECRYPT(?, ?)", array($this->_user->passSecret, $config->app->salt));
+		$sfc->login($this->_user->username, $passSecret);
+		$records = $sfc->getDeleted($entity, date("Y-m-d", strtotime("-29 day")) . "T00:00:00Z", date("Y-m-d", strtotime("+1 day")) . "T00:00:00Z");
+		$ids = array();
+		if (isset($records->deletedRecords)) {
+			foreach($records->deletedRecords as $deletedRecord) {
+				$ids[] = $deletedRecord->id;
+			}
+		}
+		return $ids;
 
 	}
 

@@ -9,11 +9,15 @@ $application->bootstrap(array("base", "autoload", "config", "db", "debug", "log"
 // Setup console input
 $opts = new Zend_Console_Getopt(array(
 	'id|i=s'	=> 'Id of user',
-	'table|t=s' => 'Table'
+	'table|t=s' => 'Table',
+	'attribute|a=s' => 'Attribute',
+	'incremental|n-i' => 'Incremental update'
 ));
 $opts->setHelp(array(
 	'i'	=> 'Id of user',
-	't'	=> 'Table to import'
+	't'	=> 'Table to import',
+	'a' => 'Attribute to import',
+	'n' => 'Incremental import'
 ));
 try {
 	$opts->parse();
@@ -61,9 +65,9 @@ if (!$opts->getOption('id')) {
 			$importConfig = new Zend_Config_Ini(ROOT_PATH . '/gooddata/' . $user->strId . '/config.ini', 'salesforce', Array('allowModifications' => true));
 			$import = new App_SalesForceImport($user, $importConfig);
 			if($opts->getOption('table')) {
-				$import->import($opts->getOption('table'));
+				$import->import($opts->getOption('table'), $opts->getOption('attribute'), $opts->getOption('incremental'));
 			} else {
-				$import->importAll();
+				$import->importAll($opts->getOption('incremental'));
 				$user->lastImportDate = date("Y-m-d H:i:s");
 				$user->save();
 			}
