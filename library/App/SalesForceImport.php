@@ -362,12 +362,13 @@ class App_SalesForceImport
 			foreach($response['records'] as $key => $record) {
 				NDebugger::timer("transformValues");
 				$record = $this->_parseRecord($record);
-				$recordsHash[$record["Id"]] = $this->transformValues($record, $tableConfig);
+				$transformedRecord  = $this->transformValues($record, $tableConfig);
+				$recordsHash[$record["Id"]] = $transformedRecord;
 				$durations["transformValues"] += NDebugger::timer("transformValues");
 
 				NDebugger::timer("updateRecords");
 				// Direct update query to DB
-				$dbTable->getAdapter()->query("UPDATE {$tableName} SET {$attribute} = '?' WHERE Id = '{$record["Id"]}'", array($record[$attribute]));
+				$dbTable->getAdapter()->query("UPDATE {$tableName} SET {$attribute} = ? WHERE Id = '{$record["Id"]}'", array($transformedRecord[$attribute]));
 				$durations["updateRecords"] += NDebugger::timer("updateRecords");
 
 			}

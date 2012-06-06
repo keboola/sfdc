@@ -46,5 +46,26 @@
 			<format>yyyy-MM-dd</format>
 			<schemaReference>OpportunityLineItemScheduleScheduleDate</schemaReference>
 		</column>
+		<column>
+			<name>stagename</name>
+			<title>StageName (OpportunityLineItemSchedule)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>VARCHAR(255)</dataType>
+			<folder>OpportunityLineItemSchedule</folder>
+		</column>
+		<column>
+			<name>stagesortorder</name>
+			<title>StageSortOrder (OpportunityLineItemSchedule)</title>
+			<ldmType>LABEL</ldmType>
+			<dataType>INT</dataType>
+			<reference>stagename</reference>
+			<folder>OpportunityLineItemSchedule</folder>
+		</column>
+		<column>
+			<name>probability</name>
+			<title>Probability (OpportunityLineItemSchedule)</title>
+			<ldmType>FACT</ldmType>
+			<folder>OpportunityLineItemSchedule</folder>
+		</column>
 	</columns>
 </schema>
