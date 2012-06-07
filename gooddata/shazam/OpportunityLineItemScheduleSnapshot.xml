@@ -90,5 +90,12 @@
 			<ldmType>FACT</ldmType>
 			<folder>OpportunityLineItemScheduleSnapshot</folder>
 		</column>
+		<column>
+			<name>probability_attr</name>
+			<title>Probability Attr (OpportunityLineItemScheduleSnapshot)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>OpportunityLineItemScheduleSnapshot</folder>
+		</column>
 	</columns>
 </schema>

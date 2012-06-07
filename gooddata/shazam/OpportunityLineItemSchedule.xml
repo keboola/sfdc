@@ -67,5 +67,12 @@
 			<ldmType>FACT</ldmType>
 			<folder>OpportunityLineItemSchedule</folder>
 		</column>
+		<column>
+			<name>probability_attr</name>
+			<title>Probability Attr (OpportunityLineItemSchedule)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>OpportunityLineItemSchedule</folder>
+		</column>
 	</columns>
 </schema>

@@ -196,5 +196,12 @@
 			<dataType>VARCHAR(255)</dataType>
 			<folder>OpportunitySnapshot</folder>
 		</column>
+		<column>
+			<name>probability_attr</name>
+			<title>Probability Attr (OpportunitySnapshot)</title>
+			<ldmType>ATTRIBUTE</ldmType>
+			<dataType>INT</dataType>
+			<folder>OpportunitySnapshot</folder>
+		</column>
     </columns>
 </schema>
