@@ -94,7 +94,7 @@ foreach($usersQuery as $user) {
 		try {
 			$user->revalidateAccessToken();
 			$import = new App_SalesForceImport($user, $importExportConfig);
-			$import->importAll();
+			$import->importAll($user->incrementalImport);
 			print "Importing done\n";
 			$duration = NDebugger::timer('account');
 			$user->lastImportDate = date("Y-m-d H:i:s");
