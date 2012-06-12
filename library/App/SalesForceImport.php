@@ -418,7 +418,7 @@ class App_SalesForceImport
 	private function _getDeletedRecords($entity, Zend_Db_Table_Abstract $dbTable) {
 		$config = Zend_Registry::get("config");
 		$sfc = new SforcePartnerClient();
-		$sfc->createConnection("library/SalesForce/partner.wsdl.xml");
+		$sfc->createConnection(ROOT_PATH . "/library/SalesForce/partner.wsdl.xml");
 		$passSecret = $dbTable->getAdapter()->fetchOne("SELECT AES_DECRYPT(?, ?)", array($this->_user->passSecret, $config->app->salt));
 		$sfc->login($this->_user->username, $passSecret);
 		$records = $sfc->getDeleted($entity, date("Y-m-d", strtotime("-29 day")) . "T00:00:00Z", date("Y-m-d", strtotime("+1 day")) . "T00:00:00Z");
