@@ -368,7 +368,7 @@ class App_SalesForceImport
 
 				NDebugger::timer("updateRecords");
 				// Direct update query to DB
-				$dbTable->getAdapter()->query("UPDATE {$tableName} SET {$attribute} = ? WHERE Id = '{$record["Id"]}'", array($transformedRecord[$attribute]));
+				$dbTable->getAdapter()->query("UPDATE {$tableName} SET {$attribute} = ?, lastModificationDate = ? WHERE Id = '{$record["Id"]}'", array($transformedRecord[$attribute], date("Y-m-d")));
 				$durations["updateRecords"] += NDebugger::timer("updateRecords");
 
 			}
