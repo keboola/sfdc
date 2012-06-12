@@ -30,12 +30,24 @@ class Model_DataTable extends App_Db_Table
 	{
 		$items = $this->fetchAll();
 		$snapshotTable = new Model_DataTableSnapshot(null, null, $this->_name);
+
+		// Fill missing snapshots
+		$snapshotNumbers = array();
+		$lastSnapshot = $snapshotTable->getAdapter()->fetchOne("SELECT MAX(snapshotNumber)+1 FROM {$this->_name}Snapshot");
+		while ($lastSnapshot < $snapshotNumber) {
+			$snapshotNumbers[] = $lastSnapshot;
+			$lastSnapshot++;
+		}
+		$snapshotNumbers[] = $snapshotNumber;
+
 		foreach ($items as $item) {
 			$data = $item->toArray();
 			unset($data['_id']);
 			unset($data['isDeletedCheck']);
-			$data['snapshotNumber'] = $snapshotNumber;
-			$snapshotTable->insertOrSet($data);
+			foreach($snapshotNumbers as $snapshotNumber) {
+				$data['snapshotNumber'] = $snapshotNumber;
+				$snapshotTable->insertOrSet($data);
+			}
 		}
 	}
 
