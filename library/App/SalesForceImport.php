@@ -6,6 +6,12 @@ class App_SalesForceImport
 
 	private $_sfConfig;
 
+	private $_csvDelimiter = ",";
+
+	private $_csvEnclosure = '"';
+
+	public $tmpDir = "/tmp/";
+
 	/**
 	 * @param $idUser
 	 */
@@ -14,8 +20,7 @@ class App_SalesForceImport
 		$this->_user = $user;
 		$this->_sfConfig = $sfConfig;
 		$this->_registry = Zend_Registry::getInstance();
-		$snapshotTable = new Model_BiSnapshot();
-		$this->_snapshotNumber = $snapshotTable->getSnapshotNumber();
+		$this->_snapshotNumber = time();
 	}
 
 
@@ -23,148 +28,122 @@ class App_SalesForceImport
 	 * imports all tables
 	 * @return void
 	 */
-	public function importAll($incremental=false)
+	public function importAll()
 	{
-		foreach($this->_sfConfig->tables as $table => $tableConfig) {
-			$this->import($table, null, $incremental);
+		foreach($this->_sfConfig->objects as $objectConfig) {
+			$this->importQuery($objectConfig->query, $objectConfig->storageApiTable, $objectConfig->incremental);
 		}
 	}
 
 	/**
-	 * imports one table
-	 * @param $tableName
-	 * @return bool
+	 *
+	 * imports
+	 *
+	 * @param $query
+	 * @param $fileName
+	 * @param bool $incremental
+	 * @throws Exception
 	 */
-	public function import($tableName, $attribute=null, $incremental=false) {
-		if(isset($this->_sfConfig->tables->$tableName)) {
-			$tableConfig = $this->_sfConfig->tables->$tableName;
+	public function importQuery($query, $outputDataset, $incremental=false) {
 
-			$table = $tableName;
-			$sfTable = $tableName;
+		$fileName = $this->tmpDir . $outputDataset . ".csv";
+		$file = fopen($fileName, "w");
+		if (!$file) {
+			throw new Exception("Cannot open file '" . $fileName . "' for writing.");
+		}
 
-			// Custom Table Name in SalesForce
-			if ($tableConfig->sfTableName) {
-				$sfTable  = $tableConfig->sfTableName;
-			}
-
-			$query = '';
-			if (isset($tableConfig->importQuery)) {
-				$query = $tableConfig->importQuery;
-			}
-			if (isset($tableConfig->importQueryColumns) && count($tableConfig->importQueryColumns->toArray())) {
-				$query = "SELECT " . join(",", $tableConfig->importQueryColumns->toArray()) . " FROM {$sfTable}";
-			}
-			if (!$query) {
-				throw new Exception("Table {$table} not configured.");
-			}
-
-			$dbTable = new Model_DataTable(null, null, $table);
-
-			if ($attribute) {
-				// Request only one attribute
-
-				$query = "SELECT Id, {$attribute} FROM {$sfTable}";
-				$response = $this->_query($query);
-				$this->_parseAttributeResponse($response, $dbTable, $tableConfig, $attribute, $tableName);
-				// Query more
-				while (isset($response['done']) && $response['done'] === false && $response['nextRecordsUrl'] != '') {
-					$response = $this->_query($query, $response['nextRecordsUrl']);
-					$this->_parseAttributeResponse($response, $dbTable, $tableConfig, $attribute, $tableName);
-				}
-
+		if ($incremental) {
+			if (strpos($query, "WHERE") !== false ) {
+				$query .= " AND ";
 			} else {
+				$query .= " WHERE ";
+			}
+			$query .= " LastModifiedDate > " . date("Y-m-d", strtotime("-1 week")) ."T00:00:00Z";
+		}
 
-				if ($incremental) {
+		$response = $this->_query($query);
+		$headers = $this->_getHeaders($response);
+		$this->_writeCsv($file, array($headers));
 
-					$query .= " WHERE LastModifiedDate > " . date("Y-m-d", strtotime("-1 week")) ."T00:00:00Z";
-					$response = $this->_query($query);
-					$this->_parseResponse($response, $dbTable, $tableConfig);
-					// Query more
-					while (isset($response['done']) && $response['done'] === false && $response['nextRecordsUrl'] != '') {
-						$response = $this->_query($query, $response['nextRecordsUrl']);
-						$this->_parseResponse($response, $dbTable, $tableConfig);
-					}
+		$records = $this->_parseRecords($response);
+		$this->_writeCsv($file, $records);
 
-					// get deleted records
-					$deleted = $this->_getDeletedRecords("Contact", $dbTable);
-					if (count($deleted)) {
-						$dbTable->getAdapter()->query("
-							UPDATE {$table}
-							SET
-								lastModificationDate = '" . date("Y-m-d") . "',
-								isDeleted = 1
-							WHERE Id IN ('" . join("','", $deleted) . "')
-						");
-					}
+		// Query for more
+		while (isset($response['done']) && $response['done'] === false && $response['nextRecordsUrl'] != '') {
+			$response = $this->_query($query, $response['nextRecordsUrl']);
+			$records = $this->_parseRecords($response);
+			$this->_writeCsv($file, $records);
+		}
 
-				} else {
+		fclose($file);
 
-					$dbTable->prepareDeleteCheck();
+		//get deleted records
+		if ($incremental) {
 
-					// Empty record
-					if ($tableConfig->emptyRecord) {
-						$data = array();
+			$fileName = $this->tmpDir . $outputDataset . ".deleted.csv";
+			$file = fopen($fileName, "w");
+			if (!$file) {
+				throw new Exception("Cannot open file '" . $fileName . "' for writing.");
+			}
 
-						foreach($tableConfig->emptyRecord as $column => $value) {
-							$data[$column] = $value;
-						}
-						$data = $this->transformValues($data, $tableConfig);
-						$dbTable->insertOrSet($data);
-					}
+			$deletedArray = array(array("Id", "isDeleted"));
 
-					$response = $this->_query($query);
-					$this->_parseResponse($response, $dbTable, $tableConfig);
+			$matches = array();
+			preg_match('/FROM (\w*)/', $query, $matches);
 
-					// Query more
-					while (isset($response['done']) && $response['done'] === false && $response['nextRecordsUrl'] != '') {
-						$response = $this->_query($query, $response['nextRecordsUrl']);
-						$this->_parseResponse($response, $dbTable, $tableConfig);
-					}
+			// get deleted records
+			$deleted = $this->_getDeletedRecords($matches[1]);
 
-					$dbTable->deleteCheck();
+			if (count($deleted)) {
+				foreach($deleted as $deletedItem) {
+					$deletedArray[] = array($deletedItem, 1);
 				}
 			}
 
-			if ($tableConfig->snapshot) {
-				$dbTable->createSnapshot($this->_snapshotNumber);
-			}
+			$this->_writeCsv($file, $deletedArray);
+			fclose($file);
 		}
 	}
 
 	/**
-	 * sets empty values, transforms desired columns
-	 * @param $record
-	 * @param $tableConfig
+	 *
+	 * Writes to CSV
+	 *
+	 * @param $file
+	 * @param $data array of records
+	 */
+	private function _writeCsv($file, $data) {
+		foreach ($data as $line) {
+			fputcsv($file, $line, $this->_csvDelimiter, $this->_csvEnclosure);
+		}
+	}
+
+	/**
+	 *
+	 * Returns column names
+	 *
+	 * @param $response
 	 * @return array
 	 */
-	public function transformValues($record, $tableConfig) {
-		// Column aliases
-		if (isset($tableConfig->importQueryColumnAlias)) {
-			foreach($tableConfig->importQueryColumnAlias as $source => $destination) {
-				$record[$destination] = $record[$source];
-				unset($record[$source]);
-			}
-		}
+	private function _getHeaders($response) {
+		$firstRecord = $this->_parseRecord($response["records"][0]);
+		return array_keys($firstRecord);
+	}
 
-		// Empty values
-		if (isset($tableConfig->emptyColumn)) {
-			foreach($tableConfig->emptyColumn as $emptyColumnName => $emptyColumnValue) {
-				if (!isset($record[$emptyColumnName]) || $record[$emptyColumnName] === null) {
-					$record[$emptyColumnName] = $emptyColumnValue;
-				}
-			}
+	/**
+	 *
+	 * Flattens the result to a single line for each record (used when joining objects)
+	 *
+	 * @param $response
+	 * @return array
+	 */
+	private function _parseRecords($response) {
+		$records = array();
+		foreach($response['records'] as $record) {
+			$record = $this->_parseRecord($record);
+			$records[] = $record;
 		}
-
-		// Value transformation
-		if (isset($tableConfig->columnTransformation)) {
-			foreach($tableConfig->columnTransformation as $columnName => $columnTransformation) {
-				if ($columnTransformation == 'timeToDate') {
-					$dateParts = explode("T", $record[$columnName]);
-					$record[$columnName] = $dateParts[0];
-				}
-			}
-		}
-		return $record;
+		return $records;
 	}
 
 	/**
@@ -215,6 +194,13 @@ class App_SalesForceImport
 		return $response;
 	}
 
+	/**
+	 *
+	 * Flattens one record to a single line - useful when joining tables
+	 *
+	 * @param $record
+	 * @return array
+	 */
 	private function _parseRecord($record) {
 		unset($record['attributes']);
 		$result = array();
@@ -234,146 +220,6 @@ class App_SalesForceImport
 			}
 		}
 		return $result;
-	}
-
-	/**
-	 * Parse response data and insert into DB
-	 *
-	 * @param $response
-	 * @param $dbTable
-	 * @param $tableConfig
-	 */
-	private function _parseResponse($response, $dbTable, $tableConfig)
-	{
-		if ($response['totalSize'] > 0) {
-			$ids = array();
-			$idsStrings = array();
-			$storedIds = array();
-			$recordsHash = array();
-
-			$durations = array(
-				"transformValues" => 0,
-				"getDbRecords" => 0,
-				"compareRecords" => 0,
-				"updateRecords" =>0,
-				"insertRecords" => 0,
-				"count" => $response['totalSize']
-			);
-
-			NDebugger::timer("transformValues");
-			// Transofm values
-			foreach($response['records'] as $key => $record) {
-				$record = $this->_parseRecord($record);
-				$recordsHash[$record["Id"]] = $this->transformValues($record, $tableConfig);
-				$ids[] = $record["Id"];
-				$idsStrings[] = "'{$record["Id"]}'";
-			}
-
-			$durations["transformValues"] = NDebugger::timer("transformValues");
-
-			NDebugger::timer("getDbRecords");
-			// get all records, if snapshot table, then in
-			$query = "Id IN (" . join(",", $idsStrings) . ")";
-			if ($dbTable->isSnapshotTable()) {
-				$query .= " AND snapshotNumber='{$dbTable->getSnapshotNumber()}'";
-			}
-			$storedRecords = $dbTable->fetchAll($query);
-			$durations["getDbRecords"] = NDebugger::timer("getRecords");
-
-			$dbTable->deleteCheck($idsStrings);
-
-			// Check for updates
-			foreach ($storedRecords as $storedRecord) {
-				$storedIds[] = $storedRecord["Id"];
-				$storedRecordArray = $storedRecord->toArray();
-				$recordModified = false;
-				NDebugger::timer("compareRecords");
-				foreach(array_keys($recordsHash[$storedRecord["Id"]]) as $recordKey) {
-					if ($recordKey != "Id") {
-						if ($storedRecordArray[$recordKey] != $recordsHash[$storedRecord["Id"]][$recordKey]) {
-							$recordModified = true;
-							continue;
-						}
-					}
-				}
-				$durations["compareRecords"] += NDebugger::timer("compareRecords");
-
-				// Modifications found
-				if ($recordModified) {
-					// print "{$storedRecordArray["_id"]} / {$storedRecordArray["Id"]} modified\n";
-					// var_dump($storedRecordArray);
-					// var_dump($recordsHash[$storedRecord["Id"]]);
-					NDebugger::timer("updateRecords");
-					$row = $dbTable->fetchRow("_id = '{$storedRecordArray["_id"]}'");
-					$row->setFromArray($recordsHash[$storedRecord["Id"]]);
-					if ($row->isChanged() && !$dbTable->isSnapshotTable()) {
-						$row->lastModificationDate = date("Y-m-d");
-					}
-					if (!$dbTable->isSnapshotTable()) {
-						$row->isDeletedCheck = 0;
-						$row->isDeleted = 0;
-					}
-
-					$row->save();
-					$durations["updateRecords"] += NDebugger::timer("updateRecords");
-				}
-			}
-
-			NDebugger::timer("insertRecords");
-			// Insert new records
-			foreach(array_diff($ids, $storedIds) as $missingId) {
-				$data = $recordsHash[$missingId];
-				$data['lastModificationDate'] = date("Y-m-d");
-				if (!$dbTable->isSnapshotTable()) {
-					$data['isDeletedCheck'] = 0;
-					$data['isDeleted'] = 0;
-				}
-				$dbTable->insert($data);
-			}
-			$durations["insertRecords"] += NDebugger::timer("insertRecords");
-
-			var_dump($durations);
-		}
-	}
-
-	/**
-	 * Parse response data and insert into DB, just one selected attribute
-	 *
-	 * @param $response
-	 * @param $dbTable
-	 * @param $tableConfig
-	 */
-	private function _parseAttributeResponse($response, $dbTable, $tableConfig, $attribute, $tableName)
-	{
-		if ($response['totalSize'] > 0) {
-			$recordsHash = array();
-
-			$durations = array(
-				"transformValues" => 0,
-				"updateRecords" =>0,
-				"count" => $response['totalSize']
-			);
-
-			if ($tableConfig->importQueryColumnAlias->$attribute) {
-				$attribute = $tableConfig->importQueryColumnAlias->$attribute;
-			}
-
-			// Transofm values
-			foreach($response['records'] as $key => $record) {
-				NDebugger::timer("transformValues");
-				$record = $this->_parseRecord($record);
-				$transformedRecord  = $this->transformValues($record, $tableConfig);
-				$recordsHash[$record["Id"]] = $transformedRecord;
-				$durations["transformValues"] += NDebugger::timer("transformValues");
-
-				NDebugger::timer("updateRecords");
-				// Direct update query to DB
-				$dbTable->getAdapter()->query("UPDATE {$tableName} SET {$attribute} = ?, lastModificationDate = ? WHERE Id = '{$record["Id"]}'", array($transformedRecord[$attribute], date("Y-m-d")));
-				$durations["updateRecords"] += NDebugger::timer("updateRecords");
-
-			}
-			var_dump($durations);
-		}
 	}
 
 	/**
@@ -415,11 +261,12 @@ class App_SalesForceImport
 	 * @param Zend_Db_Table_Abstract $dbTable
 	 * @return array
 	 */
-	private function _getDeletedRecords($entity, Zend_Db_Table_Abstract $dbTable) {
+	private function _getDeletedRecords($entity) {
 		$config = Zend_Registry::get("config");
 		$sfc = new SforcePartnerClient();
 		$sfc->createConnection(ROOT_PATH . "/library/SalesForce/partner.wsdl.xml");
-		$passSecret = $dbTable->getAdapter()->fetchOne("SELECT AES_DECRYPT(?, ?)", array($this->_user->passSecret, $config->app->salt));
+		$db = Zend_Registry::get("db");
+		$passSecret = $db->fetchOne("SELECT AES_DECRYPT(?, ?)", array($this->_user->passSecret, $config->app->salt));
 		$sfc->login($this->_user->username, $passSecret);
 		$records = $sfc->getDeleted($entity, date("Y-m-d", strtotime("-29 day")) . "T00:00:00Z", date("Y-m-d", strtotime("+1 day")) . "T00:00:00Z");
 		$ids = array();
@@ -429,7 +276,6 @@ class App_SalesForceImport
 			}
 		}
 		return $ids;
-
 	}
 
 	/**
@@ -461,6 +307,4 @@ class App_SalesForceImport
 		return $this->_query($query);
 
 	}
-
-
 }

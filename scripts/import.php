@@ -9,15 +9,15 @@ $application->bootstrap(array("base", "autoload", "config", "db", "debug", "log"
 // Setup console input
 $opts = new Zend_Console_Getopt(array(
 	'id|i=s'	=> 'Id of user',
-	'table|t=s' => 'Table',
-	'attribute|a=s' => 'Attribute',
-	'incremental|n-i' => 'Incremental update'
+	'query|q=s' => 'SOQL Query',
+	'table|t=s' => 'Storage API table',
+	'incremental|c-i' => 'Incremental',
 ));
 $opts->setHelp(array(
 	'i'	=> 'Id of user',
-	't'	=> 'Table to import',
-	'a' => 'Attribute to import',
-	'n' => 'Incremental import'
+	'q'	=> 'Custom SOQL Query',
+	't'	=> 'Storage API table',
+	'c' => 'Incremental query',
 ));
 try {
 	$opts->parse();
@@ -43,29 +43,36 @@ if (!$opts->getOption('id')) {
 
 		try {
 
-			// connect do db
-			$dbData = Zend_Db::factory('pdo_mysql', array(
-				'host'		=> $config->db->host,
-				'username'	=> $config->db->login,
-				'password'	=> $config->db->password,
-				'dbname'	=> $user->dbName
-			));
-
-			// test připojení k db
-			$dbData->getConnection();
-			$dbData->query('SET NAMES utf8');
-
-			// nastavení db adapteru pro všechny potomky Zend_Db_Table
-			Zend_Db_Table::setDefaultAdapter($dbData);
-
 			NDebugger::timer('account');
 
 			$user->revalidateAccessToken();
+			if (!$user->config) {
+				throw new Exception("Missing configuration for user " . $user->strId);
+			}
 
-			$importConfig = new Zend_Config_Ini(ROOT_PATH . '/gooddata/' . $user->strId . '/config.ini', 'salesforce', Array('allowModifications' => true));
+			$importConfig = Zend_Json::decode($user->config, Zend_Json::TYPE_OBJECT);
 			$import = new App_SalesForceImport($user, $importConfig);
-			if($opts->getOption('table')) {
-				$import->import($opts->getOption('table'), $opts->getOption('attribute'), $opts->getOption('incremental'));
+
+			$tmpDir = ROOT_PATH . "/tmp/" . $user->strId . "/";
+			if (!file_exists($tmpDir)) {
+				mkdir($tmpDir);
+			}
+			if (!is_dir($tmpDir)) {
+				throw new Exception("Temporary directory path is not a directory.");
+			}
+			$import->tmpDir = $tmpDir;
+
+			if($opts->getOption('query')) {
+				$dataset = "query";
+				if ($opts->getOption('dataset')) {
+					$dataset = $opts->getOption('dataset');
+				}
+				// Download Data
+				$import->importQuery($opts->getOption('query'), "query", $opts->getOption('incremental'));
+				// Upload to Storage API
+				if ($opts->getOption('dataset')) {
+
+				}
 			} else {
 				$import->importAll($opts->getOption('incremental'));
 				$user->lastImportDate = date("Y-m-d H:i:s");
