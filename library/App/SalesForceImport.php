@@ -44,9 +44,9 @@ class App_SalesForceImport
 	 * @param bool $incremental
 	 * @throws Exception
 	 */
-	public function importQuery($query, $outputDataset, $incremental=false) {
+	public function importQuery($query, $outputTable, $incremental=false) {
 
-		$fileName = $this->tmpDir . $outputDataset . ".csv";
+		$fileName = $this->tmpDir . $outputTable . ".csv";
 		$file = fopen($fileName, "w");
 		if (!$file) {
 			throw new Exception("Cannot open file '" . $fileName . "' for writing.");
@@ -80,7 +80,7 @@ class App_SalesForceImport
 		//get deleted records
 		if ($incremental) {
 
-			$fileName = $this->tmpDir . $outputDataset . ".deleted.csv";
+			$fileName = $this->tmpDir . $outputTable . ".deleted.csv";
 			$file = fopen($fileName, "w");
 			if (!$file) {
 				throw new Exception("Cannot open file '" . $fileName . "' for writing.");
