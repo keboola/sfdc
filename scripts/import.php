@@ -9,15 +9,17 @@ $application->bootstrap(array("base", "autoload", "config", "db", "debug", "log"
 // Setup console input
 $opts = new Zend_Console_Getopt(array(
 	'id|i=s'	=> 'Id of user',
-	'query|q=s' => 'SOQL Query',
-	'table|t=s' => 'Storage API table',
-	'incremental|c-i' => 'Incremental',
+	//'query|q=s' => 'SOQL Query',
+	//'table|t=s' => 'Storage API table',
+	//'incremental|c-i' => 'Incremental',
+	'clean|c-i' => "Delete all tables before loading and recreate them"
 ));
 $opts->setHelp(array(
 	'i'	=> 'Id of user',
-	'q'	=> 'Custom SOQL Query',
-	't'	=> 'Storage API table',
-	'c' => 'Incremental query',
+	//'q'	=> 'Custom SOQL Query',
+	//'t'	=> 'Storage API table',
+	//'c' => 'Incremental query',
+	'c' => 'Cleanup',
 ));
 try {
 	$opts->parse();
@@ -42,16 +44,19 @@ if (!$opts->getOption('id')) {
 	if ($user) {
 
 		try {
-
+			//App_StorageApi::setDebug(true);
+			App_StorageApi::setLogger(function($message, $data) use($log) {
+				$log->log($message, Zend_Log::INFO, $data);
+			});
 			NDebugger::timer('account');
 
 			$user->revalidateAccessToken();
-			if (!$user->config) {
+			if (!$user->sfdcConfig) {
 				throw new Exception("Missing configuration for user " . $user->strId);
 			}
 
-			$importConfig = Zend_Json::decode($user->config, Zend_Json::TYPE_OBJECT);
-			$import = new App_SalesForceImport($user, $importConfig);
+			$importConfig = Zend_Json::decode($user->sfdcConfig, Zend_Json::TYPE_OBJECT);
+			$sfdc = new App_SalesForceImport($user, $importConfig);
 
 			$tmpDir = ROOT_PATH . "/tmp/" . $user->strId . "/";
 			if (!file_exists($tmpDir)) {
@@ -60,8 +65,8 @@ if (!$opts->getOption('id')) {
 			if (!is_dir($tmpDir)) {
 				throw new Exception("Temporary directory path is not a directory.");
 			}
-			$import->tmpDir = $tmpDir;
-
+			$sfdc->tmpDir = $tmpDir;
+			/*
 			if($opts->getOption('query')) {
 				$dataset = "query";
 				if ($opts->getOption('dataset')) {
@@ -74,10 +79,17 @@ if (!$opts->getOption('id')) {
 
 				}
 			} else {
-				$import->importAll($opts->getOption('incremental'));
-				$user->lastImportDate = date("Y-m-d H:i:s");
-				$user->save();
+			*/
+
+			if ($opts->getOption('clean')) {
+				$sfdc->dropAll();
 			}
+
+			$sfdc->importAll();
+
+			$user->sfdcLastImportDate = date("Y-m-d H:i:s");
+			$user->save();
+			// }
 			$duration = NDebugger::timer('account');
 			$log->log("SalesForce Cron Import for user {$user->strId} ({$user->id})", Zend_Log::INFO, array(
 				'duration'	=> $duration

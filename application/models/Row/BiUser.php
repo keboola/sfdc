@@ -14,15 +14,15 @@ class Model_Row_BiUser extends Zend_Db_Table_Row_Abstract
 		$url = $registry->config->salesForce->loginUri . "/services/oauth2/token";
 
 		$clientId = $registry->config->salesForce->clientId;
-		if($this->clientId) {
-			$clientId = $this->clientId;
+		if($this->sfdcClientId) {
+			$clientId = $this->sfdcClientId;
 		}
 		$clientSecret = $registry->config->salesForce->clientSecret;
-		if($this->clientSecret) {
-			$clientSecret = $this->clientSecret;
+		if($this->sfdcClientSecret) {
+			$clientSecret = $this->sfdcClientSecret;
 		}
 
-		$params = "grant_type=refresh_token&client_id=" . $clientId . "&client_secret=" . $clientSecret . "&refresh_token=" . $this->refreshToken;
+		$params = "grant_type=refresh_token&client_id=" . $clientId . "&client_secret=" . $clientSecret . "&refresh_token=" . $this->sfdcRefreshToken;
 
 		$curl = curl_init($url);
 
@@ -30,7 +30,7 @@ class Model_Row_BiUser extends Zend_Db_Table_Row_Abstract
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($curl, CURLOPT_POST, true);
 		curl_setopt($curl, CURLOPT_POSTFIELDS, $params);
-		curl_setopt($curl, CURLOPT_HTTPHEADER, array("Authorization: OAuth {$this->accessToken}"));
+		curl_setopt($curl, CURLOPT_HTTPHEADER, array("Authorization: OAuth {$this->sfdcAccessToken}"));
 
 		$json_response = curl_exec($curl);
 		curl_close($curl);
@@ -39,33 +39,10 @@ class Model_Row_BiUser extends Zend_Db_Table_Row_Abstract
 		if (isset($response['error'])) {
 			throw new Exception("Refreshing OAuth access token for user {$this->strId} ({$this->id}) failed: " . $response['error'] . ": " . $response['error_description']);
 		}
-		$this->accessToken = $response['access_token'];
-		$this->instanceUrl = $response['instance_url'];
+		$this->sfdcAccessToken = $response['access_token'];
+		$this->sfdcInstanceUrl = $response['instance_url'];
 		$this->save();
 
-	}
-
-	/**
-	 * Checks for valid data including date
-	 * @return bool
-	 */
-	public function hasValidData() {
-		$timeZone = date_default_timezone_get();
-		$valid = false;
-		$lastImportTimestampUtc = strtotime($this->lastImportDate);
-		$lastExportTimestampUtc = strtotime($this->lastExportDate);
-
-		// GoodData timezone
-		date_default_timezone_set("America/Los_Angeles");
-
-		if (date("Y-m-d", $lastImportTimestampUtc) == date("Y-m-d") &&
-			date("Y-m-d", $lastExportTimestampUtc) == date("Y-m-d") &&
-			$lastImportTimestampUtc < $lastExportTimestampUtc)
-		{
-			$valid = true;
-		}
-		date_default_timezone_set($timeZone);
-		return $valid;
 	}
 
 }

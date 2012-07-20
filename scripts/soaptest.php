@@ -7,9 +7,9 @@ require_once 'Zend/Application.php';
 $application = new Zend_Application('application', APPLICATION_PATH . '/configs/application.ini');
 $application->bootstrap(array("base", "autoload", "config", "db", "debug", "log"));
 
-define("USERNAME", "gooddata@hubspot.com");
-define("PASSWORD", "Kebulacek23");
-define("SECURITY_TOKEN", "PSQEInRFXzkaZpYZGRTAmVAb7");
+define("USERNAME", "vojta.rocek@keboola.com");
+define("PASSWORD", "Kebulacek24");
+define("SECURITY_TOKEN", "kCMjSyaMBfeCjyNxg9V22U9S");
 
 require_once ('library/SalesForce/SforcePartnerClient.php');
 $mySforceConnection = new SforcePartnerClient();
@@ -17,7 +17,7 @@ $mySforceConnection->createConnection("library/SalesForce/partner.wsdl.xml");
 $mySforceConnection->login(USERNAME, PASSWORD.SECURITY_TOKEN);
 
 
-var_dump($mySforceConnection->getDeleted("Contact", "2012-05-02T00:00:00Z", "2012-06-01T00:00:00Z"));
+var_dump($mySforceConnection->getDeleted("OpportunityLineItemSchedule", "2012-07-01T00:00:00Z", "2012-07-20T00:00:00Z"));
 
 /*
 // Setup console input

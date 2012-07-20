@@ -13,6 +13,14 @@ class App_SalesForceImport
 	public $tmpDir = "/tmp/";
 
 	/**
+	 *
+	 * Storage API client
+	 *
+	 * @var App_StorageApi
+	 */
+	private $_sApi;
+
+	/**
 	 * @param $idUser
 	 */
 	public function __construct($user, $sfConfig)
@@ -21,6 +29,7 @@ class App_SalesForceImport
 		$this->_sfConfig = $sfConfig;
 		$this->_registry = Zend_Registry::getInstance();
 		$this->_snapshotNumber = time();
+		$this->_sApi = new App_StorageApi($user->storageApiToken, $user->storageApiUrl);
 	}
 
 
@@ -31,28 +40,88 @@ class App_SalesForceImport
 	public function importAll()
 	{
 		foreach($this->_sfConfig->objects as $objectConfig) {
-			$this->importQuery($objectConfig->query, $objectConfig->storageApiTable, $objectConfig->incremental);
+			if (!$objectConfig->storageApiTable) {
+				$matches = array();
+				preg_match('/FROM (\w*)/', $objectConfig->query, $matches);
+				$outputTable = $matches[1];
+			} else {
+				$outputTable = $objectConfig->storageApiTable;
+			}
+
+			$this->importQuery($objectConfig->query, $outputTable, $objectConfig->load);
 		}
 	}
 
 	/**
 	 *
-	 * imports
+	 * Drop all Storage API tables
+	 *
+	 * @return bool
+	 */
+	public function dropAll()
+	{
+		foreach($this->_sfConfig->objects as $objectConfig) {
+			if (!$objectConfig->storageApiTable) {
+				$matches = array();
+				preg_match('/FROM (\w*)/', $objectConfig->query, $matches);
+				$outputTable = $matches[1];
+			} else {
+				$outputTable = $objectConfig->storageApiTable;
+			}
+			$tableId = $this->_sApi->getTableId($outputTable, $this->_user->storageApiBucketId);
+			if ($tableId) {
+				$this->_sApi->dropTable($tableId);
+			}
+			// deleted items table
+			if($deletedTableId =  $this->_sApi->getTableId($outputTable . "_deleted", $this->_user->storageApiBucketId)) {
+				$this->_sApi->dropTable($deletedTableId);
+			}
+		}
+		return true;
+	}
+
+	/**
+	 *
+	 * Writes result of a query into output table
 	 *
 	 * @param $query
 	 * @param $fileName
-	 * @param bool $incremental
+	 * @param string $load Load Type (basic|increments|snapshots)
+	 * @param bool $transactional All tables are transactional by default
 	 * @throws Exception
 	 */
-	public function importQuery($query, $outputTable, $incremental=false) {
+	public function importQuery($query, $outputTable, $load="basic")
+	{
+		$increments = false;
+		$deletedItems = false;
+		$snapshots = false;
+		switch ($load) {
+			case "increments":
+				$increments = true;
+				$deletedItems = true;
+				break;
+			case "snapshots":
+				$increments = true;
+				$deletedItems = true;
+				$snapshots = true;
+				break;
+		}
 
+		// Check output file
 		$fileName = $this->tmpDir . $outputTable . ".csv";
 		$file = fopen($fileName, "w");
 		if (!$file) {
 			throw new Exception("Cannot open file '" . $fileName . "' for writing.");
 		}
 
-		if ($incremental) {
+		// Check storage API table. If table does not exist, perform a full dump
+		$tableId = $this->_sApi->getTableId($outputTable, $this->_user->storageApiBucketId);
+		if (!$tableId && $increments) {
+			$increments = false;
+		}
+
+		// Incremental queries require SOQL modification
+		if ($increments) {
 			if (strpos($query, "WHERE") !== false ) {
 				$query .= " AND ";
 			} else {
@@ -61,6 +130,7 @@ class App_SalesForceImport
 			$query .= " LastModifiedDate > " . date("Y-m-d", strtotime("-1 week")) ."T00:00:00Z";
 		}
 
+		// First batch
 		$response = $this->_query($query);
 		$headers = $this->_getHeaders($response);
 		$this->_writeCsv($file, array($headers));
@@ -68,41 +138,84 @@ class App_SalesForceImport
 		$records = $this->_parseRecords($response);
 		$this->_writeCsv($file, $records);
 
-		// Query for more
+		// Query for more if all records could not be retreived at once
 		while (isset($response['done']) && $response['done'] === false && $response['nextRecordsUrl'] != '') {
 			$response = $this->_query($query, $response['nextRecordsUrl']);
 			$records = $this->_parseRecords($response);
 			$this->_writeCsv($file, $records);
 		}
 
+		// Close input file
 		fclose($file);
 
-		//get deleted records
-		if ($incremental) {
+		// If table in Storage API does not exist, create a new one
+		if (!$tableId) {
+			// Create oneliner with CSV header
+			$definitionFilename = $this->tmpDir . $outputTable . ".header.csv";
+			$definitionFile = fopen($definitionFilename, "w");
+			$dataFile = fopen($fileName, "r");
+			fputs($definitionFile, fgets($dataFile));
+			fclose($definitionFile);
+			fclose($dataFile);
+			$tableId = $this->_sApi->createTable($this->_user->storageApiBucketId, $outputTable, $definitionFilename, ",", '"', "Id", $snapshots);
+		}
 
-			$fileName = $this->tmpDir . $outputTable . ".deleted.csv";
-			$file = fopen($fileName, "w");
-			if (!$file) {
-				throw new Exception("Cannot open file '" . $fileName . "' for writing.");
-			}
+		// Write data to table
+		$this->_sApi->writeTable($tableId, $fileName, $this->_snapshotNumber, ",", '"', $increments);
 
-			$deletedArray = array(array("Id", "isDeleted"));
-
+		// Get deleted records in incremental mode
+		if ($deletedItems) {
 			$matches = array();
 			preg_match('/FROM (\w*)/', $query, $matches);
-
-			// get deleted records
-			$deleted = $this->_getDeletedRecords($matches[1]);
-
-			if (count($deleted)) {
-				foreach($deleted as $deletedItem) {
-					$deletedArray[] = array($deletedItem, 1);
-				}
-			}
-
-			$this->_writeCsv($file, $deletedArray);
-			fclose($file);
+			$this->importDeleted($matches[1], $outputTable);
 		}
+	}
+
+	/**
+	 *
+	 * Imports deleted items into Storage API with _deleted suffix
+	 *
+	 * @param $object
+	 * @param $outputTable
+	 * @throws Exception¨
+	 */
+	public function importDeleted($object, $outputTable)
+	{
+		$fileName = $this->tmpDir . $outputTable . "_deleted.csv";
+		$file = fopen($fileName, "w");
+		if (!$file) {
+			throw new Exception("Cannot open file '" . $fileName . "' for writing.");
+		}
+
+		$deletedArray = array(array("Id", "deletedDate"));
+
+		// Get deleted records
+		$deleted = $this->_getDeletedRecords($object);
+
+		if ($deleted && count($deleted)) {
+			foreach($deleted as $deletedItem) {
+				$deletedArray[] = array($deletedItem->id, $deletedItem->deletedDate);
+			}
+		}
+
+		$this->_writeCsv($file, $deletedArray);
+		fclose($file);
+
+		$tableId = $this->_sApi->getTableId($outputTable . "_deleted", $this->_user->storageApiBucketId);
+
+		// If table in Storage API does not exist, create a new one
+		if (!$tableId) {
+			// Create oneliner with CSV header
+			$definitionFilename = $this->tmpDir . $outputTable . "_deleted.header.csv";
+			$definitionFile = fopen($definitionFilename, "w");
+			$dataFile = fopen($fileName, "r");
+			fputs($definitionFile, fgets($dataFile));
+			fclose($definitionFile);
+			fclose($dataFile);
+			$tableId = $this->_sApi->createTable($this->_user->storageApiBucketId, $outputTable . "_deleted", $definitionFilename, ",", '"', "Id");
+		}
+
+		$this->_sApi->writeTable($tableId, $fileName, $this->_snapshotNumber, ",", '"', true);
 	}
 
 	/**
@@ -137,10 +250,10 @@ class App_SalesForceImport
 	 * @param $response
 	 * @return array
 	 */
-	private function _parseRecords($response) {
+	private function _parseRecords($response, $incremental=false) {
 		$records = array();
 		foreach($response['records'] as $record) {
-			$record = $this->_parseRecord($record);
+			$record = $this->_parseRecord($record, $incremental);
 			$records[] = $record;
 		}
 		return $records;
@@ -160,15 +273,15 @@ class App_SalesForceImport
 		NDebugger::timer("query");
 
 		if (!$queryUrl) {
-			$url = "{$this->_user->instanceUrl}/services/data/v24.0/query?q=" . urlencode($query);
+			$url = "{$this->_user->sfdcInstanceUrl}/services/data/v24.0/query?q=" . urlencode($query);
 		} else {
-			$url = $this->_user->instanceUrl.$queryUrl;
+			$url = $this->_user->sfdcInstanceUrl.$queryUrl;
 		}
 
 		$curl = curl_init($url);
 		curl_setopt($curl, CURLOPT_HEADER, false);
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($curl, CURLOPT_HTTPHEADER, array("Authorization: OAuth {$this->_user->accessToken}"));
+		curl_setopt($curl, CURLOPT_HTTPHEADER, array("Authorization: OAuth {$this->_user->sfdcAccessToken}"));
 
 		$json_response = curl_exec($curl);
 		curl_close($curl);
@@ -201,7 +314,7 @@ class App_SalesForceImport
 	 * @param $record
 	 * @return array
 	 */
-	private function _parseRecord($record) {
+	private function _parseRecord($record, $incremental=false, $recursion=false) {
 		unset($record['attributes']);
 		$result = array();
 		foreach($record as $key => $data) {
@@ -210,9 +323,9 @@ class App_SalesForceImport
 			}
 
 			if (is_array($data)) {
-				$data = $this->_parseRecord($data);
+				$data = $this->_parseRecord($data, $incremental, true);
 				foreach ($data as $innerKey => $innerData) {
-					$innerKey = $key . '.' . $innerKey;
+					$innerKey = $key . '_' . $innerKey;
 					$result[$innerKey] = $innerData;
 				}
 			} else {
@@ -232,10 +345,10 @@ class App_SalesForceImport
 	 */
 	private function _request($url) {
 
-		$curl = curl_init($this->_user->instanceUrl . $url);
+		$curl = curl_init($this->_user->sfdcInstanceUrl . $url);
 		curl_setopt($curl, CURLOPT_HEADER, false);
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($curl, CURLOPT_HTTPHEADER, array("Authorization: OAuth {$this->_user->accessToken}"));
+		curl_setopt($curl, CURLOPT_HTTPHEADER, array("Authorization: OAuth {$this->_user->sfdcAccessToken}"));
 
 		$json_response = curl_exec($curl);
 		curl_close($curl);
@@ -266,16 +379,10 @@ class App_SalesForceImport
 		$sfc = new SforcePartnerClient();
 		$sfc->createConnection(ROOT_PATH . "/library/SalesForce/partner.wsdl.xml");
 		$db = Zend_Registry::get("db");
-		$passSecret = $db->fetchOne("SELECT AES_DECRYPT(?, ?)", array($this->_user->passSecret, $config->app->salt));
-		$sfc->login($this->_user->username, $passSecret);
+		$passSecret = $db->fetchOne("SELECT AES_DECRYPT(?, ?)", array($this->_user->sfdcPassSecret, $config->app->salt));
+		$sfc->login($this->_user->sfdcUsername, $passSecret);
 		$records = $sfc->getDeleted($entity, date("Y-m-d", strtotime("-29 day")) . "T00:00:00Z", date("Y-m-d", strtotime("+1 day")) . "T00:00:00Z");
-		$ids = array();
-		if (isset($records->deletedRecords)) {
-			foreach($records->deletedRecords as $deletedRecord) {
-				$ids[] = $deletedRecord->id;
-			}
-		}
-		return $ids;
+		return $records->deletedRecords;
 	}
 
 	/**
