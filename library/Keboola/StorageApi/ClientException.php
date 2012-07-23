@@ -1,5 +1,6 @@
 <?
-class App_StorageApiException extends Exception
+namespace Keboola\StorageApi;
+class ClientException extends \Exception
 {
 	/**
 	 * @var null|Exception

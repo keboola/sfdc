@@ -1,5 +1,6 @@
 <?
-class App_StorageApi
+namespace Keboola\StorageApi;
+class Client
 {
 	// Stage names
 	const STAGE_IN = "in";
@@ -222,7 +223,7 @@ class App_StorageApi
 			"partial" => $partial,
 			"data" => "@" . $dataFile
 		);
-		$result = $this->_apiPost("/storage/tables/" . $tableId, $options);
+		$result = $this->_apiPost("/storage/tables/{$tableId}/import" , $options);
 
 		$this->_log("Data written to table {$tableId}", array("options" => $options, "result" => $result));
 
@@ -378,11 +379,12 @@ class App_StorageApi
 	 * TODO Test!
 	 *
 	 * @param $tableId
+	 * @param $fileName file to store data
 	 * @return mixed|string¨
 	 */
-	public function getGdXmlConfig($tableId)
+	public function getGdXmlConfig($tableId, $fileName=null)
 	{
-		return $this->_apiGet("/storage/tables/{$tableId}/gooddata-xml");
+		return $this->_apiGet("/storage/tables/{$tableId}/gooddata-xml", null, $fileName);
 	}
 
 	/**
@@ -390,13 +392,14 @@ class App_StorageApi
 	 * Exports table contents to CSV
 	 *
 	 * @param $tableId
+	 * @param $fileName file to store data
 	 * @param int $limit TODO to be implemented
 	 * @param int $days  TODO to be implemented
 	 * @return string data
 	 */
-	public function exportTable($tableId, $limit=0, $days=0)
+	public function exportTable($tableId, $fileName=null, $limit=0, $days=0)
 	{
-		return $this->_apiGet("/storage/tables/{$tableId}/export");
+		return $this->_apiGet("/storage/tables/{$tableId}/export", null, $fileName);
 	}
 
 	/**
@@ -450,8 +453,11 @@ class App_StorageApi
 	private function _parseResponse($jsonString)
 	{
 		$data = json_decode($jsonString, true);
+		if (!$data) {
+			return null;
+		}
 		if($data["error"]) {
-			throw new App_StorageApiException($data["error"]);
+			throw new ClientException($data["error"]);
 		}
 		if (count($data) === 1 && $data["uri"]) {
 			return $this->_curlGet($data["uri"]);
@@ -467,9 +473,9 @@ class App_StorageApi
 	 * @param null $token
 	 * @return mixed|string
 	 */
-	protected function _apiGet($url, $token=null)
+	protected function _apiGet($url, $token=null, $fileName=null)
 	{
-		return $this->_curlGet($this->_constructUrl($url, $token));
+		return $this->_curlGet($this->_constructUrl($url, $token), $fileName);
 	}
 
 	/**
@@ -501,29 +507,56 @@ class App_StorageApi
 
 	/**
 	 *
-	 * CURL GET request
+	 * CURL GET request, may be written to a file
 	 *
 	 * @param $url
-	 * @return mixed|string
+	 * @param null $fileName
+	 * @return bool|mixed|string
+	 * @throws ClientException
 	 */
-	protected function _curlGet($url) {
+	protected function _curlGet($url, $fileName=null)
+	{
 
 		$logData = array("url" => $url);
-		NDebugger::timer("request");
+		Client::_timer("request");
 
-		$ch = curl_init();
-		$ch = $this->_curlSetOpts($ch);
+		$ch = $this->_curlSetOpts();
 		curl_setopt($ch, CURLOPT_URL, $url);
+
+		if ($fileName) {
+			$file = fopen($fileName, "w");
+			if (!$file) {
+				throw new ClientException("Cannot open file {$fileName}");
+			}
+			curl_setopt($ch, CURLOPT_FILE, $file);
+		}
+
 		$result = curl_exec($ch);
 		curl_close($ch);
 
-		$logData["requestTime"] = NDebugger::timer("request");
+		if ($fileName) {
+			fclose($file);
+			// Read the first line from the file, as it might contain errors
+			$file = fopen($fileName, "r");
+			$result = fgets($file);
+			fclose($file);
+		}
+
+		$logData["requestTime"] = Client::_timer("request");
 
 		if ($result) {
 			$this->_log("GET Request finished", $logData);
-			try{
-				return $this->_parseResponse($result);
-			} catch (App_StorageApiException $e) {
+			try {
+				$parsedData = $this->_parseResponse($result);
+				// If data cannot be parsed, there might be no error - JSON not parsed
+				if ($parsedData===null) {
+					if ($fileName) {
+						return true;
+					}
+					return $result;
+				}
+				return $parsedData;
+			} catch (ClientException $e) {
 				$errData = array(
 					"error" => $e->getMessage(),
 					"url" => $url
@@ -535,7 +568,7 @@ class App_StorageApi
 			$curlError = curl_error($ch);
 			$logData["curlError"] = $curlError;
 			$this->_log("GET Request failed", $logData);
-			throw new Exception("CURL: " . curl_error($ch));
+			throw new ClientException("CURL: " . curl_error($ch));
 		}
 	}
 
@@ -550,10 +583,9 @@ class App_StorageApi
 	protected function _curlPost($url, $postData=null) {
 
 		$logData = array("url" => $url, "postData" => $postData);
-		NDebugger::timer("request");
+		Client::_timer("request");
 
-		$ch = curl_init();
-		$ch = $this->_curlSetOpts($ch);
+		$ch = $this->_curlSetOpts();
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
 		curl_setopt($ch, CURLOPT_POST, 1);
@@ -563,13 +595,13 @@ class App_StorageApi
 		$result = curl_exec($ch);
 		curl_close($ch);
 
-		$logData["requestTime"] = NDebugger::timer("request");
+		$logData["requestTime"] = Client::_timer("request");
 
 		if ($result) {
 			$this->_log("POST Request finished", $logData);
 			try{
 				return $this->_parseResponse($result);
-			} catch (App_StorageApiException $e) {
+			} catch (ClientException $e) {
 				$errData = array(
 					"error" => $e->getMessage(),
 					"url" => $url,
@@ -582,7 +614,7 @@ class App_StorageApi
 			$curlError = curl_error($ch);
 			$logData["curlError"] = $curlError;
 			$this->_log("POST Request failed", $logData);
-			throw new Exception("CURL: " . $curlError);
+			throw new ClientException("CURL: " . $curlError);
 		}
 	}
 
@@ -597,23 +629,22 @@ class App_StorageApi
 	protected function _curlDelete($url)
 	{
 		$logData = array("url" => $url);
-		NDebugger::timer("request");
+		Client::_timer("request");
 
-		$ch = curl_init();
-		$ch = $this->_curlSetOpts($ch);
+		$ch = $this->_curlSetOpts();
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
 		$result = curl_exec($ch);
 		$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 		curl_close($ch);
 
-		$logData["requestTime"] = NDebugger::timer("request");
+		$logData["requestTime"] = Client::_timer("request");
 
 		if ($result) {
 			$this->_log("DELETE Request finished", $logData);
 			try{
 				return $this->_parseResponse($result);
-			} catch (App_StorageApiException $e) {
+			} catch (ClientException $e) {
 				$errData = array(
 					"error" => $e->getMessage(),
 					"url" => $url
@@ -628,37 +659,26 @@ class App_StorageApi
 			$curlError = curl_error($ch);
 			$logData["curlError"] = $curlError;
 			$this->_log("POST Request failed", $logData);
-			throw new Exception("CURL: " . $curlError);
+			throw new ClientException("CURL: " . $curlError);
 		}
-	}
-
-	protected function _curlSetOpts($ch)
-	{
-		curl_setopt($ch, CURLOPT_HEADER, false);
-		curl_setopt($ch, CURLOPT_NOBODY, false);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-		curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 6.0) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.63 Safari/535.7');
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-		//curl_setopt($ch, CURLOPT_ENCODING, "gzip");
-		return $ch;
 	}
 
 	/**
 	 *
-	 * Print debug message to STDOUT
+	 * Init cUrl and set common params
 	 *
-	 * @param $message
+	 * @return resource
 	 */
-	protected function _debug($message)
+	protected function _curlSetOpts()
 	{
-		if (App_StorageApi::$_debugOn) {
-			if (is_string($message)) {
-				$message .= "\n";
-			}
-			print_r($message);
-		}
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_HEADER, false);
+		curl_setopt($ch, CURL_HTTP_VERSION_1_1, true);
+		curl_setopt($ch, CURLOPT_HTTPGET, true);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+		return $ch;
 	}
 
 	/**
@@ -668,10 +688,10 @@ class App_StorageApi
 	 */
 	protected function _log($message, $data=array())
 	{
-		if (App_StorageApi::$_log) {
+		if (Client::$_log) {
 			$data["token"] = $this->_token["token"];
 			$message = "Storage API: " . $message;
-			call_user_func(App_StorageApi::$_log, $message, $data);
+			call_user_func(Client::$_log, $message, $data);
 		}
 	}
 
@@ -681,7 +701,22 @@ class App_StorageApi
 	 */
 	public static function setLogger($function)
 	{
-		App_StorageApi::$_log = $function;
+		Client::$_log = $function;
+	}
+
+	/**
+	 * Timer function
+	 *
+	 * @param string $name
+	 * @return float
+	 */
+	private function _timer($name=null)
+	{
+		static $_time = array();
+		$now = microtime(true);
+		$delta = isset($time[$name]) ? $now-$time[$name] : 0;
+		$time[$name] = $now;
+		return $delta;
 	}
 
 }
