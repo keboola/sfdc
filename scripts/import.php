@@ -45,7 +45,7 @@ if (!$opts->getOption('id')) {
 
 		try {
 			//App_StorageApi::setDebug(true);
-			App_StorageApi::setLogger(function($message, $data) use($log) {
+			Keboola\StorageApi\Client::setLogger(function($message, $data) use($log) {
 				$log->log($message, Zend_Log::INFO, $data);
 			});
 			NDebugger::timer('account');

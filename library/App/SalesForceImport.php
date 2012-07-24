@@ -29,7 +29,7 @@ class App_SalesForceImport
 		$this->_sfConfig = $sfConfig;
 		$this->_registry = Zend_Registry::getInstance();
 		$this->_snapshotNumber = time();
-		$this->_sApi = new App_StorageApi($user->storageApiToken, $user->storageApiUrl);
+		$this->_sApi = new Keboola\StorageApi\Client($user->storageApiToken, $user->storageApiUrl);
 	}
 
 

@@ -16,6 +16,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 	{
 		$autoloader = Zend_Loader_Autoloader::getInstance();
 		$autoloader->registerNamespace('App_');
+		$autoloader->registerNamespace('Keboola');
 		$autoloader->registerNamespace('Ladybug');
 
 		$resourceLoader = new Zend_Loader_Autoloader_Resource(array(
