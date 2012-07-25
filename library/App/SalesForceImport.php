@@ -329,6 +329,15 @@ class App_SalesForceImport
 					$result[$innerKey] = $innerData;
 				}
 			} else {
+				// Date transformation: "2011-11-15T20:49:19.000Z" to "2011-11-15 20:49:19"
+				if (strlen($data) == 24 && preg_match("/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3}Z$/", $data)) {
+					$data = str_replace("T", " ", substr($data, 0, -5));
+				}
+				// Date transformation: "2011-11-15T20:49:19.000+0000" to "2011-11-15 20:49:19"
+				if (strlen($data) == 28 && preg_match("/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3}\+0000$/", $data)) {
+					$data = str_replace("T", " ", substr($data, 0, -9));
+				}
+
 				$result[$key] = $data;
 			}
 		}
