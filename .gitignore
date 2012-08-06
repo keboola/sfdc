@@ -4,3 +4,4 @@ exec
 nbproject
 .idea
 cache.properties
+composer.lock
