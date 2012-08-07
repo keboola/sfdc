@@ -9,18 +9,18 @@ $application->bootstrap(array("base", "autoload", "config", "db", "debug", "log"
 
 // Setup console input
 $opts = new Zend_Console_Getopt(array(
-	'id|i=s'	=> 'Id of user',
+	'token=s'	=> 'Storage API token',
 	//'query|q=s' => 'SOQL Query',
 	//'table|t=s' => 'Storage API table',
 	//'incremental|c-i' => 'Incremental',
 	'clean|c-i' => "Delete all tables before loading and recreate them"
 ));
 $opts->setHelp(array(
-	'i'	=> 'Id of user',
+	'token'	=> 'Storage API token',
 	//'q'	=> 'Custom SOQL Query',
 	//'t'	=> 'Storage API table',
 	//'c' => 'Incremental query',
-	'c' => 'Cleanup',
+	'clean' => 'Cleanup',
 ));
 try {
 	$opts->parse();
@@ -32,15 +32,18 @@ try {
 $start = time();
 echo 'Start: '.date('j. n. Y H:i:s', $start)."\n";
 
-$userTable = new Model_BiUser();
 $config = Zend_Registry::get('config');
 $log = Zend_Registry::get('log');
 
-if (!$opts->getOption('id')) {
+if (!$opts->getOption('token')) {
 	echo $opts->getUsageMessage();
 } else {
 
-	$user = $userTable->fetchRow(array('id=?' => $opts->getOption('id')));
+
+	$sapi = new \Keboola\StorageApi\Client($opts->getOption('token'));
+	\Keboola\StorageApi\OneLiner::setClient($sapi);
+	\Keboola\StorageApi\OneLiner::$tmpDir = ROOT_PATH . "/tmp/";
+	$user = new \Keboola\StorageApi\OneLiner($config->storageApi->configBucket . "." . $config->storageApi->name);
 
 	if ($user) {
 
@@ -51,36 +54,35 @@ if (!$opts->getOption('id')) {
 			});
 			NDebugger::timer('account');
 
-			$user->revalidateAccessToken();
-			if (!$user->sfdcConfig) {
-				throw new Exception("Missing configuration for user " . $user->strId);
+			if (!$user->config) {
+				throw new Exception("Missing configuration for token " . $opts->getOption('token'));
 			}
 
-			$importConfig = Zend_Json::decode($user->sfdcConfig, Zend_Json::TYPE_OBJECT);
-			$sfdc = new App_SalesForceImport($user, $importConfig);
+			$importConfig = Zend_Json::decode($user->config, Zend_Json::TYPE_OBJECT);
+			$sfdc = new App_SalesForceImport($importConfig);
 
-			$tmpDir = ROOT_PATH . "/tmp/" . $user->strId . "/";
+			$revalidation = $sfdc->revalidateAccessToken($user->accessToken, $user->clientId, $user->clientSecret, $user->refreshToken);
+
+			$user->accessToken = $revalidation['access_token'];
+			$user->instanceUrl = $revalidation['instance_url'];
+
+			$sfdc->sApi = $sapi;
+			$sfdc->storageApiBucket = "in.c-" . $config->storageApi->name;
+			$sfdc->accessToken = $user->accessToken;
+			$sfdc->instanceUrl = $user->instanceUrl;
+			$sfdc->userId = $user->id;
+			$sfdc->username = $user->username;
+			$sfdc->passSecret = $user->passSecret;
+
+			$tmpDir = ROOT_PATH . "/tmp/" . $user->id . "/";
 			if (!file_exists($tmpDir)) {
 				mkdir($tmpDir);
 			}
+
 			if (!is_dir($tmpDir)) {
 				throw new Exception("Temporary directory path is not a directory.");
 			}
 			$sfdc->tmpDir = $tmpDir;
-			/*
-			if($opts->getOption('query')) {
-				$dataset = "query";
-				if ($opts->getOption('dataset')) {
-					$dataset = $opts->getOption('dataset');
-				}
-				// Download Data
-				$import->importQuery($opts->getOption('query'), "query", $opts->getOption('incremental'));
-				// Upload to Storage API
-				if ($opts->getOption('dataset')) {
-
-				}
-			} else {
-			*/
 
 			if ($opts->getOption('clean')) {
 				$sfdc->dropAll();
@@ -88,11 +90,11 @@ if (!$opts->getOption('id')) {
 
 			$sfdc->importAll();
 
-			$user->sfdcLastImportDate = date("Y-m-d H:i:s");
+			$user->lastImportDate = date("Y-m-d H:i:s");
 			$user->save();
-			// }
+
 			$duration = NDebugger::timer('account');
-			$log->log("SalesForce Cron Import for user {$user->strId} ({$user->id})", Zend_Log::INFO, array(
+			$log->log("SalesForce Cron Import for user {$user->id} ({$opts->getOption('token')})", Zend_Log::INFO, array(
 				'duration'	=> $duration
 			));
 

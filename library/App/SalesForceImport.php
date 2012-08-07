@@ -2,8 +2,6 @@
 require_once (ROOT_PATH . '/library/SalesForce/SforcePartnerClient.php');
 class App_SalesForceImport
 {
-	private $_user;
-
 	private $_sfConfig;
 
 	private $_csvDelimiter = ",";
@@ -12,24 +10,29 @@ class App_SalesForceImport
 
 	public $tmpDir = "/tmp/";
 
+	public $storageApiBucket = "in.c-SFDC";
+	public $instanceUrl;
+	public $accessToken;
+	public $username;
+	public $passSecret;
+	public $userId;
+
 	/**
 	 *
 	 * Storage API client
 	 *
-	 * @var App_StorageApi
+	 * @var \Keboola\StorageApi\Client
 	 */
-	private $_sApi;
+	public $sApi;
 
 	/**
 	 * @param $idUser
 	 */
-	public function __construct($user, $sfConfig)
+	public function __construct($sfConfig)
 	{
-		$this->_user = $user;
 		$this->_sfConfig = $sfConfig;
 		$this->_registry = Zend_Registry::getInstance();
 		$this->_snapshotNumber = time();
-		$this->_sApi = new Keboola\StorageApi\Client($user->storageApiToken, $user->storageApiUrl);
 	}
 
 
@@ -68,13 +71,13 @@ class App_SalesForceImport
 			} else {
 				$outputTable = $objectConfig->storageApiTable;
 			}
-			$tableId = $this->_sApi->getTableId($outputTable, $this->_user->storageApiBucketId);
+			$tableId = $this->sApi->getTableId($outputTable, $this->storageApiBucket);
 			if ($tableId) {
-				$this->_sApi->dropTable($tableId);
+				$this->sApi->dropTable($tableId);
 			}
 			// deleted items table
-			if($deletedTableId =  $this->_sApi->getTableId($outputTable . "_deleted", $this->_user->storageApiBucketId)) {
-				$this->_sApi->dropTable($deletedTableId);
+			if($deletedTableId =  $this->sApi->getTableId($outputTable . "_deleted", $this->storageApiBucket)) {
+				$this->sApi->dropTable($deletedTableId);
 			}
 		}
 		return true;
@@ -115,7 +118,7 @@ class App_SalesForceImport
 		}
 
 		// Check storage API table. If table does not exist, perform a full dump
-		$tableId = $this->_sApi->getTableId($outputTable, $this->_user->storageApiBucketId);
+		$tableId = $this->sApi->getTableId($outputTable, $this->storageApiBucket);
 		if (!$tableId && $increments) {
 			$increments = false;
 		}
@@ -157,11 +160,11 @@ class App_SalesForceImport
 			fputs($definitionFile, fgets($dataFile));
 			fclose($definitionFile);
 			fclose($dataFile);
-			$tableId = $this->_sApi->createTable($this->_user->storageApiBucketId, $outputTable, $definitionFilename, ",", '"', "Id", $snapshots);
+			$tableId = $this->sApi->createTable($this->storageApiBucket, $outputTable, $definitionFilename, ",", '"', "Id", $snapshots);
 		}
 
 		// Write data to table
-		$this->_sApi->writeTable($tableId, $fileName, $this->_snapshotNumber, ",", '"', $increments);
+		$this->sApi->writeTable($tableId, $fileName, $this->_snapshotNumber, ",", '"', $increments);
 
 		// Get deleted records in incremental mode
 		if ($deletedItems) {
@@ -201,7 +204,7 @@ class App_SalesForceImport
 		$this->_writeCsv($file, $deletedArray);
 		fclose($file);
 
-		$tableId = $this->_sApi->getTableId($outputTable . "_deleted", $this->_user->storageApiBucketId);
+		$tableId = $this->sApi->getTableId($outputTable . "_deleted", $this->storageApiBucket);
 
 		// If table in Storage API does not exist, create a new one
 		if (!$tableId) {
@@ -212,10 +215,10 @@ class App_SalesForceImport
 			fputs($definitionFile, fgets($dataFile));
 			fclose($definitionFile);
 			fclose($dataFile);
-			$tableId = $this->_sApi->createTable($this->_user->storageApiBucketId, $outputTable . "_deleted", $definitionFilename, ",", '"', "Id");
+			$tableId = $this->sApi->createTable($this->storageApiBucket, $outputTable . "_deleted", $definitionFilename, ",", '"', "Id");
 		}
 
-		$this->_sApi->writeTable($tableId, $fileName, $this->_snapshotNumber, ",", '"', true);
+		$this->sApi->writeTable($tableId, $fileName, $this->_snapshotNumber, ",", '"', true);
 	}
 
 	/**
@@ -273,15 +276,15 @@ class App_SalesForceImport
 		NDebugger::timer("query");
 
 		if (!$queryUrl) {
-			$url = "{$this->_user->sfdcInstanceUrl}/services/data/v24.0/query?q=" . urlencode($query);
+			$url = "{$this->instanceUrl}/services/data/v24.0/query?q=" . urlencode($query);
 		} else {
-			$url = $this->_user->sfdcInstanceUrl.$queryUrl;
+			$url = $this->instanceUrl . $queryUrl;
 		}
 
 		$curl = curl_init($url);
 		curl_setopt($curl, CURLOPT_HEADER, false);
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($curl, CURLOPT_HTTPHEADER, array("Authorization: OAuth {$this->_user->sfdcAccessToken}"));
+		curl_setopt($curl, CURLOPT_HTTPHEADER, array("Authorization: OAuth {$this->accessToken}"));
 
 		$json_response = curl_exec($curl);
 		curl_close($curl);
@@ -296,7 +299,8 @@ class App_SalesForceImport
 			"query" => $query,
 			"duration" => $duration,
 			"responseLength" => strlen($json_response),
-			"client" => $this->_user->name
+			"client" => $this->userId,
+			"token" => $this->sApi->token["token"]
 		));
 
 		$response = json_decode($json_response, true);
@@ -354,10 +358,10 @@ class App_SalesForceImport
 	 */
 	private function _request($url) {
 
-		$curl = curl_init($this->_user->sfdcInstanceUrl . $url);
+		$curl = curl_init($this->instanceUrl . $url);
 		curl_setopt($curl, CURLOPT_HEADER, false);
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($curl, CURLOPT_HTTPHEADER, array("Authorization: OAuth {$this->_user->sfdcAccessToken}"));
+		curl_setopt($curl, CURLOPT_HTTPHEADER, array("Authorization: OAuth {$this->accessToken}"));
 
 		$json_response = curl_exec($curl);
 		curl_close($curl);
@@ -384,12 +388,9 @@ class App_SalesForceImport
 	 * @return array
 	 */
 	private function _getDeletedRecords($entity) {
-		$config = Zend_Registry::get("config");
 		$sfc = new SforcePartnerClient();
 		$sfc->createConnection(ROOT_PATH . "/library/SalesForce/partner.wsdl.xml");
-		$db = Zend_Registry::get("db");
-		$passSecret = $db->fetchOne("SELECT AES_DECRYPT(?, ?)", array($this->_user->sfdcPassSecret, $config->app->salt));
-		$sfc->login($this->_user->sfdcUsername, $passSecret);
+		$sfc->login($this->username, $this->passSecret);
 		$records = $sfc->getDeleted($entity, date("Y-m-d", strtotime("-29 day")) . "T00:00:00Z", date("Y-m-d", strtotime("+1 day")) . "T00:00:00Z");
 		return $records->deletedRecords;
 	}
@@ -423,4 +424,43 @@ class App_SalesForceImport
 		return $this->_query($query);
 
 	}
+
+	/**
+	 *
+	 * Returns a new access token
+	 *
+	 * @throws Exception
+	 *
+	 */
+	public function revalidateAccessToken($accessToken, $clientId, $clientSecret, $refreshToken) {
+
+		$registry = Zend_Registry::getInstance();
+		$url = $registry->config->salesForce->loginUri . "/services/oauth2/token";
+
+		$params = "grant_type=refresh_token&client_id=" . $clientId . "&client_secret=" . $clientSecret . "&refresh_token=" . $refreshToken;
+
+		$curl = curl_init($url);
+
+		curl_setopt($curl, CURLOPT_HEADER, false);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($curl, CURLOPT_POST, true);
+		curl_setopt($curl, CURLOPT_POSTFIELDS, $params);
+		curl_setopt($curl, CURLOPT_HTTPHEADER, array("Authorization: OAuth {$accessToken}"));
+
+		$json_response = curl_exec($curl);
+		curl_close($curl);
+
+		$response = json_decode($json_response, true);
+		if (isset($response['error'])) {
+			throw new Exception("Refreshing OAuth access token for user {$this->userId} ({$this->sApi->token["token"]}) failed: " . $response['error'] . ": " . $response['error_description']);
+		}
+
+		$this->accessToken = $response['access_token'];
+		$this->instanceUrl = $response['instance_url'];
+
+		return $response;
+
+	}
+
+
 }
