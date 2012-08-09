@@ -3,6 +3,7 @@ require_once (ROOT_PATH . '/library/SalesForce/SforcePartnerClient.php');
 class App_SalesForceImport
 {
 	private $_sfConfig;
+	private $_soqlConfig;
 
 	private $_csvDelimiter = ",";
 
@@ -28,9 +29,10 @@ class App_SalesForceImport
 	/**
 	 * @param $idUser
 	 */
-	public function __construct($sfConfig)
+	public function __construct($sfConfig, $soqlConfig=array())
 	{
 		$this->_sfConfig = $sfConfig;
+		$this->_soqlConfig = $soqlConfig;
 		$this->_registry = Zend_Registry::getInstance();
 		$this->_snapshotNumber = time();
 	}
@@ -42,16 +44,16 @@ class App_SalesForceImport
 	 */
 	public function importAll()
 	{
-		foreach($this->_sfConfig->objects as $objectConfig) {
-			if (!$objectConfig->storageApiTable) {
+		foreach($this->_soqlConfig as $objectConfig) {
+			if (!$objectConfig["storageApiTable"]) {
 				$matches = array();
-				preg_match('/FROM (\w*)/', $objectConfig->query, $matches);
+				preg_match('/FROM (\w*)/', $objectConfig["query"], $matches);
 				$outputTable = $matches[1];
 			} else {
-				$outputTable = $objectConfig->storageApiTable;
+				$outputTable = $objectConfig["storageApiTable"];
 			}
 
-			$this->importQuery($objectConfig->query, $outputTable, $objectConfig->load);
+			$this->importQuery($objectConfig["query"], $outputTable, $objectConfig["load"]);
 		}
 	}
 
@@ -63,13 +65,13 @@ class App_SalesForceImport
 	 */
 	public function dropAll()
 	{
-		foreach($this->_sfConfig->objects as $objectConfig) {
-			if (!$objectConfig->storageApiTable) {
+		foreach($this->_soqlConfig as $objectConfig) {
+			if (!$objectConfig["storageApiTable"]) {
 				$matches = array();
-				preg_match('/FROM (\w*)/', $objectConfig->query, $matches);
+				preg_match('/FROM (\w*)/', $objectConfig["query"], $matches);
 				$outputTable = $matches[1];
 			} else {
-				$outputTable = $objectConfig->storageApiTable;
+				$outputTable = $objectConfig["storageApiTable"];
 			}
 			$tableId = $this->sApi->getTableId($outputTable, $this->storageApiBucket);
 			if ($tableId) {

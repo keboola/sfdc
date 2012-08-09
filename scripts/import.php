@@ -43,9 +43,10 @@ if (!$opts->getOption('token')) {
 	$sapi = new \Keboola\StorageApi\Client($opts->getOption('token'));
 	\Keboola\StorageApi\OneLiner::setClient($sapi);
 	\Keboola\StorageApi\OneLiner::$tmpDir = ROOT_PATH . "/tmp/";
-	$user = new \Keboola\StorageApi\OneLiner($config->storageApi->configBucket . "." . $config->storageApi->name);
+	$connectionConfig = new \Keboola\StorageApi\OneLiner($config->storageApi->configBucket . "." . $config->storageApi->name);
+	$soqlConfig = Keboola\StorageApi\Client::parseCSV($sapi->exportTable($config->storageApi->configBucket . "." . $config->storageApi->name . "Queries"));
 
-	if ($user) {
+	if ($connectionConfig) {
 
 		try {
 			//App_StorageApi::setDebug(true);
@@ -54,27 +55,22 @@ if (!$opts->getOption('token')) {
 			});
 			NDebugger::timer('account');
 
-			if (!$user->config) {
-				throw new Exception("Missing configuration for token " . $opts->getOption('token'));
-			}
+			$sfdc = new App_SalesForceImport($connectionConfig, $soqlConfig);
 
-			$importConfig = Zend_Json::decode($user->config, Zend_Json::TYPE_OBJECT);
-			$sfdc = new App_SalesForceImport($importConfig);
+			$revalidation = $sfdc->revalidateAccessToken($connectionConfig->accessToken, $connectionConfig->clientId, $connectionConfig->clientSecret, $connectionConfig->refreshToken);
 
-			$revalidation = $sfdc->revalidateAccessToken($user->accessToken, $user->clientId, $user->clientSecret, $user->refreshToken);
-
-			$user->accessToken = $revalidation['access_token'];
-			$user->instanceUrl = $revalidation['instance_url'];
+			$connectionConfig->accessToken = $revalidation['access_token'];
+			$connectionConfig->instanceUrl = $revalidation['instance_url'];
 
 			$sfdc->sApi = $sapi;
 			$sfdc->storageApiBucket = "in.c-" . $config->storageApi->name;
-			$sfdc->accessToken = $user->accessToken;
-			$sfdc->instanceUrl = $user->instanceUrl;
-			$sfdc->userId = $user->id;
-			$sfdc->username = $user->username;
-			$sfdc->passSecret = $user->passSecret;
+			$sfdc->accessToken = $connectionConfig->accessToken;
+			$sfdc->instanceUrl = $connectionConfig->instanceUrl;
+			$sfdc->userId = $connectionConfig->id;
+			$sfdc->username = $connectionConfig->username;
+			$sfdc->passSecret = $connectionConfig->passSecret;
 
-			$tmpDir = ROOT_PATH . "/tmp/" . $user->id . "/";
+			$tmpDir = ROOT_PATH . "/tmp/" . $connectionConfig->id . "/";
 			if (!file_exists($tmpDir)) {
 				mkdir($tmpDir);
 			}
@@ -90,11 +86,11 @@ if (!$opts->getOption('token')) {
 
 			$sfdc->importAll();
 
-			$user->lastImportDate = date("Y-m-d H:i:s");
-			$user->save();
+			$connectionConfig->lastImportDate = date("Y-m-d H:i:s");
+			$connectionConfig->save();
 
 			$duration = NDebugger::timer('account');
-			$log->log("SalesForce Cron Import for user {$user->id} ({$opts->getOption('token')})", Zend_Log::INFO, array(
+			$log->log("SalesForce Cron Import for user {$connectionConfig->id} ({$opts->getOption('token')})", Zend_Log::INFO, array(
 				'duration'	=> $duration
 			));
 
