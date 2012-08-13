@@ -42,11 +42,18 @@ if (!$opts->getOption('token')) {
 
 	$sapi = new \Keboola\StorageApi\Client($opts->getOption('token'));
 	\Keboola\StorageApi\OneLiner::setClient($sapi);
-	\Keboola\StorageApi\OneLiner::$tmpDir = ROOT_PATH . "/tmp/";
-	$connectionConfig = new \Keboola\StorageApi\OneLiner($config->storageApi->configBucket . "." . $config->storageApi->name);
-	$soqlConfig = Keboola\StorageApi\Client::parseCSV($sapi->exportTable($config->storageApi->configBucket . "." . $config->storageApi->name . "Queries"));
+	\Keboola\StorageApi\OneLiner::$tmpDir = ROOT_PATH . "/tmp/" . $opts->getOption('token') . "/";
+	\Keboola\StorageApi\Config\Reader::$client = $sapi;
 
-	if ($connectionConfig) {
+	$configArray = \Keboola\StorageApi\Config\Reader::read($config->storageApi->configBucket);
+	foreach($configArray["items"] as $configName => $configInstance) {
+
+		$connectionConfig = $configInstance;
+		unset($connectionConfig["items"]);
+		$connectionConfig = new Zend_Config($connectionConfig, true);
+
+		$soqlConfig = $configInstance["items"];
+		$soqlConfig = new Zend_Config($soqlConfig, true);
 
 		try {
 			//App_StorageApi::setDebug(true);
@@ -63,14 +70,15 @@ if (!$opts->getOption('token')) {
 			$connectionConfig->instanceUrl = $revalidation['instance_url'];
 
 			$sfdc->sApi = $sapi;
-			$sfdc->storageApiBucket = "in.c-" . $config->storageApi->name;
+			$sfdc->storageApiBucket = "in.c-" . $configName;
 			$sfdc->accessToken = $connectionConfig->accessToken;
 			$sfdc->instanceUrl = $connectionConfig->instanceUrl;
 			$sfdc->userId = $connectionConfig->id;
 			$sfdc->username = $connectionConfig->username;
 			$sfdc->passSecret = $connectionConfig->passSecret;
 
-			$tmpDir = ROOT_PATH . "/tmp/" . $connectionConfig->id . "/";
+			$tmpDir = ROOT_PATH . "/tmp/" . $opts->getOption('token') . "/";
+
 			if (!file_exists($tmpDir)) {
 				mkdir($tmpDir);
 			}
@@ -86,8 +94,11 @@ if (!$opts->getOption('token')) {
 
 			$sfdc->importAll();
 
-			$connectionConfig->lastImportDate = date("Y-m-d H:i:s");
-			$connectionConfig->save();
+
+			$tableId = $config->storageApi->configBucket . "." . $configName;
+			$sapi->setTableAttribute($tableId, "log.lastImportDate", date("Y-m-d H:i:s"));
+			$sapi->setTableAttribute($tableId, "accessToken", $sfdc->accessToken);
+			$sapi->setTableAttribute($tableId, "instanceUrl", $sfdc->instanceUrl);
 
 			$duration = NDebugger::timer('account');
 			$log->log("SalesForce Cron Import for user {$connectionConfig->id} ({$opts->getOption('token')})", Zend_Log::INFO, array(
@@ -98,9 +109,6 @@ if (!$opts->getOption('token')) {
 			$debugFile = NDebugger::log($e, NDebugger::ERROR);
 			echo "ERROR: " . $e->getMessage() . PHP_EOL;
 		}
-
-	} else {
-		echo "Wrong user id!\n";
 	}
 }
 
