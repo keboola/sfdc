@@ -291,10 +291,7 @@ class App_SalesForceImport
 		$json_response = curl_exec($curl);
 		curl_close($curl);
 
-		var_dump($url);
-		var_dump(strlen($json_response));
 		$duration = NDebugger::timer("query");
-		var_dump($duration);
 
 		$log = Zend_Registry::get("log");
 		$log->log("SalesForce query finished.", Zend_Log::INFO, array(
@@ -461,8 +458,5 @@ class App_SalesForceImport
 		$this->instanceUrl = $response['instance_url'];
 
 		return $response;
-
 	}
-
-
 }

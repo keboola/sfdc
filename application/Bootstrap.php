@@ -44,28 +44,6 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		return $config;
 	}
 
-	protected function _initDb()
-	{
-		$registry = Zend_Registry::getInstance();
-
-		// connect do db
-		$db = Zend_Db::factory('pdo_mysql', array(
-			'host'		=> $registry->config->db->host,
-			'username'	=> $registry->config->db->login,
-			'password'	=> $registry->config->db->password,
-			'dbname'	=> $registry->config->db->name
-		));
-
-		// test připojení k db
-		$db->getConnection();
-		$db->query('SET NAMES utf8');
-
-		// nastavení db adapteru pro všechny potomky Zend_Db_Table
-		Zend_Db_Table::setDefaultAdapter($db);
-		Zend_Registry::set('db', $db);
-	}
-
-
 	protected function _initDebug()
 	{
 		$config = $this->bootstrap('config')->getResource('config');
@@ -125,16 +103,17 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		$frontController = Zend_Controller_Front::getInstance();
 		$router = $frontController->getRouter();
 
-		$router->addRoute('dataCheck', new Zend_Controller_Router_Route(
-			'data-check/:id',
-			array(
-				'module' => 'default',
-				'controller' => 'data-check',
-				'action' => 'index',
-				'userId' => null
-			)
-		));
+		$route = new Zend_Controller_Router_Route_Static(
+			'last-import',
+			array('controller' => 'index', 'action' => 'last-import')
+		);
+		$router->addRoute('last-import', $route);
 
+		$route = new Zend_Controller_Router_Route_Static(
+			'import',
+			array('controller' => 'index', 'action' => 'run-import')
+		);
+		$router->addRoute('import', $route);
 
 		return $router;
 	}

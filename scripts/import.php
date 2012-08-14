@@ -5,21 +5,15 @@ set_include_path(implode(PATH_SEPARATOR, array(realpath(ROOT_PATH . '/library'),
 require_once 'Zend/Application.php';
 require_once ROOT_PATH . '/vendor/autoload.php';
 $application = new Zend_Application('application', APPLICATION_PATH . '/configs/application.ini');
-$application->bootstrap(array("base", "autoload", "config", "db", "debug", "log"));
+$application->bootstrap(array("base", "autoload", "config", "debug", "log"));
 
 // Setup console input
 $opts = new Zend_Console_Getopt(array(
 	'token=s'	=> 'Storage API token',
-	//'query|q=s' => 'SOQL Query',
-	//'table|t=s' => 'Storage API table',
-	//'incremental|c-i' => 'Incremental',
 	'clean|c-i' => "Delete all tables before loading and recreate them"
 ));
 $opts->setHelp(array(
 	'token'	=> 'Storage API token',
-	//'q'	=> 'Custom SOQL Query',
-	//'t'	=> 'Storage API table',
-	//'c' => 'Incremental query',
 	'clean' => 'Cleanup',
 ));
 try {
@@ -40,12 +34,12 @@ if (!$opts->getOption('token')) {
 } else {
 
 
+
 	$sapi = new \Keboola\StorageApi\Client($opts->getOption('token'));
-	\Keboola\StorageApi\OneLiner::setClient($sapi);
-	\Keboola\StorageApi\OneLiner::$tmpDir = ROOT_PATH . "/tmp/" . $opts->getOption('token') . "/";
 	\Keboola\StorageApi\Config\Reader::$client = $sapi;
 
 	$configArray = \Keboola\StorageApi\Config\Reader::read($config->storageApi->configBucket);
+
 	foreach($configArray["items"] as $configName => $configInstance) {
 
 		$connectionConfig = $configInstance;
@@ -94,16 +88,16 @@ if (!$opts->getOption('token')) {
 
 			$sfdc->importAll();
 
-
-			$tableId = $config->storageApi->configBucket . "." . $configName;
-			$sapi->setTableAttribute($tableId, "log.lastImportDate", date("Y-m-d H:i:s"));
-			$sapi->setTableAttribute($tableId, "accessToken", $sfdc->accessToken);
-			$sapi->setTableAttribute($tableId, "instanceUrl", $sfdc->instanceUrl);
-
 			$duration = NDebugger::timer('account');
 			$log->log("SalesForce Cron Import for user {$connectionConfig->id} ({$opts->getOption('token')})", Zend_Log::INFO, array(
 				'duration'	=> $duration
 			));
+
+			$tableId = $config->storageApi->configBucket . "." . $configName;
+			$sapi->setTableAttribute($tableId, "accessToken", $sfdc->accessToken);
+			$sapi->setTableAttribute($tableId, "instanceUrl", $sfdc->instanceUrl);
+			$sapi->setTableAttribute($tableId, "log.importDate", date("Y-m-d H:i:s"));
+			$sapi->setTableAttribute($tableId, "log.importDuration", $duration);
 
 		} catch(Exception $e) {
 			$debugFile = NDebugger::log($e, NDebugger::ERROR);
