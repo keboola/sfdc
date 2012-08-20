@@ -110,7 +110,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		$router->addRoute('last-import', $route);
 
 		$route = new Zend_Controller_Router_Route_Static(
-			'import',
+			'run-import',
 			array('controller' => 'index', 'action' => 'run-import')
 		);
 		$router->addRoute('import', $route);

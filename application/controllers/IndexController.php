@@ -7,6 +7,11 @@
 class IndexController extends Zend_Controller_Action
 {
 
+	/**
+	 * @var \Keboola\StorageApi\Client
+	 */
+	public $storageApi;
+
 	public function init()
 	{
 		parent::init();
@@ -28,6 +33,17 @@ class IndexController extends Zend_Controller_Action
 			$this->getResponse()->sendResponse();
 			die;
 		}
+
+		$token = $this->getRequest()->getHeader("X-StorageApi-Token");
+		if (!$token) {
+			throw new \Keboola\Exception("Missing token", null, null, "TRANSFORMATION_TOKEN");
+		}
+		$this->storageApi = new \Keboola\StorageApi\Client($token);
+		$log = Zend_Registry::get("log");
+		Keboola\StorageApi\Client::setLogger(function($message, $data) use($log) {
+			$log->log($message, Zend_Log::INFO, $data);
+		});
+
 	}
 
 	/**
@@ -47,11 +63,9 @@ class IndexController extends Zend_Controller_Action
 	 */
 	public function lastImportAction()
 	{
-		$token = $this->_getParam("token");
 		$config = Zend_Registry::get("config");
 
-		$sapi = new \Keboola\StorageApi\Client($token);
-		\Keboola\StorageApi\Config\Reader::$client = $sapi;
+		\Keboola\StorageApi\Config\Reader::$client = $this->storageApi;
 		$sfdcConfig = \Keboola\StorageApi\Config\Reader::read($config->storageApi->configBucket);
 
 		if (count($sfdcConfig["items"]) == 0) {
@@ -69,7 +83,7 @@ class IndexController extends Zend_Controller_Action
 				$response["lastImportDate"] = min($response["lastImportDate"], $sfdcItemConfig["log"]["importDate"]);
 			}
 
-			$tableInfo = $sapi->getTable($config->storageApi->configBucket . "." . $sfdcTableName);
+			$tableInfo = $this->storageApi->getTable($config->storageApi->configBucket . "." . $sfdcTableName);
 			if ($tableInfo["lastImportDate"] > $sfdcItemConfig["log"]["importDate"]) {
 				$response["forceImport"] = true;
 			}
@@ -99,16 +113,10 @@ class IndexController extends Zend_Controller_Action
 			$jsonParams = Zend_Json::decode($body);
 		}
 
-		$token = $this->_getParam("token");
 		$config = Zend_Registry::get("config");
 		$log = Zend_Registry::get("log");
 
-		Keboola\StorageApi\Client::setLogger(function($message, $data) use($log) {
-			$log->log($message, Zend_Log::INFO, $data);
-		});
-		$sapi = new \Keboola\StorageApi\Client($token);
-
-		\Keboola\StorageApi\Config\Reader::$client = $sapi;
+		\Keboola\StorageApi\Config\Reader::$client = $this->storageApi;
 		$sfdcConfig = \Keboola\StorageApi\Config\Reader::read($config->storageApi->configBucket);
 
 		$passed = false;
@@ -140,7 +148,7 @@ class IndexController extends Zend_Controller_Action
 				$connectionConfig->accessToken = $revalidation['access_token'];
 				$connectionConfig->instanceUrl = $revalidation['instance_url'];
 
-				$sfdc->sApi = $sapi;
+				$sfdc->sApi = $this->storageApi;
 				$sfdc->storageApiBucket = "in.c-" . $configName;
 				$sfdc->accessToken = $connectionConfig->accessToken;
 				$sfdc->instanceUrl = $connectionConfig->instanceUrl;
@@ -148,7 +156,7 @@ class IndexController extends Zend_Controller_Action
 				$sfdc->username = $connectionConfig->username;
 				$sfdc->passSecret = $connectionConfig->passSecret;
 
-				$tmpDir = ROOT_PATH . "/tmp/" . $token . $configName . "/";
+				$tmpDir = ROOT_PATH . "/tmp/" . $this->storageApi->token["token"] . $configName . "/";
 
 				if (!file_exists($tmpDir)) {
 					mkdir($tmpDir);
@@ -163,15 +171,15 @@ class IndexController extends Zend_Controller_Action
 				$sfdc->importAll();
 
 				$duration = NDebugger::timer('account');
-				$log->log("SFDC Import {$configName} ({$token})", Zend_Log::INFO, array(
+				$log->log("SFDC Import {$configName} ({$this->storageApi->token["token"]})", Zend_Log::INFO, array(
 					'duration'	=> $duration
 				));
 
 				$tableId = $config->storageApi->configBucket . "." . $configName;
-				$sapi->setTableAttribute($tableId, "accessToken", $sfdc->accessToken);
-				$sapi->setTableAttribute($tableId, "instanceUrl", $sfdc->instanceUrl);
-				$sapi->setTableAttribute($tableId, "log.importDate", date("Y-m-d H:i:s"));
-				$sapi->setTableAttribute($tableId, "log.importDuration", $duration);
+				$this->storageApi->setTableAttribute($tableId, "accessToken", $sfdc->accessToken);
+				$this->storageApi->setTableAttribute($tableId, "instanceUrl", $sfdc->instanceUrl);
+				$this->storageApi->setTableAttribute($tableId, "log.importDate", date("Y-m-d H:i:s"));
+				$this->storageApi->setTableAttribute($tableId, "log.importDuration", $duration);
 
 			} catch(Exception $e) {
 				throw new \Keboola\Exception($e->getMessage(), null, null, "SFDC_IMPORT");
