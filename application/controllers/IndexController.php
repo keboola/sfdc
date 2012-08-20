@@ -99,7 +99,6 @@ class IndexController extends Zend_Controller_Action
 			$jsonParams = Zend_Json::decode($body);
 		}
 
-
 		$token = $this->_getParam("token");
 		$config = Zend_Registry::get("config");
 		$log = Zend_Registry::get("log");

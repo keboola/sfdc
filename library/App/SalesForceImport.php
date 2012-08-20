@@ -18,6 +18,9 @@ class App_SalesForceImport
 	public $passSecret;
 	public $userId;
 
+	private $importTtl = 5;
+	private $importPause = 60;
+
 	/**
 	 *
 	 * Storage API client
@@ -53,7 +56,24 @@ class App_SalesForceImport
 				$outputTable = $objectConfig->storageApiTable;
 			}
 
-			$this->importQuery($objectConfig->query, $outputTable, $objectConfig->load);
+			// Catch Import errors 
+			$tableImported = false;
+			$iteration = 0;
+			while (!$tableImported && $iteration <= $this->ttl) {
+				try {
+					$iteration++;
+					$this->importQuery($objectConfig->query, $outputTable, $objectConfig->load);
+					$tableImported = true;
+				} catch (Exception $e) {
+					if ($e->getCode() == "QUERY_TIMEOUT" && $iteration <= $this->ttl) {
+						sleep($this->pause);
+					} else {
+						throw $e;
+					}
+				}
+			}
+
+
 		}
 	}
 
