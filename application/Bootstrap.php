@@ -113,7 +113,14 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 			'run-import',
 			array('controller' => 'index', 'action' => 'run-import')
 		);
-		$router->addRoute('import', $route);
+		$router->addRoute('run-import', $route);
+
+		$route = new Zend_Controller_Router_Route_Static(
+			'accounts',
+			array('controller' => 'index', 'action' => 'accounts')
+		);
+
+		$router->addRoute('accounts', $route);
 
 		return $router;
 	}

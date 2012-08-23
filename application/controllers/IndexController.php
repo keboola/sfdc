@@ -56,6 +56,29 @@ class IndexController extends Zend_Controller_Action
 	}
 
 	/**
+	 * List Accounts
+	 */
+	public function accountsAction()
+	{
+		$config = Zend_Registry::get("config");
+		\Keboola\StorageApi\Config\Reader::$client = $this->storageApi;
+		$bucket = $this->storageApi->getBucket($config->storageApi->configBucket);
+
+		$accounts = array();
+
+		if(!$bucket["tables"] || count($bucket["tables"]) == 0) {
+			$this->_helper->json(array("accounts" => $accounts));
+			return;
+		}
+
+		foreach($bucket["tables"] as $table) {
+			$accounts[] = $table["name"];
+		}
+
+		$this->_helper->json(array("accounts" => $accounts));
+	}
+
+	/**
 	 * LastImport actions
 	 *
 	 * If multiple accounts, return the oldest date
