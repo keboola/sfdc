@@ -38,7 +38,9 @@ class IndexController extends Zend_Controller_Action
 		if (!$token) {
 			throw new \Keboola\Exception("Missing token", null, null, "TRANSFORMATION_TOKEN");
 		}
-		$this->storageApi = new \Keboola\StorageApi\Client($token);
+
+		$config = Zend_Registry::get("config");
+		$this->storageApi = new \Keboola\StorageApi\Client($token, null, $config->app->projectName);
 		$log = Zend_Registry::get("log");
 		Keboola\StorageApi\Client::setLogger(function($message, $data) use($log) {
 			$log->log($message, Zend_Log::INFO, $data);
