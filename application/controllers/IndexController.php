@@ -181,7 +181,7 @@ class IndexController extends Zend_Controller_Action
 				$sfdc->username = $connectionConfig->username;
 				$sfdc->passSecret = $connectionConfig->passSecret;
 
-				$tmpDir = ROOT_PATH . "/tmp/" . $this->storageApi->token["token"] . $configName . "/";
+				$tmpDir = ROOT_PATH . "/tmp/" . $this->storageApi->getTokenString() . $configName . "/";
 
 				if (!file_exists($tmpDir)) {
 					mkdir($tmpDir);
@@ -196,7 +196,7 @@ class IndexController extends Zend_Controller_Action
 				$sfdc->importAll();
 
 				$duration = NDebugger::timer('account');
-				$log->log("SFDC Import {$configName} ({$this->storageApi->token["token"]})", Zend_Log::INFO, array(
+				$log->log("SFDC Import {$configName} ({$this->storageApi->getTokenString()})", Zend_Log::INFO, array(
 					'duration'	=> $duration
 				));
 

@@ -319,7 +319,7 @@ class App_SalesForceImport
 			"duration" => $duration,
 			"responseLength" => strlen($json_response),
 			"client" => $this->userId,
-			"token" => $this->sApi->token["token"]
+			"token" => $this->sApi->getTokenString()
 		));
 
 		$response = json_decode($json_response, true);
@@ -471,7 +471,7 @@ class App_SalesForceImport
 
 		$response = json_decode($json_response, true);
 		if (isset($response['error'])) {
-			throw new Exception("Refreshing OAuth access token for user {$this->userId} ({$this->sApi->token["token"]}) failed: " . $response['error'] . ": " . $response['error_description']);
+			throw new Exception("Refreshing OAuth access token for user {$this->userId} ({$this->sApi->getTokenString()}) failed: " . $response['error'] . ": " . $response['error_description']);
 		}
 
 		$this->accessToken = $response['access_token'];
