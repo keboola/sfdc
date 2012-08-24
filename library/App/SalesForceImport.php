@@ -392,7 +392,7 @@ class App_SalesForceImport
 		//	$response = array_merge_recursive($response, $responseMore);
 		// }
 		if (isset($response[0]['errorCode'])) {
-			throw new Exception($response[0]['errorCode'] . ': '. $response[0]['message']);
+			throw new \Keboola\Exception($response[0]['errorCode'] . ': '. $response[0]['message'], $response[0]['errorCode']);
 		}
 		return $response;
 
