@@ -39,7 +39,8 @@ class NetteLoggerProxy extends \NLogger
 
 			$firstPart = reset($message);
 			// find debug file - if not allowed memory exhausted
-			if (strpos($firstPart, 'Fatal error: Allowed memory size of') !== 0) {
+			ini_set('memory_limit', '-1');
+			if ($this->_isMemoryExhaustedMessage($firstPart)) {
 				foreach ($message as $i => $part) {
 					$part = trim($part);
 					if (strpos($part, '@@') === 0) {
@@ -62,6 +63,11 @@ class NetteLoggerProxy extends \NLogger
 			$this->_log->log($message, $this->_translatePriority($priority));
 		}
 
+	}
+
+	protected function _isMemoryExhaustedMessage($message)
+	{
+		return strpos($message, 'Fatal error: Allowed memory size of') !== 0;
 	}
 
 	protected function _translatePriority($priority)
