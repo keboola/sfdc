@@ -46,29 +46,24 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 
 	protected function _initDebug()
 	{
-		$config = $this->bootstrap('config')->getResource('config');
 		$log = $this->bootstrap('log')->getResource('log');
 
-		if (!defined('APPLICATION_ENV')) {
-			define('APPLICATION_ENV', $config->app->env);
-		}
-
-		if (APPLICATION_ENV == 'development') {
-			ini_set('display_startup_errors', 1);
-			ini_set('display_errors', 1);
+		if ($this->getEnvironment() == 'development') {
 			Ladybug\Loader::loadHelpers();
 		}
 
-		if (isset($_SERVER['HOSTNAME']))
+		if (isset($_SERVER['HOSTNAME'])) {
 			$_SERVER['SERVER_NAME'] = $_SERVER['HOSTNAME'];
+		}
 
 		require_once 'Nette/NDebugger.php';
-		NDebugger::enable();
+		NDebugger::$strictMode = true;
 		NDebugger::$logDirectory = ROOT_PATH.'/logs';
-		NDebugger::$email = $config->app->admin;
-		NDebugger::$productionMode = (APPLICATION_ENV == 'production');
-		NDebugger::$logger = new App_Log_NetteLoggerProxy($log);
-		NLogger::$emailSnooze = 3600;
+		// NDebugger::$productionMode = ($this->getEnvironment() == 'production');
+		NDebugger::$productionMode = 'production';
+		NDebugger::enable();
+
+		NDebugger::$logger = new Keboola\Log\NetteLoggerProxy($log);
 	}
 
 	/**
