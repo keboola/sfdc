@@ -94,7 +94,7 @@ class IndexController extends Zend_Controller_Action
 		$sfdcConfig = \Keboola\StorageApi\Config\Reader::read($config->storageApi->configBucket);
 
 		if (count($sfdcConfig["items"]) == 0) {
-			throw new \Keboola\Exception("No configuration found", null, null, "SFDC_CONFIG");
+			throw new \Keboola\Exception("No configuration found", null, null, "CONFIG");
 		}
 
 		$response = array();
@@ -126,8 +126,9 @@ class IndexController extends Zend_Controller_Action
 	public function runImportAction()
 	{
 
+
 		if ($this->getRequest()->getMethod() != "POST") {
-			throw new \Keboola\Exception("Wrong method, use POST", null, null, "SFDC_METHOD");
+			throw new \Keboola\Exception("Wrong method, use POST", null, null, "METHOD");
 		}
 
 		\NDebugger::timer("import");
@@ -143,8 +144,8 @@ class IndexController extends Zend_Controller_Action
 
 		\Keboola\StorageApi\Config\Reader::$client = $this->storageApi;
 		$sfdcConfig = \Keboola\StorageApi\Config\Reader::read($config->storageApi->configBucket);
-
 		$passed = false;
+
 
 
 		foreach($sfdcConfig["items"] as $configName => $configInstance) {
@@ -164,16 +165,16 @@ class IndexController extends Zend_Controller_Action
 
 			try {
 
-				NDebugger::timer('account');
+				\NDebugger::timer('account');
 
 				$sfdc = new App_SalesForceImport($connectionConfig, $soqlConfig);
 
+				$sfdc->sApi = $this->storageApi;
 				$revalidation = $sfdc->revalidateAccessToken($connectionConfig->accessToken, $connectionConfig->clientId, $connectionConfig->clientSecret, $connectionConfig->refreshToken);
 
 				$connectionConfig->accessToken = $revalidation['access_token'];
 				$connectionConfig->instanceUrl = $revalidation['instance_url'];
 
-				$sfdc->sApi = $this->storageApi;
 				$sfdc->storageApiBucket = "in.c-" . $configName;
 				$sfdc->accessToken = $connectionConfig->accessToken;
 				$sfdc->instanceUrl = $connectionConfig->instanceUrl;
@@ -188,7 +189,7 @@ class IndexController extends Zend_Controller_Action
 				}
 
 				if (!is_dir($tmpDir)) {
-					throw new \Keboola\Exception("Temporary directory path is not a directory", null, null, "SFDC_TMP_DIR");
+					throw new \Keboola\Exception("Temporary directory path is not a directory", null, null, "TMP_DIR");
 				}
 
 				$sfdc->tmpDir = $tmpDir;
@@ -207,13 +208,13 @@ class IndexController extends Zend_Controller_Action
 				$this->storageApi->setTableAttribute($tableId, "log.importDuration", $duration);
 
 			} catch(Exception $e) {
-				throw new \Keboola\Exception($e->getMessage(), null, null, "SFDC_IMPORT");
+				throw new \Keboola\Exception($e->getMessage(), null, $e, "IMPORT");
 			}
 		}
 
 
 		if (!$passed) {
-			throw new \Keboola\Exception("Account {$jsonParams["account"]} not found", null, null, "SFDC_ACCOUNT");
+			throw new \Keboola\Exception("Account {$jsonParams["account"]} not found", null, null, "ACCOUNT");
 		}
 
 		$duration = \NDebugger::timer("import");

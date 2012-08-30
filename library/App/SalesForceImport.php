@@ -37,7 +37,7 @@ class App_SalesForceImport
 		$this->_sfConfig = $sfConfig;
 		$this->_soqlConfig = $soqlConfig;
 		$this->_registry = Zend_Registry::getInstance();
-		$this->_snapshotNumber = time();
+		$this->_snapshotNumber = floor (time()  / 86400);
 	}
 
 
@@ -59,14 +59,15 @@ class App_SalesForceImport
 			// Catch Import errors 
 			$tableImported = false;
 			$iteration = 0;
-			while (!$tableImported && $iteration <= $this->ttl) {
+			while (!$tableImported && $iteration <= $this->importTtl) {
 				try {
 					$iteration++;
 					$this->importQuery($objectConfig->query, $outputTable, $objectConfig->load);
 					$tableImported = true;
 				} catch (Exception $e) {
-					if ($e->getCode() == "QUERY_TIMEOUT" && $iteration <= $this->ttl) {
-						sleep($this->pause);
+					throw $e;
+					if ($e->getCode() == "QUERY_TIMEOUT" && $iteration <= $this->importTtl) {
+						sleep($this->importPause);
 					} else {
 						throw $e;
 					}
@@ -122,10 +123,18 @@ class App_SalesForceImport
 		$snapshots = false;
 		switch ($load) {
 			case "increments":
+				$incrementalLoad = true;
 				$increments = true;
 				$deletedItems = true;
 				break;
 			case "snapshots":
+				$incrementalLoad = true;
+				$increments = false;
+				$deletedItems = false;
+				$snapshots = true;
+				break;
+			case "snapshotIncrements":
+				$incrementalLoad = true;
 				$increments = true;
 				$deletedItems = true;
 				$snapshots = true;
@@ -141,8 +150,9 @@ class App_SalesForceImport
 
 		// Check storage API table. If table does not exist, perform a full dump
 		$tableId = $this->sApi->getTableId($outputTable, $this->storageApiBucket);
-		if (!$tableId && $increments) {
+		if ($tableId === false) {
 			$increments = false;
+			$incrementalLoad = false;
 		}
 
 		// Incremental queries require SOQL modification
@@ -186,7 +196,7 @@ class App_SalesForceImport
 		}
 
 		// Write data to table
-		$this->sApi->writeTable($tableId, $fileName, $this->_snapshotNumber, ",", '"', $increments);
+		$this->sApi->writeTable($tableId, $fileName, $this->_snapshotNumber, ",", '"', $incrementalLoad);
 
 		// Get deleted records in incremental mode
 		if ($deletedItems) {
@@ -453,7 +463,7 @@ class App_SalesForceImport
 	 */
 	public function revalidateAccessToken($accessToken, $clientId, $clientSecret, $refreshToken) {
 
-		$registry = Zend_Registry::getInstance();
+		$registry = \Zend_Registry::getInstance();
 		$url = $registry->config->salesForce->loginUri . "/services/oauth2/token";
 
 		$params = "grant_type=refresh_token&client_id=" . $clientId . "&client_secret=" . $clientSecret . "&refresh_token=" . $refreshToken;
@@ -467,11 +477,12 @@ class App_SalesForceImport
 		curl_setopt($curl, CURLOPT_HTTPHEADER, array("Authorization: OAuth {$accessToken}"));
 
 		$json_response = curl_exec($curl);
+
 		curl_close($curl);
 
 		$response = json_decode($json_response, true);
 		if (isset($response['error'])) {
-			throw new Exception("Refreshing OAuth access token for user {$this->userId} ({$this->sApi->getTokenString()}) failed: " . $response['error'] . ": " . $response['error_description']);
+			throw new \Keboola\Exception("Refreshing OAuth access token for user {$this->userId} ({$this->sApi->getTokenString()}) failed: " . $response['error'] . ": " . $response['error_description']);
 		}
 
 		$this->accessToken = $response['access_token'];
