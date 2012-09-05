@@ -103,13 +103,13 @@ class IndexController extends Zend_Controller_Action
 		foreach($sfdcConfig["items"] as $sfdcTableName => $sfdcItemConfig) {
 
 			if (!$response["lastImportDate"]) {
-				$response["lastImportDate"] = $sfdcItemConfig["log"]["importDate"];
+				$response["lastImportDate"] = $sfdcItemConfig["log"]["extractDate"];
 			} else {
-				$response["lastImportDate"] = min($response["lastImportDate"], $sfdcItemConfig["log"]["importDate"]);
+				$response["lastImportDate"] = min($response["lastImportDate"], $sfdcItemConfig["log"]["extractDate"]);
 			}
 
 			$tableInfo = $this->storageApi->getTable($config->storageApi->configBucket . "." . $sfdcTableName);
-			if ($tableInfo["lastImportDate"] > $sfdcItemConfig["log"]["importDate"]) {
+			if ($tableInfo["lastImportDate"] > $sfdcItemConfig["log"]["extractDate"]) {
 				$response["forceImport"] = true;
 			}
 		}
@@ -182,14 +182,14 @@ class IndexController extends Zend_Controller_Action
 				$sfdc->username = $connectionConfig->username;
 				$sfdc->passSecret = $connectionConfig->passSecret;
 
-				$tmpDir = ROOT_PATH . "/tmp/" . $this->storageApi->getTokenString() . $configName . "/";
+				$tmpDir = "/tmp/" . $this->storageApi->getTokenString() . "-" . uniqid($configName . "-") . "/";
 
 				if (!file_exists($tmpDir)) {
 					mkdir($tmpDir);
 				}
 
 				if (!is_dir($tmpDir)) {
-					throw new \Keboola\Exception("Temporary directory path is not a directory", null, null, "TMP_DIR");
+					throw new \Keboola\Exception("Temporary directory path ($tmpDir) is not a directory", null, null, "TMP_DIR");
 				}
 
 				$sfdc->tmpDir = $tmpDir;
@@ -204,8 +204,11 @@ class IndexController extends Zend_Controller_Action
 				$tableId = $config->storageApi->configBucket . "." . $configName;
 				$this->storageApi->setTableAttribute($tableId, "accessToken", $sfdc->accessToken);
 				$this->storageApi->setTableAttribute($tableId, "instanceUrl", $sfdc->instanceUrl);
-				$this->storageApi->setTableAttribute($tableId, "log.importDate", date("Y-m-d H:i:s"));
-				$this->storageApi->setTableAttribute($tableId, "log.importDuration", $duration);
+				$this->storageApi->setTableAttribute($tableId, "log.extractDate", date("Y-m-d H:i:s"));
+				$this->storageApi->setTableAttribute($tableId, "log.extractDuration", $duration);
+
+				// Cleanup
+				exec("rm -rf $tmpDir");
 
 			} catch(Exception $e) {
 				throw new \Keboola\Exception($e->getMessage(), null, $e, "IMPORT");

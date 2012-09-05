@@ -184,20 +184,15 @@ class App_SalesForceImport
 		// Close input file
 		fclose($file);
 
-		// If table in Storage API does not exist, create a new one
-		if (!$tableId) {
-			// Create oneliner with CSV header
-			$definitionFilename = $this->tmpDir . $outputTable . ".header.csv";
-			$definitionFile = fopen($definitionFilename, "w");
-			$dataFile = fopen($fileName, "r");
-			fputs($definitionFile, fgets($dataFile));
-			fclose($definitionFile);
-			fclose($dataFile);
-			$tableId = $this->sApi->createTable($this->storageApiBucket, $outputTable, $definitionFilename, ",", '"', "Id", $snapshots);
+		if (count($records)) {
+			// If table in Storage API does not exist, create a new one
+			if (!$tableId) {
+				$this->sApi->createTable($this->storageApiBucket, $outputTable, $fileName, ",", '"', "Id", $snapshots, $this->_snapshotNumber);
+			} else {
+				// Write data to table
+				$this->sApi->writeTable($tableId, $fileName, $this->_snapshotNumber, ",", '"', $incrementalLoad);
+			}
 		}
-
-		// Write data to table
-		$this->sApi->writeTable($tableId, $fileName, $this->_snapshotNumber, ",", '"', $incrementalLoad);
 
 		// Get deleted records in incremental mode
 		if ($deletedItems) {
@@ -237,21 +232,17 @@ class App_SalesForceImport
 		$this->_writeCsv($file, $deletedArray);
 		fclose($file);
 
-		$tableId = $this->sApi->getTableId($outputTable . "_deleted", $this->storageApiBucket);
+		if (count($deletedArray)) {
+			$tableId = $this->sApi->getTableId($outputTable . "_deleted", $this->storageApiBucket);
 
-		// If table in Storage API does not exist, create a new one
-		if (!$tableId) {
-			// Create oneliner with CSV header
-			$definitionFilename = $this->tmpDir . $outputTable . "_deleted.header.csv";
-			$definitionFile = fopen($definitionFilename, "w");
-			$dataFile = fopen($fileName, "r");
-			fputs($definitionFile, fgets($dataFile));
-			fclose($definitionFile);
-			fclose($dataFile);
-			$tableId = $this->sApi->createTable($this->storageApiBucket, $outputTable . "_deleted", $definitionFilename, ",", '"', "Id");
+			// If table in Storage API does not exist, create a new one
+			if (!$tableId) {
+				// Create oneliner with CSV header
+				$this->sApi->createTable($this->storageApiBucket, $outputTable . "_deleted", $definitionFilename, ",", '"', "Id");
+			} else {
+				$this->sApi->writeTable($tableId, $fileName, $this->_snapshotNumber, ",", '"', true);
+			}
 		}
-
-		$this->sApi->writeTable($tableId, $fileName, $this->_snapshotNumber, ",", '"', true);
 	}
 
 	/**
