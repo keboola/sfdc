@@ -121,6 +121,7 @@ class App_SalesForceImport
 		$increments = false;
 		$deletedItems = false;
 		$snapshots = false;
+		$incrementalLoad = false;
 		switch ($load) {
 			case "increments":
 				$incrementalLoad = true;
