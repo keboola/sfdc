@@ -185,12 +185,16 @@ class App_SalesForceImport
 		fclose($file);
 
 		if (count($records)) {
+
+			$fileNameGz = $fileName . ".gz";
+			exec("gzip $fileName");
+
 			// If table in Storage API does not exist, create a new one
 			if (!$tableId) {
-				$this->sApi->createTable($this->storageApiBucket, $outputTable, $fileName, ",", '"', "Id", $snapshots, $this->_snapshotNumber);
+				$this->sApi->createTable($this->storageApiBucket, $outputTable, $fileNameGz, ",", '"', "Id", $snapshots, $this->_snapshotNumber);
 			} else {
 				// Write data to table
-				$this->sApi->writeTable($tableId, $fileName, $this->_snapshotNumber, ",", '"', $incrementalLoad);
+				$this->sApi->writeTable($tableId, $fileNameGz, $this->_snapshotNumber, ",", '"', $incrementalLoad);
 			}
 		}
 
@@ -233,14 +237,18 @@ class App_SalesForceImport
 		fclose($file);
 
 		if (count($deletedArray)) {
+
+			$fileNameGz = $fileName . ".gz";
+			exec("gzip $fileName");
+
 			$tableId = $this->sApi->getTableId($outputTable . "_deleted", $this->storageApiBucket);
 
 			// If table in Storage API does not exist, create a new one
 			if (!$tableId) {
 				// Create oneliner with CSV header
-				$this->sApi->createTable($this->storageApiBucket, $outputTable . "_deleted", $definitionFilename, ",", '"', "Id");
+				$this->sApi->createTable($this->storageApiBucket, $outputTable . "_deleted", $fileNameGz, ",", '"', "Id");
 			} else {
-				$this->sApi->writeTable($tableId, $fileName, $this->_snapshotNumber, ",", '"', true);
+				$this->sApi->writeTable($tableId, $fileNameGz, $this->_snapshotNumber, ",", '"', true);
 			}
 		}
 	}
