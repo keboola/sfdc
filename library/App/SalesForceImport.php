@@ -163,7 +163,7 @@ class App_SalesForceImport
 			} else {
 				$query .= " WHERE ";
 			}
-			$query .= " LastModifiedDate > " . date("Y-m-d", strtotime("-1 week")) ."T00:00:00Z";
+			$query .= "SystemModstamp > " . date("Y-m-d", strtotime("-1 week")) ."T00:00:00Z";
 		}
 
 		// First batch
@@ -303,7 +303,17 @@ class App_SalesForceImport
 	 * @param string $queryUrl
 	 * @return mixed
 	 */
-	private function _query($query, $queryUrl='') {
+	private function _query($query, $queryUrl='')
+	{
+
+		$log = Zend_Registry::get("log");
+		$logData = array(
+			"query" => $query,
+			"queryUrl" => $queryUrl,
+			"client" => $this->userId,
+			"token" => $this->sApi->getTokenString()
+		);
+		$log->log("SalesForce query starting.", Zend_Log::INFO, $logData);
 
 		NDebugger::timer("query");
 
@@ -323,14 +333,9 @@ class App_SalesForceImport
 
 		$duration = NDebugger::timer("query");
 
-		$log = Zend_Registry::get("log");
-		$log->log("SalesForce query finished.", Zend_Log::INFO, array(
-			"query" => $query,
-			"duration" => $duration,
-			"responseLength" => strlen($json_response),
-			"client" => $this->userId,
-			"token" => $this->sApi->getTokenString()
-		));
+		$logData["duration"] = $duration;
+		$logData["responseLength"] = strlen($json_response);
+		$log->log("SalesForce query finished.", Zend_Log::INFO, $logData);
 
 		$response = json_decode($json_response, true);
 
