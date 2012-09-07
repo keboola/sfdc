@@ -163,7 +163,15 @@ class App_SalesForceImport
 			} else {
 				$query .= " WHERE ";
 			}
-			$query .= "SystemModstamp > " . date("Y-m-d", strtotime("-1 week")) ."T00:00:00Z";
+			// OpportunityFieldHistory and *History do not have SystemModstamp, only CreatedDate
+			// OpportunityHistory does have SystemModstamp
+			if (
+				strpos($query, "OpportunityFieldHistory") !== false
+					|| strpos($query, "History") !== false && strpos($query, "FieldHistory") === false && strpos($query, "History") > 0) {
+				$query .= "CreatedDate > " . date("Y-m-d", strtotime("-1 week")) ."T00:00:00Z";
+			} else {
+				$query .= "SystemModstamp > " . date("Y-m-d", strtotime("-1 week")) ."T00:00:00Z";
+			}
 		}
 
 		// First batch
