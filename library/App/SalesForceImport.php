@@ -434,7 +434,10 @@ class App_SalesForceImport
 		$sfc->createConnection(ROOT_PATH . "/library/SalesForce/partner.wsdl.xml");
 		$sfc->login($this->username, $this->passSecret);
 		$records = $sfc->getDeleted($entity, date("Y-m-d", strtotime("-29 day")) . "T00:00:00Z", date("Y-m-d", strtotime("+1 day")) . "T00:00:00Z");
-		return $records->deletedRecords;
+		if (isset($records->deletedRecords)) {
+			return $records->deletedRecords;
+		}
+		return null;
 	}
 
 	/**

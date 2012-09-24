@@ -102,7 +102,7 @@ class IndexController extends Zend_Controller_Action
 
 		foreach($sfdcConfig["items"] as $sfdcTableName => $sfdcItemConfig) {
 
-			if (!$response["lastImportDate"]) {
+			if (!isset($response["lastImportDate"])) {
 				$response["lastImportDate"] = $sfdcItemConfig["log"]["extractDate"];
 			} else {
 				$response["lastImportDate"] = min($response["lastImportDate"], $sfdcItemConfig["log"]["extractDate"]);
