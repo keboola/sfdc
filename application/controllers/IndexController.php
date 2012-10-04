@@ -40,7 +40,7 @@ class IndexController extends Zend_Controller_Action
 		}
 
 		$config = Zend_Registry::get("config");
-		$this->storageApi = new \Keboola\StorageApi\Client($token, null, $config->app->projectName);
+		$this->storageApi = new \Keboola\StorageApi\Client($token, $config->storageApi->url, $config->app->projectName);
 		$log = Zend_Registry::get("log");
 		Keboola\StorageApi\Client::setLogger(function($message, $data) use($log) {
 			$log->log($message, Zend_Log::INFO, $data);
@@ -176,6 +176,9 @@ class IndexController extends Zend_Controller_Action
 				$connectionConfig->instanceUrl = $revalidation['instance_url'];
 
 				$sfdc->storageApiBucket = "in.c-" . $configName;
+				if (!$this->storageApi->bucketExists($sfdc->storageApiBucket)) {
+					$this->storageApi->createBucket($configName, \Keboola\StorageApi\Client::STAGE_IN, "SalesForce Data");
+				}
 				$sfdc->accessToken = $connectionConfig->accessToken;
 				$sfdc->instanceUrl = $connectionConfig->instanceUrl;
 				$sfdc->userId = $connectionConfig->id;
@@ -210,7 +213,7 @@ class IndexController extends Zend_Controller_Action
 				// Cleanup
 				exec("rm -rf $tmpDir");
 
-			} catch(Exception $e) {
+			} catch(\Exception $e) {
 				throw new \Keboola\Exception($e->getMessage(), null, $e, "IMPORT");
 			}
 		}

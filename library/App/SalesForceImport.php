@@ -5,10 +5,6 @@ class App_SalesForceImport
 	private $_sfConfig;
 	private $_soqlConfig;
 
-	private $_csvDelimiter = ",";
-
-	private $_csvEnclosure = '"';
-
 	public $tmpDir = "/tmp/";
 
 	public $storageApiBucket = "in.c-SFDC";
@@ -144,10 +140,7 @@ class App_SalesForceImport
 
 		// Check output file
 		$fileName = $this->tmpDir . $outputTable . ".csv";
-		$file = fopen($fileName, "w");
-		if (!$file) {
-			throw new Exception("Cannot open file '" . $fileName . "' for writing.");
-		}
+		$file = new \Keboola\Csv\CsvFile($fileName);
 
 		// Check storage API table. If table does not exist, perform a full dump
 		$tableId = $this->sApi->getTableId($outputTable, $this->storageApiBucket);
@@ -225,10 +218,7 @@ class App_SalesForceImport
 	public function importDeleted($object, $outputTable)
 	{
 		$fileName = $this->tmpDir . $outputTable . "_deleted.csv";
-		$file = fopen($fileName, "w");
-		if (!$file) {
-			throw new Exception("Cannot open file '" . $fileName . "' for writing.");
-		}
+		$file = new \Keboola\Csv\CsvFile($fileName);
 
 		$deletedArray = array(array("Id", "deletedDate"));
 
@@ -265,12 +255,12 @@ class App_SalesForceImport
 	 *
 	 * Writes to CSV
 	 *
-	 * @param $file
+	 * @param $file \Keboola|Csv
 	 * @param $data array of records
 	 */
-	private function _writeCsv($file, $data) {
+	private function _writeCsv(\Keboola\Csv\CsvFile $file, $data) {
 		foreach ($data as $line) {
-			fputcsv($file, $line, $this->_csvDelimiter, $this->_csvEnclosure);
+			$file->writeRow($line);
 		}
 	}
 
