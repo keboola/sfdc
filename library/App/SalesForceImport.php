@@ -138,9 +138,6 @@ class App_SalesForceImport
 				break;
 		}
 
-		// Check output file
-		$fileName = $this->tmpDir . $outputTable . ".csv";
-		$file = new \Keboola\Csv\CsvFile($fileName);
 
 		// Check storage API table. If table does not exist, perform a full dump
 		$tableId = $this->sApi->getTableId($outputTable, $this->storageApiBucket);
@@ -169,32 +166,39 @@ class App_SalesForceImport
 
 		// First batch
 		$response = $this->_query($query);
-		$headers = $this->_getHeaders($response);
-		$this->_writeCsv($file, array($headers));
+		if (count($response["records"]) > 0) {
+			// Check output file
+			$fileName = $this->tmpDir . $outputTable . ".csv";
+			$file = new \Keboola\Csv\CsvFile($fileName);
 
-		$records = $this->_parseRecords($response);
-		$this->_writeCsv($file, $records);
+			$headers = $this->_getHeaders($response);
+			$this->_writeCsv($file, array($headers));
 
-		// Query for more if all records could not be retreived at once
-		while (isset($response['done']) && $response['done'] === false && $response['nextRecordsUrl'] != '') {
-			$response = $this->_query($query, $response['nextRecordsUrl']);
 			$records = $this->_parseRecords($response);
 			$this->_writeCsv($file, $records);
-		}
 
-		if (count($records)) {
+			// Query for more if all records could not be retreived at once
+			while (isset($response['done']) && $response['done'] === false && $response['nextRecordsUrl'] != '') {
+				$response = $this->_query($query, $response['nextRecordsUrl']);
+				$records = $this->_parseRecords($response);
+				$this->_writeCsv($file, $records);
+			}
 
-			$fileNameGz = $fileName . ".gz";
-			exec("gzip $fileName");
+			if (count($records)) {
 
-			// If table in Storage API does not exist, create a new one
-			if (!$tableId) {
-				$this->sApi->createTable($this->storageApiBucket, $outputTable, $fileNameGz, ",", '"', "Id", $snapshots, $this->_snapshotNumber);
-			} else {
-				// Write data to table
-				$this->sApi->writeTable($tableId, $fileNameGz, $this->_snapshotNumber, ",", '"', $incrementalLoad);
+				$fileNameGz = $fileName . ".gz";
+				exec("gzip $fileName");
+
+				// If table in Storage API does not exist, create a new one
+				if (!$tableId) {
+					$this->sApi->createTable($this->storageApiBucket, $outputTable, $fileNameGz, ",", '"', "Id", $snapshots, $this->_snapshotNumber);
+				} else {
+					// Write data to table
+					$this->sApi->writeTable($tableId, $fileNameGz, $this->_snapshotNumber, ",", '"', $incrementalLoad);
+				}
 			}
 		}
+
 
 		// Get deleted records in incremental mode
 		if ($deletedItems) {
