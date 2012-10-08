@@ -182,9 +182,6 @@ class App_SalesForceImport
 			$this->_writeCsv($file, $records);
 		}
 
-		// Close input file
-		fclose($file);
-
 		if (count($records)) {
 
 			$fileNameGz = $fileName . ".gz";
@@ -232,7 +229,6 @@ class App_SalesForceImport
 		}
 
 		$this->_writeCsv($file, $deletedArray);
-		fclose($file);
 
 		if (count($deletedArray)) {
 
