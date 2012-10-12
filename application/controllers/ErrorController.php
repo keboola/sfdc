@@ -5,6 +5,8 @@ class ErrorController extends Zend_Controller_Action
 
 	public function errorAction()
 	{
+		$this->jsonErrorAction();
+		/*
 		$this->logError();
 
 		$errors = $this->_getParam('error_handler');
@@ -32,11 +34,13 @@ class ErrorController extends Zend_Controller_Action
 
 		$this->view->request = $errors->request;
 		$this->view->env = $this->getInvokeArg('bootstrap')->getEnvironment();
+		*/
 	}
 
 	public function jsonErrorAction()
 	{
-		$this->logError();
+
+		$exceptionId = $this->logError();
 
 		$this->_helper->viewRenderer->setNoRender(TRUE);
 
@@ -71,12 +75,13 @@ class ErrorController extends Zend_Controller_Action
 					$response['code'] = $stringCode;
 				}
 
+				$response["message"] = $errors->exception->getMessage();
+				$response["exceptionId"] = $exceptionId;
+
 				$this->_helper->json($response);
 
 				break;
 		}
-
-
 	}
 
 	protected function _getExceptionStringCode(\Exception $e)
@@ -88,11 +93,20 @@ class ErrorController extends Zend_Controller_Action
 		return $e->getStringCode();
 	}
 
+	protected function _getExceptionContextParams(\Exception $e)
+	{
+		if (!$e instanceof \Keboola\Exception) {
+			return FALSE;
+		}
+
+		return $e->getContextParams();
+	}
 
 	public function logError()
 	{
 		$errors = $this->_getParam('error_handler');
 		$logData = array();
+		$logData['exceptionId'] = "transformation-" . md5(uniqid("transformation", true));
 
 		$logPriority = Zend_Log::ERR;
 		if ($errors) {
@@ -100,6 +114,9 @@ class ErrorController extends Zend_Controller_Action
 			$logMessage = $exception->getMessage();
 			$logData['exception'] = $exception;
 			$logData['code'] = $this->_getExceptionStringCode($exception);
+			if ($this->_getExceptionContextParams($exception)) {
+				$logData['context'] = $this->_getExceptionContextParams($exception);
+			}
 
 			// log 404 as notice
 			$clientErrors = array(
@@ -113,11 +130,25 @@ class ErrorController extends Zend_Controller_Action
 				$logPriority = Zend_Log::NOTICE;
 			}
 
+			$body = $this->getRequest()->getRawBody();
+			$devel = $this->getRequest()->getParam("devel");
+			$jsonParams = array();
+			if (strlen($body)) {
+				try {
+					$jsonParams = Zend_Json::decode($body);
+				} catch (\Exception $e) {
+				}
+			}
+			if (isset($jsonParams["devel"]) && $jsonParams["devel"] || $devel) {
+				$logPriority = Zend_Log::NOTICE;
+			}
+
 		} else {
 			$logMessage = 'Unknown error';
 		}
 
 		$this->getLog()->log($logMessage, $logPriority, $logData);
+		return $logData["exceptionId"];
 	}
 
 	/**

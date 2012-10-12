@@ -33,10 +33,13 @@ class IndexController extends Zend_Controller_Action
 			$this->getResponse()->sendResponse();
 			die;
 		}
+	}
 
+	public function initStorageApi()
+	{
 		$token = $this->getRequest()->getHeader("X-StorageApi-Token");
 		if (!$token) {
-			throw new \Keboola\Exception("Missing token", null, null, "TRANSFORMATION_TOKEN");
+			throw new \Keboola\Exception("Missing Storage API token", null, null, "MISSING_TOKEN");
 		}
 
 		$config = Zend_Registry::get("config");
@@ -62,6 +65,7 @@ class IndexController extends Zend_Controller_Action
 	 */
 	public function accountsAction()
 	{
+		$this->initStorageApi();
 		$config = Zend_Registry::get("config");
 		\Keboola\StorageApi\Config\Reader::$client = $this->storageApi;
 		$bucket = $this->storageApi->getBucket($config->storageApi->configBucket);
@@ -88,6 +92,7 @@ class IndexController extends Zend_Controller_Action
 	 */
 	public function lastImportAction()
 	{
+		$this->initStorageApi();
 		$config = Zend_Registry::get("config");
 
 		\Keboola\StorageApi\Config\Reader::$client = $this->storageApi;
@@ -125,8 +130,7 @@ class IndexController extends Zend_Controller_Action
 	 */
 	public function runImportAction()
 	{
-
-
+		$this->initStorageApi();
 		if ($this->getRequest()->getMethod() != "POST") {
 			throw new \Keboola\Exception("Wrong method, use POST", null, null, "METHOD");
 		}
