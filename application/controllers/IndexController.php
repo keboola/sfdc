@@ -106,15 +106,14 @@ class IndexController extends Zend_Controller_Action
 		$response["forceImport"] = false;
 
 		foreach($sfdcConfig["items"] as $sfdcTableName => $sfdcItemConfig) {
-
-			if (!isset($response["lastImportDate"])) {
-				$response["lastImportDate"] = $sfdcItemConfig["log"]["extractDate"];
+			if (!isset($response["lastImport"])) {
+				$response["lastImport"] = $sfdcItemConfig["log"]["extractDate"];
 			} else {
-				$response["lastImportDate"] = min($response["lastImportDate"], $sfdcItemConfig["log"]["extractDate"]);
+				$response["lastImport"] = min($response["lastImport"], $sfdcItemConfig["log"]["extractDate"]);
 			}
 
 			$tableInfo = $this->storageApi->getTable($config->storageApi->configBucket . "." . $sfdcTableName);
-			if ($tableInfo["lastImportDate"] > $sfdcItemConfig["log"]["extractDate"]) {
+			if ($tableInfo["lastImport"] > $sfdcItemConfig["log"]["extractDate"]) {
 				$response["forceImport"] = true;
 			}
 		}
