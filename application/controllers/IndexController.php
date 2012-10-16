@@ -217,10 +217,9 @@ class IndexController extends Zend_Controller_Action
 				exec("rm -rf $tmpDir");
 
 			} catch(\Exception $e) {
-				throw new \Keboola\Exception($e->getMessage(), null, $e, "IMPORT");
+				throw new \Keboola\Exception($e->getMessage(), $e->getCode(), $e, "IMPORT");
 			}
 		}
-
 
 		if (!$passed) {
 			throw new \Keboola\Exception("Account {$jsonParams["account"]} not found", null, null, "ACCOUNT");

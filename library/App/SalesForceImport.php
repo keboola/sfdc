@@ -52,7 +52,7 @@ class App_SalesForceImport
 				$outputTable = $objectConfig->storageApiTable;
 			}
 
-			// Catch Import errors 
+			// Catch Import errors
 			$tableImported = false;
 			$iteration = 0;
 			while (!$tableImported && $iteration <= $this->importTtl) {
@@ -60,17 +60,14 @@ class App_SalesForceImport
 					$iteration++;
 					$this->importQuery($objectConfig->query, $outputTable, $objectConfig->load);
 					$tableImported = true;
-				} catch (Exception $e) {
-					throw $e;
-					if ($e->getCode() == "QUERY_TIMEOUT" && $iteration <= $this->importTtl) {
+				} catch (\Keboola\Exception $e) {
+					if ($e->getStringCode() == "QUERY_TIMEOUT" && $iteration <= $this->importTtl) {
 						sleep($this->importPause);
 					} else {
 						throw $e;
 					}
 				}
 			}
-
-
 		}
 	}
 
@@ -230,9 +227,8 @@ class App_SalesForceImport
 			foreach($deleted as $deletedItem) {
 				$deletedArray[] = array($deletedItem->id, $deletedItem->deletedDate);
 			}
+			$this->_writeCsv($file, $deletedArray);
 		}
-
-		$this->_writeCsv($file, $deletedArray);
 
 		if (count($deletedArray)) {
 
@@ -338,7 +334,7 @@ class App_SalesForceImport
 		$response = json_decode($json_response, true);
 
 		if (isset($response[0]['errorCode'])) {
-			throw new Exception($response[0]['errorCode'] . ': '. $response[0]['message']);
+			throw new \Keboola\Exception($response[0]['errorCode'] . ': '. $response[0]['message'], null, null, $response[0]['errorCode']);
 		}
 		return $response;
 	}
@@ -405,7 +401,7 @@ class App_SalesForceImport
 		//	$response = array_merge_recursive($response, $responseMore);
 		// }
 		if (isset($response[0]['errorCode'])) {
-			throw new \Keboola\Exception($response[0]['errorCode'] . ': '. $response[0]['message'], $response[0]['errorCode']);
+			throw new \Keboola\Exception($response[0]['errorCode'] . ': '. $response[0]['message'], null, null, $response[0]['errorCode']);
 		}
 		return $response;
 
