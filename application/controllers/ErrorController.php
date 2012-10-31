@@ -57,6 +57,13 @@ class ErrorController extends Zend_Controller_Action
 				));
 				break;
 			default:
+				// Maintenance
+				if ($errors->exception instanceof \Keboola\StorageApi\Exception) {
+					if ($errors->exception->getCode() == "MAINTENANCE") {
+						$this->getResponse()->setHttpResponseCode(503);
+						$this->_helper->json($errors->exception->getContextParams());
+					}
+				}
 				// application error
 				$logMessage = 'Application error.';
 				if ($errors->exception instanceof HttpException) {
@@ -67,6 +74,7 @@ class ErrorController extends Zend_Controller_Action
 				}
 
 				$response = array(
+					'status' => 'error',
 					'error' => $logMessage,
 				);
 
