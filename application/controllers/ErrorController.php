@@ -150,6 +150,9 @@ class ErrorController extends Zend_Controller_Action
 			if (isset($jsonParams["devel"]) && $jsonParams["devel"] || $devel) {
 				$logPriority = Zend_Log::NOTICE;
 			}
+			if ($logData['code'] == "MAINTENANCE") {
+				$logPriority = Zend_Log::NOTICE;
+			}
 
 		} else {
 			$logMessage = 'Unknown error';
