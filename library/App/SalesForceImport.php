@@ -305,7 +305,7 @@ class App_SalesForceImport
 			"query" => $query,
 			"queryUrl" => $queryUrl,
 			"client" => $this->userId,
-			"token" => $this->sApi->getTokenString()
+			"token" => $this->sApi->getLogData()
 		);
 		$log->log("SalesForce query starting.", Zend_Log::INFO, $logData);
 
@@ -484,7 +484,8 @@ class App_SalesForceImport
 
 		$response = json_decode($json_response, true);
 		if (isset($response['error'])) {
-			throw new \Keboola\Exception("Refreshing OAuth access token for user {$this->userId} ({$this->sApi->getTokenString()}) failed: " . $response['error'] . ": " . $response['error_description']);
+			$tokenInfo = $this->sApi->getLogData();
+			throw new \Keboola\Exception("Refreshing OAuth access token for user {$tokenInfo["owner"]} ({$tokenInfo["id"]}/{$tokenInfo["token"]})) failed: " . $response['error'] . ": " . $response['error_description']);
 		}
 
 		$this->accessToken = $response['access_token'];

@@ -187,8 +187,9 @@ class IndexController extends Zend_Controller_Action
 				$sfdc->userId = $connectionConfig->id;
 				$sfdc->username = $connectionConfig->username;
 				$sfdc->passSecret = $connectionConfig->passSecret;
+				$tokenInfo = $this->storageApi->getLogData();
 
-				$tmpDir = "/tmp/" . $this->storageApi->getTokenString() . "-" . uniqid($configName . "-") . "/";
+				$tmpDir = "/tmp/" . $tokenInfo["token"] . "-" . uniqid($configName . "-") . "/";
 
 				if (!file_exists($tmpDir)) {
 					mkdir($tmpDir);
@@ -203,8 +204,9 @@ class IndexController extends Zend_Controller_Action
 				$sfdc->importAll();
 
 				$duration = NDebugger::timer('account');
-				$log->log("SFDC Import {$configName} ({$this->storageApi->getTokenString()})", Zend_Log::INFO, array(
-					'duration'	=> $duration
+				$log->log("SFDC Import {$configName}", Zend_Log::INFO, array(
+					'duration'	=> $duration,
+					'token' => $tokenInfo
 				));
 
 				$tableId = $config->storageApi->configBucket . "." . $configName;
