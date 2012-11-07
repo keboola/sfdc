@@ -114,7 +114,7 @@ class ErrorController extends Zend_Controller_Action
 	{
 		$errors = $this->_getParam('error_handler');
 		$logData = array();
-		$logData['exceptionId'] = "transformation-" . md5(uniqid("transformation", true));
+		$logData['exceptionId'] = "extractor-sfdc-" . md5(uniqid("transformation", true));
 
 		$logPriority = Zend_Log::ERR;
 		if ($errors) {
