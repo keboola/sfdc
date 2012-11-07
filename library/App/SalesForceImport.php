@@ -230,7 +230,7 @@ class App_SalesForceImport
 			$this->_writeCsv($file, $deletedArray);
 		}
 
-		if (count($deletedArray)) {
+		if (count($deletedArray) > 1) {
 
 			$fileNameGz = $fileName . ".gz";
 			exec("gzip $fileName");
