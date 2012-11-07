@@ -212,7 +212,7 @@ class IndexController extends Zend_Controller_Action
 				$tableId = $config->storageApi->configBucket . "." . $configName;
 				$this->storageApi->setTableAttribute($tableId, "accessToken", $sfdc->accessToken);
 				$this->storageApi->setTableAttribute($tableId, "instanceUrl", $sfdc->instanceUrl);
-				$this->storageApi->setTableAttribute($tableId, "log.extractDate", date("Y-m-d H:i:s"));
+				$this->storageApi->setTableAttribute($tableId, "log.extractDate", date("Y-m-d\TH:i:sO"));
 				$this->storageApi->setTableAttribute($tableId, "log.extractDuration", $duration);
 
 				// Cleanup
