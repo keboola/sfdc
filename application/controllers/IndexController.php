@@ -230,4 +230,54 @@ class IndexController extends Zend_Controller_Action
 		$this->_helper->json($response);
 	}
 
+	/**
+	 * Alias
+	 */
+	public function runAction()
+	{
+		$this->_forward("run-import");
+	}
+
+	public function checkAction()
+	{
+		$this->initStorageApi();
+		$config = Zend_Registry::get("config");
+
+		\Keboola\StorageApi\Config\Reader::$client = $this->storageApi;
+		$sfdcConfig = \Keboola\StorageApi\Config\Reader::read($config->storageApi->configBucket);
+
+		if (count($sfdcConfig["items"]) == 0) {
+			throw new \Keboola\Exception("No configuration found", null, null, "CONFIG");
+		}
+
+		$response = array();
+		$response["forceRun"] = false;
+		$response["lastRunDate"] = null;
+
+		foreach($sfdcConfig["items"] as $sfdcTableName => $sfdcItemConfig) {
+			if (!isset($response["lastRunDate"])) {
+				$response["lastRunDate"] = $sfdcItemConfig["log"]["extractDate"];
+			} else {
+				$response["lastRunDate"] = min($response["lastRun"], $sfdcItemConfig["log"]["extractDate"]);
+			}
+
+			$tableInfo = $this->storageApi->getTable($config->storageApi->configBucket . "." . $sfdcTableName);
+			if ($tableInfo["lastImportDate"] > $sfdcItemConfig["log"]["extractDate"]) {
+				$response["forceRun"] = true;
+			}
+		}
+
+		$this->_helper->json($response);
+	}
+
+	public function checkRunAction()
+	{
+		$this->_forward("check");
+	}
+
+	public function lastAction()
+	{
+		$this->_forward("check");
+	}
+
 }

@@ -111,6 +111,30 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		$router->addRoute('run-import', $route);
 
 		$route = new Zend_Controller_Router_Route_Static(
+			'run',
+			array('controller' => 'index', 'action' => 'run')
+		);
+		$router->addRoute('run', $route);
+
+		$route = new Zend_Controller_Router_Route_Static(
+			'check',
+			array('controller' => 'index', 'action' => 'check')
+		);
+		$router->addRoute('check', $route);
+
+		$route = new Zend_Controller_Router_Route_Static(
+			'last',
+			array('controller' => 'index', 'action' => 'last')
+		);
+		$router->addRoute('last', $route);
+
+		$route = new Zend_Controller_Router_Route_Static(
+			'check-run',
+			array('controller' => 'index', 'action' => 'check-run')
+		);
+		$router->addRoute('check-run', $route);
+
+		$route = new Zend_Controller_Router_Route_Static(
 			'accounts',
 			array('controller' => 'index', 'action' => 'accounts')
 		);
