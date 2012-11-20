@@ -239,7 +239,7 @@ class App_SalesForceImport
 			$fileHeader = new \Keboola\Csv\CsvFile($fileHeaderName);
 			$this->_writeCsv($fileHeader, $deletedHeader);
 			// Create oneliner with CSV header
-			$this->sApi->createTable($this->storageApiBucket, $outputTable . "_deleted", $fileHeaderName, ",", '"', "Id");
+			$tableId = $this->sApi->createTable($this->storageApiBucket, $outputTable . "_deleted", $fileHeaderName, ",", '"', "Id");
 		}
 
 		if (count($deletedArray) > 1) {
