@@ -120,7 +120,7 @@ class ErrorController extends Zend_Controller_Action
 		if ($errors) {
 			$exception = $errors['exception'];
 			$logMessage = $exception->getMessage();
-			$logData['exception'] = $exception->__toString();
+			$logData['exception'] = $exception;
 			$logData['code'] = $this->_getExceptionStringCode($exception);
 			if ($this->_getExceptionContextParams($exception)) {
 				$logData['context'] = $this->_getExceptionContextParams($exception);
