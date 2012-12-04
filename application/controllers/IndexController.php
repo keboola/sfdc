@@ -257,10 +257,12 @@ class IndexController extends Zend_Controller_Action
 		$response["lastRunDate"] = null;
 
 		foreach($sfdcConfig["items"] as $sfdcTableName => $sfdcItemConfig) {
-			if (!isset($response["lastRunDate"])) {
-				$response["lastRunDate"] = $sfdcItemConfig["log"]["extractDate"];
-			} else {
-				$response["lastRunDate"] = min($response["lastRun"], $sfdcItemConfig["log"]["extractDate"]);
+			if (isset($sfdcItemConfig["log"]["extractDate"])) {
+				if (!$response["lastRunDate"]) {
+					$response["lastRunDate"] = $sfdcItemConfig["log"]["extractDate"];
+				} else {
+					$response["lastRunDate"] = min($response["lastRunDate"], $sfdcItemConfig["log"]["extractDate"]);
+				}
 			}
 
 			$tableInfo = $this->storageApi->getTable($config->storageApi->configBucket . "." . $sfdcTableName);
