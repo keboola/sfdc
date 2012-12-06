@@ -266,7 +266,9 @@ class IndexController extends Zend_Controller_Action
 			}
 
 			$tableInfo = $this->storageApi->getTable($config->storageApi->configBucket . "." . $sfdcTableName);
-			if ($tableInfo["lastImportDate"] > $sfdcItemConfig["log"]["extractDate"]) {
+			if (!isset($sfdcItemConfig["log"]["extractDate"])) {
+				$response["forceRun"] = true;
+			} elseif ($tableInfo["lastImportDate"] > $sfdcItemConfig["log"]["extractDate"]) {
 				$response["forceRun"] = true;
 			}
 		}
