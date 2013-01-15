@@ -48,6 +48,8 @@ class IndexController extends Zend_Controller_Action
 		Keboola\StorageApi\Client::setLogger(function($message, $data) use($log) {
 			$log->log($message, Zend_Log::INFO, $data);
 		});
+		$registry = Zend_Registry::getInstance();
+		$registry->storageApi = $this->storageApi;
 
 	}
 

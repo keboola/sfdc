@@ -126,6 +126,11 @@ class ErrorController extends Zend_Controller_Action
 				$logData['context'] = $this->_getExceptionContextParams($exception);
 			}
 
+			$registry = Zend_Registry::getInstance();
+			if (isset($registry->storageApi)) {
+				$logData["token"] = $registry->storageApi->getLogData();
+			}
+
 			// log 404 as notice
 			$clientErrors = array(
 				HttpException::BAD_REQUEST,
