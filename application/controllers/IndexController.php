@@ -28,7 +28,7 @@ class IndexController extends Zend_Controller_Action
 		// CORS
 		if ($this->getRequest()->getMethod() == "OPTIONS") {
 			$this->getResponse()->setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-			$this->getResponse()->setHeader('Access-Control-Allow-Headers', 'content-type, x-requested-with, x-requested-by');
+			$this->getResponse()->setHeader('Access-Control-Allow-Headers', 'content-type, x-requested-with, x-requested-by', 'x-storageapi-token', 'x-storageapi-url', 'x-kbc-runid');
 			$this->getResponse()->setHeader('Access-Control-Max-Age', '86400');
 			$this->getResponse()->sendResponse();
 			die;
@@ -46,11 +46,20 @@ class IndexController extends Zend_Controller_Action
 		$this->storageApi = new \Keboola\StorageApi\Client($token, $config->storageApi->url, $config->app->projectName);
 		$log = Zend_Registry::get("log");
 		Keboola\StorageApi\Client::setLogger(function($message, $data) use($log) {
+			$registry = \Zend_Registry::getInstance();
+			if (!isset($data["runId"]) && isset($registry["runId"])) {
+				$data["runId"] = $registry["runId"];
+			}
 			$log->log($message, Zend_Log::INFO, $data);
 		});
 		$registry = Zend_Registry::getInstance();
 		$registry->storageApi = $this->storageApi;
-
+		if ($this->getRequest()->getHeader("X-KBC-RunId")) {
+			$registry->runId = $this->getRequest()->getHeader("X-KBC-RunId");
+		} else {
+			$registry->runId = $this->storageApi->generateId();
+		}
+		$this->storageApi->setRunId($registry->runId);
 	}
 
 	/**

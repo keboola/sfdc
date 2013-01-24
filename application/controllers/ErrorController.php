@@ -117,6 +117,7 @@ class ErrorController extends Zend_Controller_Action
 		$logData['exceptionId'] = "extractor-sfdc-" . md5(uniqid("transformation", true));
 
 		$logPriority = Zend_Log::ERR;
+		$registry = Zend_Registry::getInstance();
 		if ($errors) {
 			$exception = $errors['exception'];
 			$logMessage = $exception->getMessage();
@@ -126,7 +127,6 @@ class ErrorController extends Zend_Controller_Action
 				$logData['context'] = $this->_getExceptionContextParams($exception);
 			}
 
-			$registry = Zend_Registry::getInstance();
 			if (isset($registry->storageApi)) {
 				$logData["token"] = $registry->storageApi->getLogData();
 			}
@@ -161,6 +161,10 @@ class ErrorController extends Zend_Controller_Action
 
 		} else {
 			$logMessage = 'Unknown error';
+		}
+
+		if (!isset($logData["runId"]) && isset($registry->runId)) {
+			$logData["runId"] = \Zend_Registry::get("runId");
 		}
 
 		$this->getLog()->log($logMessage, $logPriority, $logData);
