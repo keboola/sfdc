@@ -343,7 +343,7 @@ class IndexController extends Zend_Controller_Action
 		$session = new Zend_Session_Namespace('oauth');
 		if (!$session->token) {
 			$this->_helper->json(array("status" => "error", "message" => "Session expired. Prepare again."));
-		} 
+		}
 		if ($session->token) {
 			$this->initStorageApi($session->token);
 		}
@@ -409,6 +409,8 @@ class IndexController extends Zend_Controller_Action
 		$this->storageApi->setTableAttribute($tableId, "instanceUrl", $response['instance_url']);
 		$this->storageApi->setTableAttribute($tableId, "accessToken", $response['access_token']);
 		$this->storageApi->setTableAttribute($tableId, "refreshToken", $response['refresh_token']);
+
+		$session->unsetAll();
 
 		$this->_helper->json(array("status" => "ok"));
 	}
