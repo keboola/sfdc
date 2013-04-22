@@ -153,8 +153,8 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		$router->addRoute('oauth-callback', $route);
 
 		$route = new Zend_Controller_Router_Route_Static(
-			'prepare-oauth',
-			array('controller' => 'index', 'action' => 'prepare-oauth')
+			'oauth-prepare',
+			array('controller' => 'index', 'action' => 'oauth-prepare')
 		);
 		$router->addRoute('prepare-oauth', $route);
 

@@ -301,7 +301,7 @@ class IndexController extends Zend_Controller_Action
 		$this->_forward("check");
 	}
 
-	public function prepareOauthAction()
+	public function oauthPrepareAction()
 	{
 		$config = Zend_Registry::get("config");
 		$this->initStorageApi();
