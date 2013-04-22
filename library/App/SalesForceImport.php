@@ -211,7 +211,7 @@ class App_SalesForceImport
 	 *
 	 * @param $object
 	 * @param $outputTable
-	 * @throws Exception¨
+	 * @throws Exception
 	 */
 	public function importDeleted($object, $outputTable)
 	{

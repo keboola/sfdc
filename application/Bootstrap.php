@@ -138,8 +138,27 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 			'accounts',
 			array('controller' => 'index', 'action' => 'accounts')
 		);
-
 		$router->addRoute('accounts', $route);
+
+		$route = new Zend_Controller_Router_Route_Static(
+			'oauth',
+			array('controller' => 'index', 'action' => 'oauth')
+		);
+		$router->addRoute('oauth', $route);
+
+		$route = new Zend_Controller_Router_Route_Static(
+			'oauth-callback',
+			array('controller' => 'index', 'action' => 'oauth-callback')
+		);
+		$router->addRoute('oauth-callback', $route);
+
+		$route = new Zend_Controller_Router_Route_Static(
+			'prepare-oauth',
+			array('controller' => 'index', 'action' => 'prepare-oauth')
+		);
+		$router->addRoute('prepare-oauth', $route);
+
+
 
 		return $router;
 	}

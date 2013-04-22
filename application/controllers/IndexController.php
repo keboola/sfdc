@@ -35,9 +35,13 @@ class IndexController extends Zend_Controller_Action
 		}
 	}
 
-	public function initStorageApi()
+	public function initStorageApi($tkn=null)
 	{
-		$token = $this->getRequest()->getHeader("X-StorageApi-Token");
+		if ($tkn) {
+			$token = $tkn;
+		} else {
+			$token = $this->getRequest()->getHeader("X-StorageApi-Token");
+		}
 		if (!$token) {
 			throw new \Keboola\Exception("Missing Storage API token", null, null, "MISSING_TOKEN");
 		}
@@ -295,6 +299,118 @@ class IndexController extends Zend_Controller_Action
 	public function lastAction()
 	{
 		$this->_forward("check");
+	}
+
+	public function prepareOauthAction()
+	{
+		$config = Zend_Registry::get("config");
+		$this->initStorageApi();
+
+		$session = new Zend_Session_Namespace('oauth');
+		$session->setExpirationSeconds(60);
+		$session->token = $this->storageApi->getTokenString();
+
+		$body = $this->getRequest()->getRawBody();
+		$jsonParams = array();
+		if (strlen($body)) {
+			$jsonParams = Zend_Json::decode($body);
+		}
+		if (isset($jsonParams["account"])) {
+			$session->account = $jsonParams["account"];
+		}
+		$this->_helper->json(array(
+			"status" => "ok",
+			"uri" => $config->salesForce->oauthUri
+		));
+	}
+
+	public function oauthAction()
+	{
+		$session = new Zend_Session_Namespace('oauth');
+		if (!$session->token) {
+			$this->_helper->json(array("status" => "error", "message" => "Session expired. Prepare again."));
+		}
+		$config = Zend_Registry::get("config");
+		$auth_url = $config->salesForce->loginUri
+			. "/services/oauth2/authorize?response_type=code&client_id="
+			. $config->salesForce->clientId . "&redirect_uri=" . urlencode($config->salesForce->redirectUri)
+			. "&scope=id api full refresh_token web";
+		die(header('Location: ' . $auth_url));
+	}
+
+	public function oauthCallbackAction()
+	{
+		$session = new Zend_Session_Namespace('oauth');
+		if (!$session->token) {
+			$this->_helper->json(array("status" => "error", "message" => "Session expired. Prepare again."));
+		} 
+		if ($session->token) {
+			$this->initStorageApi($session->token);
+		}
+
+		$config = Zend_Registry::get("config");
+		$token_url = $config->salesForce->loginUri . "/services/oauth2/token";
+		$code = $_GET['code'];
+
+		if (!isset($code) || $code == "") {
+			throw new Exception("Error - code parameter missing from request!");
+		}
+
+		$params = "code=" . $code
+			. "&grant_type=authorization_code"
+			. "&client_id=" . $config->salesForce->clientId
+			. "&client_secret=" . $config->salesForce->clientSecret
+			. "&redirect_uri=" . urlencode($config->salesForce->redirectUri);
+
+		$curl = curl_init($token_url);
+		curl_setopt($curl, CURLOPT_HEADER, false);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($curl, CURLOPT_POST, true);
+		curl_setopt($curl, CURLOPT_POSTFIELDS, $params);
+
+		$json_response = curl_exec($curl);
+
+		$status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+
+		if ( $status != 200 ) {
+			throw new Exception("Error: call to token URL $token_url failed with status $status, response $json_response, curl_error " . curl_error($curl) . ", curl_errno " . curl_errno($curl));
+		}
+
+		curl_close($curl);
+
+		$response = json_decode($json_response, true);
+
+		$access_token = $response['access_token'];
+		$instance_url = $response['instance_url'];
+
+		if (!isset($access_token) || $access_token == "") {
+			throw new Exception("Error - access token missing from response!");
+		}
+
+		if (!isset($instance_url) || $instance_url == "") {
+			throw new Exception("Error - instance URL missing from response!");
+		}
+
+		if (!$this->storageApi->bucketExists("sys.c-SFDC")) {
+			$this->storageApi->createBucket("SFDC", "sys", "SFDC configuration");
+		}
+		if (isset($session->account)) {
+			$tableName = $session->account;
+
+		} else {
+			$tableName = "SFDC01";
+		}
+		$tableId = "sys.c-SFDC." . $tableName;
+		if (!$this->storageApi->tableExists($tableId)) {
+			$this->storageApi->createTable("sys.c-SFDC", $tableName, ROOT_PATH . "/application/configs/tableTemplate.csv");
+		}
+		$this->storageApi->setTableAttribute($tableId, "clientId", $config->salesForce->clientId);
+		$this->storageApi->setTableAttribute($tableId, "clientSecret", $config->salesForce->clientSecret);
+		$this->storageApi->setTableAttribute($tableId, "instanceUrl", $response['instance_url']);
+		$this->storageApi->setTableAttribute($tableId, "accessToken", $response['access_token']);
+		$this->storageApi->setTableAttribute($tableId, "refreshToken", $response['refresh_token']);
+
+		$this->_helper->json(array("status" => "ok"));
 	}
 
 }
