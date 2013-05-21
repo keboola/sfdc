@@ -466,10 +466,9 @@ class App_SalesForceImport
 	 * @throws Exception
 	 *
 	 */
-	public function revalidateAccessToken($accessToken, $clientId, $clientSecret, $refreshToken) {
+	public function revalidateAccessToken($accessToken, $clientId, $clientSecret, $refreshToken, $loginUri) {
 
-		$registry = \Zend_Registry::getInstance();
-		$url = $registry->config->salesForce->loginUri . "/services/oauth2/token";
+		$url = $loginUri . "/services/oauth2/token";
 
 		$params = "grant_type=refresh_token&client_id=" . $clientId . "&client_secret=" . $clientSecret . "&refresh_token=" . $refreshToken;
 

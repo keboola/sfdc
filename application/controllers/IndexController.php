@@ -188,7 +188,9 @@ class IndexController extends Zend_Controller_Action
 				$sfdc = new App_SalesForceImport($connectionConfig, $soqlConfig);
 
 				$sfdc->sApi = $this->storageApi;
-				$revalidation = $sfdc->revalidateAccessToken($connectionConfig->accessToken, $connectionConfig->clientId, $connectionConfig->clientSecret, $connectionConfig->refreshToken);
+				$registry = \Zend_Registry::getInstance();
+				$loginUri = $connectionConfig->get("loginUri", $registry->config->salesForce->loginUri);
+				$revalidation = $sfdc->revalidateAccessToken($connectionConfig->accessToken, $connectionConfig->clientId, $connectionConfig->clientSecret, $connectionConfig->refreshToken, $loginUri);
 
 				$connectionConfig->accessToken = $revalidation['access_token'];
 				$connectionConfig->instanceUrl = $revalidation['instance_url'];
@@ -318,6 +320,12 @@ class IndexController extends Zend_Controller_Action
 		if (isset($jsonParams["account"])) {
 			$session->account = $jsonParams["account"];
 		}
+		if (isset($jsonParams["loginUri"])) {
+			$session->loginUri = $jsonParams["loginUri"];
+		} else {
+			$session->loginUri = $config->salesForce->loginUri;
+		}
+
 		$this->_helper->json(array(
 			"status" => "ok",
 			"uri" => $config->salesForce->oauthUri
@@ -331,8 +339,8 @@ class IndexController extends Zend_Controller_Action
 			$this->_helper->json(array("status" => "error", "message" => "Session expired. Prepare again."));
 		}
 		$config = Zend_Registry::get("config");
-		$auth_url = $config->salesForce->loginUri
-			. "/services/oauth2/authorize?response_type=code&client_id="
+		$auth_url = $session->loginUri;
+		$auth_url .= "/services/oauth2/authorize?response_type=code&client_id="
 			. $config->salesForce->clientId . "&redirect_uri=" . urlencode($config->salesForce->redirectUri)
 			. "&scope=id api full refresh_token web";
 		die(header('Location: ' . $auth_url));
@@ -349,7 +357,7 @@ class IndexController extends Zend_Controller_Action
 		}
 
 		$config = Zend_Registry::get("config");
-		$token_url = $config->salesForce->loginUri . "/services/oauth2/token";
+		$token_url = $session->loginUri . "/services/oauth2/token";
 		$code = $_GET['code'];
 
 		if (!isset($code) || $code == "") {
@@ -409,6 +417,7 @@ class IndexController extends Zend_Controller_Action
 		$this->storageApi->setTableAttribute($tableId, "instanceUrl", $response['instance_url']);
 		$this->storageApi->setTableAttribute($tableId, "accessToken", $response['access_token']);
 		$this->storageApi->setTableAttribute($tableId, "refreshToken", $response['refresh_token']);
+		$this->storageApi->setTableAttribute($tableId, "loginUri", $session->loginUri);
 
 		$session->unsetAll();
 
