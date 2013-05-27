@@ -336,7 +336,7 @@ class IndexController extends Zend_Controller_Action
 	{
 		$session = new Zend_Session_Namespace('oauth');
 		if (!$session->token) {
-			$this->_helper->json(array("status" => "error", "message" => "Session expired. Prepare again."));
+			$this->_helper->json(array("status" => "warning", "message" => "Session expired. Prepare again."));
 		}
 		$config = Zend_Registry::get("config");
 		$auth_url = $session->loginUri;
@@ -350,7 +350,7 @@ class IndexController extends Zend_Controller_Action
 	{
 		$session = new Zend_Session_Namespace('oauth');
 		if (!$session->token) {
-			$this->_helper->json(array("status" => "error", "message" => "Session expired. Prepare again."));
+			$this->_helper->json(array("status" => "warning", "message" => "Session expired. Prepare again."));
 		}
 		if ($session->token) {
 			$this->initStorageApi($session->token);
