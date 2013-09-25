@@ -188,10 +188,19 @@ class App_SalesForceImport
 
 				// If table in Storage API does not exist, create a new one
 				if (!$tableId) {
-					$this->sApi->createTable($this->storageApiBucket, $outputTable, $fileNameGz, ",", '"', "Id", $snapshots, $this->_snapshotNumber);
+					$this->sApi->createTableAsync(
+							$this->storageApiBucket,
+							$outputTable,
+							new \Keboola\Csv\CsvFile($fileNameGz, ",", '"'),
+							array("primaryKey" => "Id", "transactional" => $snapshots));
+
 				} else {
 					// Write data to table
-					$this->sApi->writeTable($tableId, $fileNameGz, $this->_snapshotNumber, ",", '"', $incrementalLoad);
+					$this->sApi->writeTableAsync(
+							$tableId,
+							new \Keboola\Csv\CsvFile($fileNameGz, ",", '"'),
+							array("transaction" => $this->_snapshotNumber, "incremental" => $incrementalLoad)
+					);
 				}
 			}
 		}
@@ -235,17 +244,25 @@ class App_SalesForceImport
 
 		// If table in Storage API does not exist, create a new one
 		if (!$tableId) {
-			$fileHeaderName = $this->tmpDir . $outputTable . "_deleted" . "_header";
+			$fileHeaderName = $this->tmpDir . $outputTable . "_deleted" . "_header.csv";
 			$fileHeader = new \Keboola\Csv\CsvFile($fileHeaderName);
 			$this->_writeCsv($fileHeader, $deletedHeader);
 			// Create oneliner with CSV header
-			$tableId = $this->sApi->createTable($this->storageApiBucket, $outputTable . "_deleted", $fileHeaderName, ",", '"', "Id");
+			$tableId = $this->sApi->createTableAsync(
+					$this->storageApiBucket,
+					$outputTable . "_deleted",
+					new Keboola\Csv\CsvFile($fileHeaderName, ",", '"'),
+					array("primaryKey" => "Id")
+			);
 		}
-
 		if (count($deletedArray) > 1) {
 			$fileNameGz = $fileName . ".gz";
 			exec("gzip $fileName");
-			$this->sApi->writeTable($tableId, $fileNameGz, $this->_snapshotNumber, ",", '"', true);
+			$this->sApi->writeTableAsync(
+					$tableId,
+					new \Keboola\Csv\CsvFile($fileNameGz, ",", '"'),
+					array("transaction" => $this->_snapshotNumber, "incremental" => true)
+			);
 		}
 	}
 
