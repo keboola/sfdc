@@ -123,9 +123,8 @@ class ErrorController extends Zend_Controller_Action
 			$logMessage = $exception->getMessage();
 			$logData['exception'] = $exception;
 			$logData['code'] = $this->_getExceptionStringCode($exception);
-			if ($this->_getExceptionContextParams($exception)) {
-				$logData['context'] = $this->_getExceptionContextParams($exception);
-			}
+			$logData['context'] = $this->_getExceptionContextParams($exception);
+			$logData['class'] = get_class($exception);
 
 			if (isset($registry->storageApi)) {
 				$logData["token"] = $registry->storageApi->getLogData();

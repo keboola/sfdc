@@ -64,8 +64,16 @@ class App_SalesForceImport
 					if ($e->getStringCode() == "QUERY_TIMEOUT" && $iteration <= $this->importTtl) {
 						sleep($this->importPause);
 					} else {
-						throw $e;
+						$message = "Import failed for table '{$outputTable}': " . $e->getMessage();
+						$newE = new \Keboola\Exception($message, $e->getCode(), $e, "IMPORT");
+						$newE->setContextParams(array_merge($e->getContextParams(), array("query" => $objectConfig->query)));
+						throw $newE;
 					}
+				} catch (\Exception $e) {
+					$message = "Import failed for table '{$outputTable}': " . $e->getMessage();
+					$newE = new \Keboola\Exception($message, $e->getCode(), $e, "IMPORT");
+					$newE->setContextParams(array("query" => $objectConfig->query));
+					throw $newE;
 				}
 			}
 		}
@@ -504,7 +512,7 @@ class App_SalesForceImport
 		$response = json_decode($json_response, true);
 		if (isset($response['error'])) {
 			$tokenInfo = $this->sApi->getLogData();
-			throw new \Keboola\Exception("Refreshing OAuth access token for user {$tokenInfo["owner"]} ({$tokenInfo["id"]}/{$tokenInfo["token"]})) failed: " . $response['error'] . ": " . $response['error_description']);
+			throw new \Keboola\Exception("Refreshing OAuth access token for user {$tokenInfo["owner"]["id"]}/{$tokenInfo["owner"]["name"]} ({$tokenInfo["id"]}/{$tokenInfo["token"]})) failed: " . $response['error'] . ": " . $response['error_description']);
 		}
 
 		$this->accessToken = $response['access_token'];

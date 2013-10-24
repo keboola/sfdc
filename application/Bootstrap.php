@@ -147,6 +147,12 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		$router->addRoute('oauth', $route);
 
 		$route = new Zend_Controller_Router_Route_Static(
+			'oauth-ui',
+			array('controller' => 'index', 'action' => 'oauth-ui')
+		);
+		$router->addRoute('oauth-ui', $route);
+
+		$route = new Zend_Controller_Router_Route_Static(
 			'oauth-callback',
 			array('controller' => 'index', 'action' => 'oauth-callback')
 		);

@@ -28,7 +28,7 @@ class IndexController extends Zend_Controller_Action
 		// CORS
 		if ($this->getRequest()->getMethod() == "OPTIONS") {
 			$this->getResponse()->setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-			$this->getResponse()->setHeader('Access-Control-Allow-Headers', 'content-type, x-requested-with, x-requested-by', 'x-storageapi-token', 'x-storageapi-url', 'x-kbc-runid');
+			$this->getResponse()->setHeader('Access-Control-Allow-Headers', 'content-type, x-requested-with, x-requested-by, x-storageapi-token, x-storageapi-url, x-kbc-runid');
 			$this->getResponse()->setHeader('Access-Control-Max-Age', '86400');
 			$this->getResponse()->sendResponse();
 			die;
@@ -37,10 +37,13 @@ class IndexController extends Zend_Controller_Action
 
 	public function initStorageApi($tkn=null)
 	{
+
 		if ($tkn) {
 			$token = $tkn;
-		} else {
+		} elseif ($this->getRequest()->getHeader("X-StorageApi-Token")) {
 			$token = $this->getRequest()->getHeader("X-StorageApi-Token");
+		} else {
+			$token = $this->getRequest()->getParam("token");
 		}
 		if (!$token) {
 			throw new \Keboola\Exception("Missing Storage API token", null, null, "MISSING_TOKEN");
@@ -190,7 +193,11 @@ class IndexController extends Zend_Controller_Action
 				$sfdc->sApi = $this->storageApi;
 				$registry = \Zend_Registry::getInstance();
 				$loginUri = $connectionConfig->get("loginUri", $registry->config->salesForce->loginUri);
-				$revalidation = $sfdc->revalidateAccessToken($connectionConfig->accessToken, $connectionConfig->clientId, $connectionConfig->clientSecret, $connectionConfig->refreshToken, $loginUri);
+
+				# Default keys overwritten by config
+				$clientId = $connectionConfig->get("clientId", $registry->config->salesForce->clientId);
+				$clientSecret = $connectionConfig->get("clientSecret", $registry->config->salesForce->clientSecret);
+				$revalidation = $sfdc->revalidateAccessToken($connectionConfig->accessToken, $clientId, $clientSecret, $connectionConfig->refreshToken, $loginUri);
 
 				$connectionConfig->accessToken = $revalidation['access_token'];
 				$connectionConfig->instanceUrl = $revalidation['instance_url'];
@@ -236,7 +243,11 @@ class IndexController extends Zend_Controller_Action
 				exec("rm -rf $tmpDir");
 
 			} catch(\Exception $e) {
-				throw new \Keboola\Exception($e->getMessage(), $e->getCode(), $e, "IMPORT");
+				$newE = new \Keboola\Exception($e->getMessage(), $e->getCode(), $e, "IMPORT");
+				if ($e instanceof \Keboola\Exception) {
+					$newE->setContextParams($e->getContextParams());
+				}
+				throw $newE;
 			}
 		}
 
@@ -346,6 +357,36 @@ class IndexController extends Zend_Controller_Action
 		die(header('Location: ' . $auth_url));
 	}
 
+	public function oauthUiAction()
+	{
+		$config = Zend_Registry::get("config");
+		$this->initStorageApi();
+
+		$session = new Zend_Session_Namespace('oauth');
+		$session->setExpirationSeconds(60);
+		$session->token = $this->storageApi->getTokenString();
+
+		if ($this->getRequest()->getParam("account")) {
+			$session->account = $this->getRequest()->getParam("account");
+		}
+		if ($this->getRequest()->getParam("referrer")) {
+			$session->referrer = $this->getRequest()->getParam("referrer");
+		}
+
+		if ($this->getRequest()->getParam("loginUri")) {
+			$session->loginUri = $this->getRequest()->getParam("loginUri");
+		} else {
+			$session->loginUri = $config->salesForce->loginUri;
+		}
+
+		$config = Zend_Registry::get("config");
+		$auth_url = $session->loginUri;
+		$auth_url .= "/services/oauth2/authorize?response_type=code&client_id="
+			. $config->salesForce->clientId . "&redirect_uri=" . urlencode($config->salesForce->redirectUri)
+			. "&scope=id api full refresh_token web";
+		$this->_redirect($auth_url);
+	}
+
 	public function oauthCallbackAction()
 	{
 		$session = new Zend_Session_Namespace('oauth');
@@ -418,10 +459,13 @@ class IndexController extends Zend_Controller_Action
 		$this->storageApi->setTableAttribute($tableId, "accessToken", $response['access_token']);
 		$this->storageApi->setTableAttribute($tableId, "refreshToken", $response['refresh_token']);
 		$this->storageApi->setTableAttribute($tableId, "loginUri", $session->loginUri);
-
+		$referrer = $session->referrer;
 		$session->unsetAll();
-
-		$this->_helper->json(array("status" => "ok"));
+		if ($referrer) {
+			$this->_redirect($referrer);
+		} else {
+			$this->_helper->json(array("status" => "ok"));
+		}
 	}
 
 }
