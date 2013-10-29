@@ -453,8 +453,7 @@ class IndexController extends Zend_Controller_Action
 		if (!$this->storageApi->tableExists($tableId)) {
 			$this->storageApi->createTable("sys.c-SFDC", $tableName, ROOT_PATH . "/application/configs/tableTemplate.csv");
 		}
-		$this->storageApi->setTableAttribute($tableId, "clientId", $config->salesForce->clientId);
-		$this->storageApi->setTableAttribute($tableId, "clientSecret", $config->salesForce->clientSecret);
+
 		$this->storageApi->setTableAttribute($tableId, "instanceUrl", $response['instance_url']);
 		$this->storageApi->setTableAttribute($tableId, "accessToken", $response['access_token']);
 		$this->storageApi->setTableAttribute($tableId, "refreshToken", $response['refresh_token']);
