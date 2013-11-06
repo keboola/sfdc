@@ -210,7 +210,12 @@ class IndexController extends Zend_Controller_Action
 				$sfdc->instanceUrl = $connectionConfig->instanceUrl;
 				$sfdc->userId = $connectionConfig->id;
 				$sfdc->username = $connectionConfig->username;
-				$sfdc->passSecret = $connectionConfig->passSecret;
+				if ($connectionConfig->passSecret) {
+					$sfdc->passSecret = $connectionConfig->passSecret;
+				}
+				if ($connectionConfig->password && $connectionConfig->securityToken) {
+					$sfdc->passSecret = $connectionConfig->password . $connectionConfig->securityToken;
+				}
 				$tokenInfo = $this->storageApi->getLogData();
 
 				$tmpDir = "/tmp/" . $tokenInfo["token"] . "-" . uniqid($configName . "-") . "/";
