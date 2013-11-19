@@ -79,27 +79,84 @@ class IndexController extends Zend_Controller_Action
 	}
 
 	/**
-	 * List Accounts
+	 * List Accounts, Create a new account
 	 */
 	public function accountsAction()
 	{
 		$this->initStorageApi();
 		$config = Zend_Registry::get("config");
-		\Keboola\StorageApi\Config\Reader::$client = $this->storageApi;
 		$bucket = $this->storageApi->getBucket($config->storageApi->configBucket);
 
 		$accounts = array();
+		\Keboola\StorageApi\Config\Reader::$client = $this->storageApi;
 
-		if(!$bucket["tables"] || count($bucket["tables"]) == 0) {
-			$this->_helper->json(array("accounts" => $accounts));
-			return;
+		if ($this->getRequest()->getMethod() == "GET") {
+			if(!$bucket["tables"] || count($bucket["tables"]) == 0) {
+				$this->_helper->json($accounts);
+				return;
+			}
+
+			foreach($bucket["tables"] as $table) {
+				$account = array();
+				$account["id"] = $table["name"];
+				$account["name"] = $table["name"];
+				$account["description"] = "";
+				$attributes = $this->attributesKeyValueMap($table["attributes"]);
+				if (isset($attributes["friendlyName"])) {
+					$account["name"] = $attributes["friendlyName"];
+				}
+				if (isset($attributes["description"])) {
+					$account["description"] = $attributes["description"];
+				}
+				$accounts[] = $account;
+			}
+
+			$this->_helper->json($accounts);
 		}
 
-		foreach($bucket["tables"] as $table) {
-			$accounts[] = $table["name"];
+		if ($this->getRequest()->getMethod() == "POST") {
+			$body = $this->getRequest()->getRawBody();
+			$jsonParams = array();
+			if (strlen($body)) {
+				$jsonParams = Zend_Json::decode($body);
+			}
+			if (!isset($jsonParams["name"])) {
+				throw new \Keboola\Exception("Missing 'name' parameter.", null, null, "CONFIG");
+			}
+			$name = $jsonParams["name"];
+			$description = "";
+			if (isset($jsonParams["description"])) {
+				$description = $jsonParams["description"];
+			}
+			$id = "SFDC-" . strtolower(preg_replace("/[^[:alnum:]_]/", '_', $name));
+
+			$available = true;
+			foreach($bucket["tables"] as $table) {
+				if($table["name"] == $id) {
+					$available = false;
+				}
+			}
+
+			// Add suffix
+			if (!$available) {
+				$id .= "-" . substr(base_convert(uniqid(), 16, 36), -4);
+			}
+
+			$templateFile = new \Keboola\Csv\CsvFile(ROOT_PATH . "/application/configs/tableTemplate.csv");
+			$this->storageApi->createTable($config->storageApi->configBucket, $id, $templateFile);
+			$this->storageApi->setTableAttribute($config->storageApi->configBucket . "." . $id, "friendlyName", $name);
+			$this->storageApi->setTableAttribute($config->storageApi->configBucket . "." . $id, "description", $description);
+
+			$account = array(
+				"id" => $id,
+				"name" => $name,
+				"description" => $description
+			);
+			$this->getResponse()->setHttpResponseCode(201);
+			$this->_helper->json($account);
 		}
 
-		$this->_helper->json(array("accounts" => $accounts));
+
 	}
 
 	/**
@@ -170,7 +227,6 @@ class IndexController extends Zend_Controller_Action
 
 
 		foreach($sfdcConfig["items"] as $configName => $configInstance) {
-
 			if (count($jsonParams) && $jsonParams["account"] != $configName) {
 				continue;
 			}
@@ -470,6 +526,16 @@ class IndexController extends Zend_Controller_Action
 		} else {
 			$this->_helper->json(array("status" => "ok"));
 		}
+	}
+
+
+	private function attributesKeyValueMap($attributes)
+	{
+		$map = array();
+		foreach ($attributes as $attribute) {
+			$map[$attribute['name']] = $attribute['value'];
+		}
+		return $map;
 	}
 
 }
