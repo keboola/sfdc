@@ -244,7 +244,7 @@ class IndexController extends Zend_Controller_Action
 
 				\NDebugger::timer('account');
 
-				$sfdc = new App_SalesForceImport($connectionConfig, $soqlConfig);
+				$sfdc = new App_SalesForceImport($connectionConfig, $soqlConfig, $configName);
 
 				$sfdc->sApi = $this->storageApi;
 				$registry = \Zend_Registry::getInstance();

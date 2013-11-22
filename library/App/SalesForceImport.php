@@ -4,6 +4,7 @@ class App_SalesForceImport
 {
 	private $_sfConfig;
 	private $_soqlConfig;
+	private $_configName;
 
 	public $tmpDir = "/tmp/";
 
@@ -28,11 +29,12 @@ class App_SalesForceImport
 	/**
 	 * @param $idUser
 	 */
-	public function __construct($sfConfig, $soqlConfig=array())
+	public function __construct($sfConfig, $soqlConfig=array(), $configName)
 	{
 		$this->_sfConfig = $sfConfig;
 		$this->_soqlConfig = $soqlConfig;
 		$this->_registry = Zend_Registry::getInstance();
+		$this->_configName = $configName;
 		$this->_snapshotNumber = floor (time()  / 86400);
 	}
 
@@ -512,7 +514,7 @@ class App_SalesForceImport
 		$response = json_decode($json_response, true);
 		if (isset($response['error'])) {
 			$tokenInfo = $this->sApi->getLogData();
-			throw new \Keboola\Exception("Refreshing OAuth access token for user {$tokenInfo["owner"]["id"]}/{$tokenInfo["owner"]["name"]} ({$tokenInfo["id"]}/{$tokenInfo["token"]})) failed: " . $response['error'] . ": " . $response['error_description']);
+			throw new \Keboola\Exception("Refreshing OAuth access token in account '{$this->_configName}' failed: " . $response['error'] . ": " . $response['error_description']);
 		}
 
 		$this->accessToken = $response['access_token'];
