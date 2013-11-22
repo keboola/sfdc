@@ -141,6 +141,18 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 		$router->addRoute('accounts', $route);
 
 		$route = new Zend_Controller_Router_Route_Static(
+			'configs',
+			array('controller' => 'index', 'action' => 'accounts')
+		);
+		$router->addRoute('configs', $route);
+
+		$route = new Zend_Controller_Router_Route(
+			'configs/:id',
+			array('controller' => 'index', 'action' => 'accounts')
+		);
+		$router->addRoute('configs-wid', $route);
+
+		$route = new Zend_Controller_Router_Route_Static(
 			'oauth',
 			array('controller' => 'index', 'action' => 'oauth')
 		);

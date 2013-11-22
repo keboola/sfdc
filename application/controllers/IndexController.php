@@ -156,6 +156,38 @@ class IndexController extends Zend_Controller_Action
 			$this->_helper->json($account);
 		}
 
+		if ($this->getRequest()->getMethod() == "DELETE") {
+			$accountId = $this->getRequest()->getUserParam("id");
+			$present = false;
+			foreach($bucket["tables"] as $table) {
+				if($table["name"] == $accountId) {
+					$present = true;
+					$tableId = $table["id"];
+				}
+			}
+			if (!$present) {
+				$this->getResponse()->setHttpResponseCode(404);
+				return;
+			}
+
+			// Drop configuration table
+			$this->storageApi->dropTable($tableId);
+
+			// Drop data buckets and tables
+			if ($this->getRequest()->getParam("purge") == 1) {
+				$bucketId = "in.c-" . $accountId;
+				if ($this->storageApi->bucketExists($bucketId)) {
+					$bucket = $this->storageApi->getBucket($bucketId);
+					foreach($bucket["tables"] as $table) {
+						$this->storageApi->dropTable($table["id"]);
+					}
+					$this->storageApi->dropBucket($bucketId);
+				}
+			}
+			$this->getResponse()->setHttpResponseCode(204);
+			return;
+		}
+
 
 	}
 
@@ -224,10 +256,17 @@ class IndexController extends Zend_Controller_Action
 		$sfdcConfig = \Keboola\StorageApi\Config\Reader::read($config->storageApi->configBucket);
 		$passed = false;
 
+		$accountId = "";
+		if (isset($jsonParams["account"])) {
+			$accountId = $jsonParams["account"];
+		}
+		if (isset($jsonParams["config"])) {
+			$accountId = $jsonParams["config"];
+		}
 
 
 		foreach($sfdcConfig["items"] as $configName => $configInstance) {
-			if (count($jsonParams) && $jsonParams["account"] != $configName) {
+			if ($accountId && $accountId != $configName) {
 				continue;
 			}
 
@@ -313,7 +352,7 @@ class IndexController extends Zend_Controller_Action
 		}
 
 		if (!$passed) {
-			throw new \Keboola\Exception("Account {$jsonParams["account"]} not found", null, null, "ACCOUNT");
+			throw new \Keboola\Exception("Account {$accountId} not found", null, null, "ACCOUNT");
 		}
 
 		$duration = \NDebugger::timer("import");
@@ -392,6 +431,11 @@ class IndexController extends Zend_Controller_Action
 		if (isset($jsonParams["account"])) {
 			$session->account = $jsonParams["account"];
 		}
+		if (isset($jsonParams["config"])) {
+			$session->account = $jsonParams["config"];
+		}
+
+
 		if (isset($jsonParams["loginUri"])) {
 			$session->loginUri = $jsonParams["loginUri"];
 		} else {
@@ -430,6 +474,10 @@ class IndexController extends Zend_Controller_Action
 		if ($this->getRequest()->getParam("account")) {
 			$session->account = $this->getRequest()->getParam("account");
 		}
+		if ($this->getRequest()->getParam("config")) {
+			$session->account = $this->getRequest()->getParam("config");
+		}
+
 		if ($this->getRequest()->getParam("referrer")) {
 			$session->referrer = $this->getRequest()->getParam("referrer");
 		}
@@ -506,6 +554,7 @@ class IndexController extends Zend_Controller_Action
 		}
 		if (isset($session->account)) {
 			$tableName = $session->account;
+
 
 		} else {
 			$tableName = "SFDC01";
