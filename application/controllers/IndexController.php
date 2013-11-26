@@ -22,7 +22,7 @@ class IndexController extends Zend_Controller_Action
 		$errorHandler = $this->getFrontController()->getPlugin('Zend_Controller_Plugin_ErrorHandler');
 		$errorHandler->setErrorHandlerAction('json-error');
 
-		$this->getResponse()->setHeader('Access-Control-Allow-Origin', '*');
+		$this->getResponse()->setHeader('Access-Control-Allow-Origin', '*', true);
 		set_time_limit(60 * 120);
 
 		// CORS
@@ -357,7 +357,9 @@ class IndexController extends Zend_Controller_Action
 
 		$duration = \NDebugger::timer("import");
 		$response = array("status" => "ok", "duration" => $duration);
+		$this->getResponse()->setHttpResponseCode(200);
 		$this->_helper->json($response);
+		return;
 	}
 
 	/**
@@ -400,8 +402,9 @@ class IndexController extends Zend_Controller_Action
 				$response["forceRun"] = true;
 			}
 		}
-
+		$this->getResponse()->setHttpResponseCode(200);
 		$this->_helper->json($response);
+		return;
 	}
 
 	public function checkRunAction()

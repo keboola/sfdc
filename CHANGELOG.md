@@ -1,3 +1,7 @@
+## 1.0.0
+
+* [Bugfix] overwriting 'Access-Control-Allow-Origin' header instead of appending
+
 ## 2013-11-22
 
 * [Feature] Added DELETE method for /configs
