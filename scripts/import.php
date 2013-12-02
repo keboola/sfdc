@@ -86,7 +86,7 @@ if (!$opts->getOption('token')) {
 				$sfdc->dropAll();
 			}
 
-			$sfdc->importAll();
+			$sfdc->import();
 
 			$duration = NDebugger::timer('account');
 			$log->log("SalesForce Cron Import for user {$connectionConfig->id} ({$opts->getOption('token')})", Zend_Log::INFO, array(

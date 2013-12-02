@@ -40,12 +40,18 @@ class App_SalesForceImport
 
 
 	/**
-	 * imports all tables
+	 * imports all queries or selected
+	 *
 	 * @return void
 	 */
-	public function importAll()
+	public function import($queryNumber=false)
 	{
+		$i = 0;
 		foreach($this->_soqlConfig as $objectConfig) {
+			$i++;
+			if ($queryNumber && $queryNumber != $i) {
+				continue;
+			}
 			if (!$objectConfig->storageApiTable) {
 				$matches = array();
 				preg_match('/FROM (\w*)/', $objectConfig->query, $matches);

@@ -263,7 +263,10 @@ class IndexController extends Zend_Controller_Action
 		if (isset($jsonParams["config"])) {
 			$accountId = $jsonParams["config"];
 		}
-
+		$queryNumber = false;
+		if (isset($jsonParams["query"])) {
+			$queryNumber = $jsonParams["query"];
+		}
 
 		foreach($sfdcConfig["items"] as $configName => $configInstance) {
 			if ($accountId && $accountId != $configName) {
@@ -325,7 +328,7 @@ class IndexController extends Zend_Controller_Action
 
 				$sfdc->tmpDir = $tmpDir;
 
-				$sfdc->importAll();
+				$sfdc->import($queryNumber);
 
 				$duration = NDebugger::timer('account');
 				$log->log("SFDC Import {$configName}", Zend_Log::INFO, array(
