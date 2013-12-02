@@ -179,10 +179,11 @@ class App_SalesForceImport
 
 		// First batch
 		$response = $this->_query($query);
+		$fileName = $this->tmpDir . $outputTable . ".csv";
+		$file = new \Keboola\Csv\CsvFile($fileName);
+
 		if (count($response["records"]) > 0) {
 			// Check output file
-			$fileName = $this->tmpDir . $outputTable . ".csv";
-			$file = new \Keboola\Csv\CsvFile($fileName);
 
 			$headers = $this->_getHeaders($response);
 			$this->_writeCsv($file, array($headers));
@@ -218,6 +219,31 @@ class App_SalesForceImport
 							array("transaction" => $this->_snapshotNumber, "incremental" => $incrementalLoad)
 					);
 				}
+			}
+		} else {
+			// If table in Storage API does not exist, create a new one, with make-up columns
+			if (!$tableId) {
+				$matches = array();
+				preg_match("/^SELECT (.*?) FROM/", $query, $matches);
+				$columns = explode(",", $matches[1]);
+				$headers = array();
+				foreach($columns as $columnName) {
+					$columnName = trim($columnName);
+					// Replace dots
+					$columnName = str_replace(".", "_", $columnName);
+					// Remove function
+					if (strpos($columnName, "(")) {
+						$columnName = substr($columnName, strpos($columnName, "("), -1);
+					}
+					$headers[] = $columnName;
+				}
+				$file->writeRow($headers);
+				$this->sApi->createTableAsync(
+						$this->storageApiBucket,
+						$outputTable,
+						$file,
+						array("primaryKey" => "Id", "transactional" => $snapshots));
+
 			}
 		}
 
