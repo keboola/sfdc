@@ -46,12 +46,20 @@ class App_SalesForceImport
 	 */
 	public function import($queryNumber=false)
 	{
+		$this->log("Starting extraction");
+
 		$i = 0;
 		foreach($this->_soqlConfig as $objectConfig) {
 			$i++;
 			if ($queryNumber && $queryNumber != $i) {
 				continue;
 			}
+
+			$logDataQuery = array(
+				"query" => $objectConfig->query
+			);
+			$this->log("Processing query {$queryNumber}", $logDataQuery, \Keboola\StorageApi\Event::TYPE_INFO);
+
 			if (!$objectConfig->storageApiTable) {
 				$matches = array();
 				preg_match('/FROM (\w*)/', $objectConfig->query, $matches);
@@ -84,7 +92,9 @@ class App_SalesForceImport
 					throw $newE;
 				}
 			}
+			$this->log("Query {$queryNumber} extracted", $logDataQuery, \Keboola\StorageApi\Event::TYPE_SUCCESS);
 		}
+		$this->log("Extraction finished", array(), \Keboola\StorageApi\Event::TYPE_SUCCESS);
 	}
 
 	/**
@@ -553,5 +563,22 @@ class App_SalesForceImport
 		$this->instanceUrl = $response['instance_url'];
 
 		return $response;
+	}
+
+	/**
+	 * @param $message
+	 * @param array $data
+	 * @param string $level
+	 */
+	public function log($message, $data=array(), $level=\Keboola\StorageApi\Event::TYPE_INFO)
+	{
+		$event = new \Keboola\StorageApi\Event();
+		$event->setComponent("ex-sfdc");
+		$event->setRunId($this->sApi->getRunId());
+		$event->setMessage($message);
+		$event->setParams($data);
+		$event->setConfigurationId($this->_configName);
+		$event->setType($level);
+		$this->sApi->createEvent($event);
 	}
 }

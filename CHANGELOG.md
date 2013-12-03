@@ -1,3 +1,10 @@
+## 1.1.0
+
+* [Improvement] 'query' option in /run request to run a specific query only.
+* [Improvement] Log runId in all events.
+* [Improvement] Added logging to StorageApi Evennts
+* [Improvement] If a query returns no results, create an empty table.
+
 ## 1.0.0
 
 * [Bugfix] overwriting 'Access-Control-Allow-Origin' header instead of appending

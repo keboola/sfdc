@@ -167,6 +167,24 @@ class ErrorController extends Zend_Controller_Action
 		}
 
 		$this->getLog()->log($logMessage, $logPriority, $logData);
+		$event = new \Keboola\StorageApi\Event();
+		$event->setComponent("ex-sfdc");
+		if (isset($registry->storageApi)) {
+			$event->setRunId($registry->storageApi->getRunId());
+		}
+		$event->setMessage($logMessage);
+		$event->setType(\Keboola\StorageApi\Event::TYPE_ERROR);
+		$eventLogData = array(
+			"exception" => $logData["exception"],
+			"exceptionId" => $logData["exceptionId"],
+		);
+		$event->setParams($eventLogData);
+		if (isset($registry->storageApi)) {
+			$registry->storageApi->createEvent($event);
+		}
+
+
+
 		return $logData["exceptionId"];
 	}
 
