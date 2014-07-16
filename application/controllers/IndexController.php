@@ -85,12 +85,16 @@ class IndexController extends Zend_Controller_Action
 	{
 		$this->initStorageApi();
 		$config = Zend_Registry::get("config");
-		$bucket = $this->storageApi->getBucket($config->storageApi->configBucket);
-
-		$accounts = array();
 		\Keboola\StorageApi\Config\Reader::$client = $this->storageApi;
+		$accounts = array();
 
 		if ($this->getRequest()->getMethod() == "GET") {
+			if(!$this->storageApi->bucketExists($config->storageApi->configBucket)) {
+				$this->_helper->json($accounts);
+				return;
+			}
+
+			$bucket = $this->storageApi->getBucket($config->storageApi->configBucket);
 			if(!$bucket["tables"] || count($bucket["tables"]) == 0) {
 				$this->_helper->json($accounts);
 				return;
@@ -115,6 +119,13 @@ class IndexController extends Zend_Controller_Action
 		}
 
 		if ($this->getRequest()->getMethod() == "POST") {
+
+			if(!$this->storageApi->bucketExists($config->storageApi->configBucket)) {
+				$this->storageApi->createBucket(explode("-", $config->storageApi->configBucket)[1], "sys", "Salesforce Extractor Configuration");
+			}
+
+			$bucket = $this->storageApi->getBucket($config->storageApi->configBucket);
+
 			$body = $this->getRequest()->getRawBody();
 			$jsonParams = array();
 			if (strlen($body)) {
@@ -157,6 +168,7 @@ class IndexController extends Zend_Controller_Action
 		}
 
 		if ($this->getRequest()->getMethod() == "DELETE") {
+			$bucket = $this->storageApi->getBucket($config->storageApi->configBucket);
 			$accountId = $this->getRequest()->getUserParam("id");
 			$present = false;
 			foreach($bucket["tables"] as $table) {
