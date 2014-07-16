@@ -121,7 +121,8 @@ class IndexController extends Zend_Controller_Action
 		if ($this->getRequest()->getMethod() == "POST") {
 
 			if(!$this->storageApi->bucketExists($config->storageApi->configBucket)) {
-				$this->storageApi->createBucket(explode("-", $config->storageApi->configBucket)[1], "sys", "Salesforce Extractor Configuration");
+				$parts = explode("-", $config->storageApi->configBucket);
+				$this->storageApi->createBucket($parts[1], "sys", "Salesforce Extractor Configuration");
 			}
 
 			$bucket = $this->storageApi->getBucket($config->storageApi->configBucket);
