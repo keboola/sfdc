@@ -383,7 +383,7 @@ class App_SalesForceImport
 		NDebugger::timer("query");
 
 		if (!$queryUrl) {
-			$url = "{$this->instanceUrl}/services/data/v24.0/query?q=" . urlencode($query);
+			$url = "{$this->instanceUrl}/services/data/v31.0/query?q=" . urlencode($query);
 		} else {
 			$url = $this->instanceUrl . $queryUrl;
 		}
@@ -506,7 +506,7 @@ class App_SalesForceImport
 	 * @return string
 	 */
 	public function describe($object) {
-		return $this->_request("/services/data/v23.0/sobjects/{$object}/describe");
+		return $this->_request("/services/data/v31.0/sobjects/{$object}/describe");
 	}
 
 	/**
@@ -515,7 +515,7 @@ class App_SalesForceImport
 	 * @return string
 	 */
 	public function listObjects() {
-		return $this->_request("/services/data/v23.0/sobjects/");
+		return $this->_request("/services/data/v31.0/sobjects/");
 	}
 
 	/**
